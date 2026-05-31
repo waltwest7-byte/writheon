@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WRITHEON — Narrative Development Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Bebas+Neue&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --black: #080808;
+    --deep: #0d0d0d;
+    --surface: #111111;
+    --border: #1e1e1e;
+    --border-light: #2a2a2a;
+    --text: #e8e4dc;
+    --text-dim: #7a7570;
+    --text-mid: #b0aa9f;
+    --gold: #c9a84c;
+    --gold-dim: #8a6f2e;
+    --gold-glow: rgba(201, 168, 76, 0.12);
+    --red: #c0392b;
+    --white: #f5f1eb;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease, background 0.2s ease;
+    mix-blend-mode: normal;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(201, 168, 76, 0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease, width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+  }
+  body:hover .cursor { opacity: 1; }
+
+  /* GRAIN OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.025;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 48px;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.4s ease, background 0.4s ease;
+  }
+  nav.scrolled {
+    border-color: var(--border);
+    background: rgba(8,8,8,0.92);
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.18em;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .nav-logo span {
+    color: var(--gold);
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s ease;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    color: var(--black) !important;
+    background: var(--gold);
+    padding: 10px 20px;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: background 0.2s ease, color 0.2s ease !important;
+  }
+  .nav-cta:hover { background: var(--white) !important; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 48px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Vertical lines background */
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent calc(100% / 12 - 1px),
+        rgba(255,255,255,0.018) calc(100% / 12 - 1px),
+        rgba(255,255,255,0.018) calc(100% / 12)
+      );
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    max-width: 1200px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.2s forwards;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    display: block;
+  }
+
+  .hero-headline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(72px, 10vw, 148px);
+    line-height: 0.92;
+    letter-spacing: 0.02em;
+    color: var(--white);
+    margin-bottom: 0;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.35s forwards;
+  }
+  .hero-headline em {
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    color: var(--gold);
+    font-size: 0.78em;
+    display: block;
+    margin-left: 4px;
+  }
+
+  .hero-sub {
+    margin-top: 48px;
+    max-width: 560px;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.5s forwards;
+  }
+  .hero-sub p {
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--text-mid);
+    font-style: italic;
+  }
+  .hero-sub p strong {
+    color: var(--text);
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .hero-actions {
+    margin-top: 56px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.65s forwards;
+  }
+
+  .btn-primary {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--black);
+    background: var(--gold);
+    padding: 16px 36px;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s ease, transform 0.2s ease;
+    position: relative;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--gold-dim);
+    transition: transform 0.2s ease;
+  }
+  .btn-primary:hover {
+    background: var(--white);
+    transform: translate(-2px, -2px);
+  }
+  .btn-primary:hover::after {
+    transform: translate(2px, 2px);
+  }
+
+  .btn-ghost {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: color 0.2s ease;
+  }
+  .btn-ghost:hover { color: var(--text); }
+  .btn-ghost::after {
+    content: '→';
+    transition: transform 0.2s ease;
+  }
+  .btn-ghost:hover::after { transform: translateX(4px); }
+
+  .hero-scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 48px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    animation: fadeIn 1s ease 1.2s forwards;
+  }
+  .scroll-line {
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: scrollPulse 2s ease infinite;
+  }
+  .scroll-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+
+  /* MANIFESTO STRIP */
+  .manifesto-strip {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 0;
+    overflow: hidden;
+    background: var(--deep);
+  }
+  .strip-track {
+    display: flex;
+    gap: 0;
+    animation: marquee 28s linear infinite;
+    white-space: nowrap;
+  }
+  .strip-item {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.16em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+  .strip-item::after {
+    content: '◆';
+    font-size: 6px;
+    color: var(--gold);
+  }
+
+  /* PROBLEM SECTION */
+  .section-problem {
+    padding: 140px 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 64px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .section-label::before {
+    content: attr(data-num);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .problem-left {
+    padding-right: 80px;
+    border-right: 1px solid var(--border);
+  }
+  .problem-right {
+    padding-left: 80px;
+  }
+
+  .problem-headline {
+    font-size: clamp(42px, 5vw, 72px);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--white);
+    margin-bottom: 40px;
+  }
+  .problem-headline em {
+    font-style: italic;
+    color: var(--text-mid);
+  }
+
+  .problem-body {
+    font-size: 19px;
+    font-weight: 300;
+    line-height: 1.75;
+    color: var(--text-mid);
+    font-style: italic;
+  }
+  .problem-body strong {
+    color: var(--text);
+    font-style: normal;
+    font-weight: 400;
+  }
+
+  .problem-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .problem-list li {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    color: var(--text-mid);
+    padding: 18px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: color 0.2s ease;
+  }
+  .problem-list li:hover { color: var(--text); }
+  .problem-list li::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    background: var(--gold);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* PRODUCT SECTION */
+  .section-product {
+    padding: 140px 48px;
+    background: var(--deep);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .section-product::before {
+    content: 'SDE';
+    position: absolute;
+    right: -40px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 280px;
+    color: rgba(255,255,255,0.018);
+    letter-spacing: 0.05em;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .product-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+  }
+
+  .product-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    margin-bottom: 100px;
+    align-items: end;
+  }
+
+  .product-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 4vw, 56px);
+    line-height: 1.05;
+    letter-spacing: 0.04em;
+    color: var(--white);
+  }
+  .product-title span {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: 0.52em;
+    color: var(--gold);
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .product-tagline {
+    font-size: 26px;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--text-mid);
+    border-left: 1px solid var(--gold);
+    padding-left: 32px;
+  }
+
+  .engine-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+  }
+
+  .engine-card {
+    background: var(--surface);
+    padding: 40px 32px;
+    position: relative;
+    transition: background 0.3s ease;
+    overflow: hidden;
+  }
+  .engine-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+  .engine-card:hover { background: #151515; }
+  .engine-card:hover::before { transform: scaleX(1); }
+
+  .card-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    color: var(--gold-dim);
+    margin-bottom: 24px;
+  }
+  .card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.06em;
+    color: var(--white);
+    margin-bottom: 16px;
+    line-height: 1.1;
+  }
+  .card-desc {
+    font-size: 15px;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--text-dim);
+  }
+  .card-badge {
+    margin-top: 24px;
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    padding: 4px 10px;
+  }
+
+  /* COVERAGE ENGINE FEATURE */
+  .section-coverage {
+    padding: 140px 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .coverage-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 100px;
+    align-items: start;
+  }
+
+  .coverage-info h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 5vw, 68px);
+    letter-spacing: 0.04em;
+    line-height: 1.0;
+    color: var(--white);
+    margin-bottom: 32px;
+  }
+  .coverage-info h2 em {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: 0.5em;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+
+  .coverage-info p {
+    font-size: 19px;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.75;
+    color: var(--text-mid);
+    margin-bottom: 48px;
+  }
+
+  .coverage-modes {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .mode-item {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: padding-left 0.2s ease;
+  }
+  .mode-item:hover { padding-left: 8px; }
+  .mode-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    color: var(--text-mid);
+    text-transform: uppercase;
+    transition: color 0.2s ease;
+  }
+  .mode-item:hover .mode-name { color: var(--text); }
+  .mode-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    border: 1px solid var(--border-light);
+    padding: 3px 8px;
+  }
+  .mode-tag.free { color: var(--text-dim); border-color: var(--border); }
+
+  /* MOCK INTERFACE */
+  .coverage-mock {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    position: relative;
+  }
+  .mock-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .mock-dots {
+    display: flex;
+    gap: 6px;
+  }
+  .mock-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border-light);
+  }
+  .mock-title-bar {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.14em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .mock-body {
+    padding: 32px 24px;
+  }
+  .mock-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .mock-score-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .mock-score {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+  .score-consider { color: #e8a030; }
+  .score-pass { color: #4caf7d; }
+  .score-fail { color: var(--red); }
+  .mock-score-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    line-height: 1.6;
+  }
+
+  .mock-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .bar-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .bar-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+  }
+  .bar-track {
+    height: 3px;
+    background: var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: var(--gold);
+    position: absolute;
+    left: 0;
+    top: 0;
+    animation: barGrow 1.2s ease forwards;
+    animation-delay: var(--delay, 0s);
+    width: 0;
+  }
+  .bar-fill.low { background: var(--red); }
+  .bar-fill.mid { background: #e8a030; }
+
+  .mock-note {
+    font-size: 14px;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--text-dim);
+    line-height: 1.65;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .mock-note strong {
+    color: var(--text-mid);
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .mock-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .mock-voice {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.14em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+  }
+  .mock-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    color: var(--black);
+    background: var(--gold);
+    padding: 8px 16px;
+    text-transform: uppercase;
+    border: none;
+    cursor: none;
+  }
+
+  /* PHILOSOPHY */
+  .section-philosophy {
+    padding: 140px 48px;
+    background: var(--deep);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .philosophy-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 120px;
+    align-items: center;
+  }
+  .philosophy-quote {
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.3;
+    color: var(--white);
+    position: relative;
+    padding-left: 40px;
+  }
+  .philosophy-quote::before {
+    content: '"';
+    position: absolute;
+    left: -10px;
+    top: -20px;
+    font-size: 120px;
+    color: var(--gold);
+    opacity: 0.15;
+    font-family: 'Cormorant Garamond', serif;
+    line-height: 1;
+  }
+  .philosophy-quote cite {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.16em;
+    color: var(--gold);
+    font-style: normal;
+    text-transform: uppercase;
+    margin-top: 32px;
+  }
+
+  .philosophy-pillars {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .pillar {
+    padding: 28px 0;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  .pillar-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    color: var(--gold-dim);
+    padding-top: 4px;
+  }
+  .pillar-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    color: var(--text-mid);
+    text-transform: uppercase;
+    line-height: 1.7;
+    transition: color 0.2s ease;
+  }
+  .pillar:hover .pillar-text { color: var(--text); }
+
+  /* PRICING */
+  .section-pricing {
+    padding: 140px 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .pricing-header {
+    text-align: center;
+    margin-bottom: 80px;
+  }
+  .pricing-header h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 5vw, 68px);
+    letter-spacing: 0.04em;
+    color: var(--white);
+    margin-bottom: 16px;
+  }
+  .pricing-header p {
+    font-size: 18px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--text-dim);
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .pricing-card {
+    background: var(--surface);
+    padding: 56px 48px;
+    position: relative;
+  }
+  .pricing-card.featured {
+    background: #131313;
+  }
+  .pricing-card.featured::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gold);
+  }
+
+  .pricing-tier {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .pricing-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 56px;
+    letter-spacing: 0.02em;
+    color: var(--white);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .pricing-price span {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+  }
+  .pricing-note {
+    font-size: 15px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--text-dim);
+    margin-bottom: 40px;
+  }
+  .pricing-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 48px;
+  }
+  .pricing-features li {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    color: var(--text-mid);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .pricing-features li::before {
+    content: '—';
+    color: var(--gold);
+    font-size: 10px;
+  }
+
+  .btn-tier {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    display: inline-block;
+    padding: 14px 28px;
+    transition: all 0.2s ease;
+  }
+  .btn-tier-free {
+    color: var(--text-dim);
+    border: 1px solid var(--border-light);
+  }
+  .btn-tier-free:hover {
+    color: var(--text);
+    border-color: var(--text-dim);
+  }
+  .btn-tier-pro {
+    color: var(--black);
+    background: var(--gold);
+  }
+  .btn-tier-pro:hover { background: var(--white); }
+
+  /* CTA FINAL */
+  .section-cta {
+    padding: 160px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-top: 1px solid var(--border);
+  }
+  .section-cta::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(ellipse, rgba(201,168,76,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  .cta-headline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 8vw, 120px);
+    letter-spacing: 0.03em;
+    line-height: 0.95;
+    color: var(--white);
+    margin-bottom: 16px;
+  }
+  .cta-sub {
+    font-size: 20px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--text-dim);
+    margin-bottom: 56px;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 48px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 0.18em;
+    color: var(--text-dim);
+  }
+  .footer-logo span { color: var(--gold); }
+  .footer-copy {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.14em;
+    color: var(--text-dim);
+    text-align: center;
+  }
+  .footer-links {
+    display: flex;
+    gap: 32px;
+  }
+  .footer-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.14em;
+    color: var(--text-dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s ease;
+  }
+  .footer-links a:hover { color: var(--text); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+  @keyframes barGrow {
+    from { width: 0; }
+    to { width: var(--width); }
+  }
+
+  /* REVEAL ON SCROLL */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">WRITH<span>E</span>ON</a>
+  <ul class="nav-links">
+    <li><a href="#product">The Engine</a></li>
+    <li><a href="/coverage">Coverage</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="https://writheon.gumroad.com" target="_blank">Resources</a></li>
+    <li><a href="/coverage" class="nav-cta">Run Free Coverage</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">For Writers. Narrative Development Intelligence.</div>
+    <h1 class="hero-headline">
+      Diagnose<br>
+      <em>before you rewrite.</em>
+    </h1>
+    <div class="hero-sub">
+      <p>Most writers are not lazy. They are <strong>overwhelmed.</strong> Writheon gives you the clarity professionals use — without the gatekeeping.</p>
+      <p style="margin-top: 16px; font-size: 15px; font-style: normal; font-family: 'DM Mono', monospace; font-weight: 300; letter-spacing: 0.08em; color: var(--text-dim);">Screenplay Development Engine™ &nbsp;→&nbsp; Coverage Engine™ &nbsp;→&nbsp; Now Live</p>
+    </div>
+    <div class="hero-actions">
+      <a href="/coverage" class="btn-primary">Run Free Coverage</a>
+      <a href="#product" class="btn-ghost">See the Engine</a>
+    </div>
+  </div>
+  <div class="hero-scroll-indicator">
+    <div class="scroll-line"></div>
+    <span class="scroll-text">Scroll</span>
+  </div>
+</section>
+
+<!-- MARQUEE STRIP -->
+<div class="manifesto-strip">
+  <div class="strip-track">
+    <div class="strip-item">Screenplay Development Engine™</div>
+    <div class="strip-item">Coverage Engine™ — First System</div>
+    <div class="strip-item">Diagnose Before You Rewrite</div>
+    <div class="strip-item">Diagnosis Before Rewrite</div>
+    <div class="strip-item">6 Coverage Voice Modes</div>
+    <div class="strip-item">Professional Development Intelligence</div>
+    
+    <div class="strip-item">Screenplay Development Engine™</div>
+    <div class="strip-item">Coverage Engine™ — First System</div>
+    <div class="strip-item">Diagnose Before You Rewrite</div>
+    <div class="strip-item">Diagnosis Before Rewrite</div>
+    <div class="strip-item">6 Coverage Voice Modes</div>
+    <div class="strip-item">Professional Development Intelligence</div>
+    
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section class="section-problem">
+  <div class="section-label" data-num="01">The Problem</div>
+  <div class="problem-grid">
+    <div class="problem-left reveal">
+      <h2 class="problem-headline">Most notes are vague.<br><em>Most feedback is reactive.</em></h2>
+      <p class="problem-body">Most development systems explain theory without helping you <strong>apply it.</strong> You are handed a red pen and a vague sense of what's wrong. You are not told why structure is breaking. You are not shown where pressure is absent.</p>
+    </div>
+    <div class="problem-right reveal reveal-delay-2">
+      <ul class="problem-list">
+        <li>Rewrite exhaustion from unclear direction</li>
+        <li>Structural confusion with no framework</li>
+        <li>Emotional attachment to scenes that aren't working</li>
+        <li>Isolation — no professional feedback loop</li>
+        <li>Idea overload with no prioritization system</li>
+        <li>Vague notes that don't tell you what to fix</li>
+        <li>Unfinished drafts accumulating</li>
+        <li>No way to measure pacing or pressure</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCT -->
+<section class="section-product" id="product">
+  <div class="product-inner">
+    <div class="section-label" data-num="02">The System</div>
+    <div class="product-header reveal">
+      <div class="product-title">
+        <span>Powered by the</span>
+        Screenplay<br>Development<br>Engine™
+      </div>
+      <p class="product-tagline">A story is not just written. It is engineered through development. Writheon gives you the system to do that.<br><br><span style="font-size: 0.7em; font-family: 'DM Mono', monospace; font-weight: 300; font-style: normal; letter-spacing: 0.1em; color: var(--text-dim);">WRITHEON → SDE™ → Coverage Engine™ (Live) → Draft Comparison → Scene Pressure Meter → Character Lab</span></p>
+    </div>
+    <div class="engine-cards">
+      <div class="engine-card reveal">
+        <div class="card-num">CE — 01</div>
+        <div class="card-title">Coverage Engine™</div>
+        <p class="card-desc">Professional script coverage in six industry voices. From first 10 pages to full coverage reports. The first system inside the Screenplay Development Engine™.</p>
+        <span class="card-badge">Live Now</span>
+      </div>
+      <div class="engine-card reveal reveal-delay-1">
+        <div class="card-num">CE — 02</div>
+        <div class="card-title">Draft Comparison</div>
+        <p class="card-desc">Paste Draft A and Draft B. Get a precise delta report showing what improved, regressed, or shifted.</p>
+        <span class="card-badge">Phase 2</span>
+      </div>
+      <div class="engine-card reveal reveal-delay-2">
+        <div class="card-num">CE — 03</div>
+        <div class="card-title">Scene Pressure Meter</div>
+        <p class="card-desc">Visual tension and escalation indicators. See exactly where your script loses momentum.</p>
+        <span class="card-badge">Phase 2</span>
+      </div>
+      <div class="engine-card reveal reveal-delay-3">
+        <div class="card-num">CE — 04</div>
+        <div class="card-title">Character Lab</div>
+        <p class="card-desc">Deep character pressure diagnostics. Track motivation, conflict, and arc integrity across your script.</p>
+        <span class="card-badge">Coming</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COVERAGE ENGINE -->
+<section class="section-coverage" id="coverage">
+  <div class="section-label" data-num="03">First System</div>
+  <div class="coverage-layout">
+    <div class="coverage-info reveal">
+      <h2>
+        <em>Writheon</em>
+        Coverage<br>Engine™
+      </h2>
+      <p>The first system inside the Writheon Screenplay Development Engine™. Six industry coverage voices. Four diagnostic modes. Built for writers serious about development.</p>
+
+      <div class="coverage-modes">
+        <div class="mode-item">
+          <span class="mode-name">First 10 Pages</span>
+          <span class="mode-tag free">Always Free</span>
+        </div>
+        <div class="mode-item">
+          <span class="mode-name">Concept Test</span>
+          <span class="mode-tag free">Free (3x)</span>
+        </div>
+        <div class="mode-item">
+          <span class="mode-name">Scene Diagnostic</span>
+          <span class="mode-tag free">Free (3x)</span>
+        </div>
+        <div class="mode-item">
+          <span class="mode-name">Full Coverage Report</span>
+          <span class="mode-tag">Pro</span>
+        </div>
+        <div class="mode-item">
+          <span class="mode-name">PDF Export</span>
+          <span class="mode-tag">Pro</span>
+        </div>
+        <div class="mode-item">
+          <span class="mode-name">All 6 Voice Modes</span>
+          <span class="mode-tag">Pro</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOCK UI -->
+    <div class="coverage-mock reveal reveal-delay-2">
+      <div class="mock-header">
+        <div class="mock-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <div class="mock-title-bar">Coverage Engine™ — Development Executive</div>
+        <div></div>
+      </div>
+      <div class="mock-body">
+        <div class="mock-label">Overall Assessment</div>
+        <div class="mock-score-row">
+          <div class="mock-score score-consider">C+</div>
+          <div class="mock-score-label">
+            CONSIDER<br>
+            <span style="color: var(--text-dim); font-size: 10px;">With Significant Notes</span>
+          </div>
+        </div>
+        <div class="mock-bars">
+          <div class="bar-row">
+            <div class="bar-label"><span>Structure</span><span>72%</span></div>
+            <div class="bar-track"><div class="bar-fill" style="--width: 72%; --delay: 0.2s;"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label"><span>Premise</span><span>84%</span></div>
+            <div class="bar-track"><div class="bar-fill" style="--width: 84%; --delay: 0.35s;"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label"><span>Pacing</span><span>43%</span></div>
+            <div class="bar-track"><div class="bar-fill low" style="--width: 43%; --delay: 0.5s;"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label"><span>Character Pressure</span><span>61%</span></div>
+            <div class="bar-track"><div class="bar-fill mid" style="--width: 61%; --delay: 0.65s;"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label"><span>Dialogue</span><span>77%</span></div>
+            <div class="bar-track"><div class="bar-fill" style="--width: 77%; --delay: 0.8s;"></div></div>
+          </div>
+        </div>
+        <div class="mock-note">
+          <strong>Priority Note:</strong> Act Two pacing collapses between pages 54–78. Protagonist lacks consequential pressure at the midpoint. The premise is strong — the architecture needs engineering.
+        </div>
+      </div>
+      <div class="mock-footer">
+        <span class="mock-voice">Voice: Dev Executive</span>
+        <button class="mock-btn">Export PDF</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHILOSOPHY -->
+<section class="section-philosophy">
+  <div class="philosophy-inner">
+    <div class="philosophy-quote reveal">
+      A story is not just written. It is engineered through development.
+      <cite>— Writheon Manifesto</cite>
+    </div>
+    <div class="philosophy-pillars reveal reveal-delay-2">
+      <div class="pillar">
+        <span class="pillar-num">01</span>
+        <span class="pillar-text">Architecture matters. Pressure matters. Escalation matters.</span>
+      </div>
+      <div class="pillar">
+        <span class="pillar-num">02</span>
+        <span class="pillar-text">AI should assist development, not replace imagination.</span>
+      </div>
+      <div class="pillar">
+        <span class="pillar-num">03</span>
+        <span class="pillar-text">Emotional carryover matters. Scene function matters. Rewrite order matters.</span>
+      </div>
+      <div class="pillar">
+        <span class="pillar-num">04</span>
+        <span class="pillar-text">Technology should support creativity, not flatten it.</span>
+      </div>
+      <div class="pillar">
+        <span class="pillar-num">05</span>
+        <span class="pillar-text">Writers deserve better tools. This is what better looks like.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section-pricing" id="pricing">
+  <div class="pricing-header reveal">
+    <div class="section-label" data-num="04" style="justify-content: center;">Access</div>
+    <h2>Start Free.<br>Go Pro When Ready.</h2>
+    <p>No credit card. No commitment. Run your first analysis in under 60 seconds.</p>
+  </div>
+  <div class="pricing-grid reveal">
+    <div class="pricing-card">
+      <div class="pricing-tier">Free Access</div>
+      <div class="pricing-price">$0 <span>/ forever</span></div>
+      <p class="pricing-note">Start diagnosing your script today.</p>
+      <ul class="pricing-features">
+        <li>First 10 Pages — always unlimited</li>
+        <li>3 full analyses (any mode)</li>
+        <li>Concept Test & Scene Diagnostic</li>
+        <li>Development Executive voice</li>
+        <li>Analysis history on device</li>
+      </ul>
+      <a href="/coverage" class="btn-tier btn-tier-free">Start Free</a>
+    </div>
+    <div class="pricing-card featured">
+      <div class="pricing-tier">Pro Access</div>
+      <div class="pricing-price">$19–29 <span>/ month</span></div>
+      <p class="pricing-note">Unlimited development. Every voice. Every mode.</p>
+      <ul class="pricing-features">
+        <li>Unlimited analyses — all modes</li>
+        <li>All 6 Coverage Voice Modes</li>
+        <li>PDF coverage report export</li>
+        <li>Cloud history — all devices</li>
+        <li>Draft Comparison (Phase 2)</li>
+        <li>Scene Pressure Meter (Phase 2)</li>
+        <li>Priority Gumroad resource access</li>
+      </ul>
+      <a href="#" class="btn-tier btn-tier-pro">Upgrade to Pro</a>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="section-cta">
+  <div class="cta-eyebrow">Coverage Engine™ — First System Inside the SDE™</div>
+  <h2 class="cta-headline reveal">Your Script<br>Deserves Better.</h2>
+  <p class="cta-sub reveal reveal-delay-1">Stop guessing. Start diagnosing.</p>
+  <a href="/coverage" class="btn-primary reveal reveal-delay-2">Run Free Coverage →</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">WRITH<span>E</span>ON</div>
+  <div class="footer-copy">
+    © 2025 Wesvane LLC. All rights reserved.<br>
+    Screenplay Development Engine™ · Coverage Engine™
+  </div>
+  <div class="footer-links">
+    <a href="https://writheon.gumroad.com" target="_blank">Resources</a>
+    <a href="mailto:hello@writheon.com">Contact</a>
+    <a href="#">Privacy</a>
+  </div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animCursor() {
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animCursor);
+  }
+  animCursor();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '16px';
+      cursor.style.height = '16px';
+      ring.style.width = '48px';
+      ring.style.height = '48px';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '8px';
+      cursor.style.height = '8px';
+      ring.style.width = '32px';
+      ring.style.height = '32px';
+    });
+  });
+
+  // Nav scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
