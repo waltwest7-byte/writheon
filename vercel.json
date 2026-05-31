@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "routes": [
+    { "src": "/coverage", "dest": "/coverage/index.html" },
+    { "src": "/coverage/(.*)", "dest": "/coverage/$1" },
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
+}
