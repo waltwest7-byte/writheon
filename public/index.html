@@ -6,1139 +6,765 @@
 <title>WRITHEON — Narrative Development Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Bebas+Neue&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --black: #080808;
-    --deep: #0d0d0d;
-    --surface: #111111;
-    --border: #1e1e1e;
-    --border-light: #2a2a2a;
-    --text: #e8e4dc;
-    --text-dim: #7a7570;
-    --text-mid: #b0aa9f;
-    --gold: #c9a84c;
-    --gold-dim: #8a6f2e;
-    --gold-glow: rgba(201, 168, 76, 0.12);
-    --red: #c0392b;
-    --white: #f5f1eb;
-  }
+:root {
+  --black: #070707;
+  --deep: #0a0a0a;
+  --surface: #0f0f0f;
+  --surface2: #141414;
+  --surface3: #1a1a1a;
+  --border: #1c1c1c;
+  --border-light: #282828;
+  --text: #e8e3db;
+  --text-dim: #6a6560;
+  --text-mid: #a8a29a;
+  --gold: #c8a456;
+  --gold-dim: #7a6030;
+  --gold-light: #e2c07a;
+  --gold-glow: rgba(200,164,86,0.08);
+  --red: #a83228;
+  --green: #3a8a5c;
+  --amber: #c87820;
+  --white: #f2ede6;
+  --ivory: #d8d0c4;
+}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
 
-  html { scroll-behavior: smooth; }
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  overflow-x: hidden;
+  cursor: none;
+}
 
-  body {
-    background: var(--black);
-    color: var(--text);
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    overflow-x: hidden;
-    cursor: none;
-  }
+/* ── CURSOR ── */
+.cursor {
+  position: fixed; width: 6px; height: 6px;
+  background: var(--gold); border-radius: 50%;
+  pointer-events: none; z-index: 9999;
+  transform: translate(-50%,-50%);
+  transition: width .15s, height .15s, background .2s;
+}
+.cursor-ring {
+  position: fixed; width: 28px; height: 28px;
+  border: 1px solid rgba(200,164,86,.3); border-radius: 50%;
+  pointer-events: none; z-index: 9998;
+  transform: translate(-50%,-50%);
+  transition: width .25s, height .25s;
+}
 
-  /* CUSTOM CURSOR */
-  .cursor {
-    position: fixed;
-    width: 8px;
-    height: 8px;
-    background: var(--gold);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-50%, -50%);
-    transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease, background 0.2s ease;
-    mix-blend-mode: normal;
-  }
-  .cursor-ring {
-    position: fixed;
-    width: 32px;
-    height: 32px;
-    border: 1px solid rgba(201, 168, 76, 0.4);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9998;
-    transform: translate(-50%, -50%);
-    transition: transform 0.15s ease, width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
-  }
-  body:hover .cursor { opacity: 1; }
+/* ── GRAIN ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.022; pointer-events: none; z-index: 1000;
+}
 
-  /* GRAIN OVERLAY */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-    opacity: 0.025;
-    pointer-events: none;
-    z-index: 1000;
-  }
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 22px 56px;
+  transition: background .5s, border-color .5s;
+}
+nav.scrolled {
+  background: rgba(7,7,7,.94);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 21px; letter-spacing: .2em;
+  color: var(--white); text-decoration: none;
+}
+.nav-logo em { color: var(--gold); font-style: normal; }
+.nav-links {
+  display: flex; align-items: center; gap: 44px; list-style: none;
+}
+.nav-links a {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
+  letter-spacing: .14em; color: var(--text-dim); text-decoration: none;
+  text-transform: uppercase; transition: color .2s;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-cta {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 400;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--black) !important; background: var(--gold);
+  padding: 10px 22px; transition: background .2s !important;
+}
+.nav-cta:hover { background: var(--white) !important; color: var(--black) !important; }
 
-  /* NAV */
-  nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 24px 48px;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.4s ease, background 0.4s ease;
-  }
-  nav.scrolled {
-    border-color: var(--border);
-    background: rgba(8,8,8,0.92);
-    backdrop-filter: blur(12px);
-  }
-  .nav-logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    letter-spacing: 0.18em;
-    color: var(--white);
-    text-decoration: none;
-  }
-  .nav-logo span {
-    color: var(--gold);
-  }
-  .nav-links {
-    display: flex;
-    align-items: center;
-    gap: 40px;
-    list-style: none;
-  }
-  .nav-links a {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    font-weight: 300;
-    letter-spacing: 0.12em;
-    color: var(--text-dim);
-    text-decoration: none;
-    text-transform: uppercase;
-    transition: color 0.2s ease;
-  }
-  .nav-links a:hover { color: var(--text); }
-  .nav-cta {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    font-weight: 400;
-    letter-spacing: 0.12em;
-    color: var(--black) !important;
-    background: var(--gold);
-    padding: 10px 20px;
-    text-decoration: none;
-    text-transform: uppercase;
-    transition: background 0.2s ease, color 0.2s ease !important;
-  }
-  .nav-cta:hover { background: var(--white) !important; }
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 0 56px;
+  position: relative; overflow: hidden;
+}
+.hero-grid-lines {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    repeating-linear-gradient(90deg,
+      transparent, transparent calc(100%/12 - 1px),
+      rgba(255,255,255,.016) calc(100%/12 - 1px),
+      rgba(255,255,255,.016) calc(100%/12));
+}
+.hero-radial {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 900px; height: 900px;
+  background: radial-gradient(ellipse, rgba(200,164,86,.04) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero-inner { max-width: 1200px; position: relative; z-index: 2; }
+.hero-eyebrow {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
+  letter-spacing: .28em; color: var(--gold); text-transform: uppercase;
+  margin-bottom: 40px; display: flex; align-items: center; gap: 20px;
+  opacity: 0; animation: fadeUp .8s ease .1s forwards;
+}
+.hero-eyebrow::before { content: ''; width: 48px; height: 1px; background: var(--gold); }
+.hero-headline {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(80px, 11vw, 164px);
+  line-height: .9; letter-spacing: .02em;
+  color: var(--white);
+  opacity: 0; animation: fadeUp .9s ease .25s forwards;
+}
+.hero-headline em {
+  font-style: italic;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300; color: var(--gold);
+  font-size: .74em; display: block;
+  margin-left: 6px; letter-spacing: .04em;
+}
+.hero-sub {
+  margin-top: 52px; max-width: 580px;
+  opacity: 0; animation: fadeUp .9s ease .4s forwards;
+}
+.hero-sub p {
+  font-size: 23px; font-weight: 300; line-height: 1.65;
+  color: var(--text-mid); font-style: italic;
+}
+.hero-sub p strong { color: var(--text); font-weight: 400; font-style: normal; }
+.hero-actions {
+  margin-top: 60px; display: flex; align-items: center; gap: 36px;
+  opacity: 0; animation: fadeUp .9s ease .55s forwards;
+}
+.btn-primary {
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 400;
+  letter-spacing: .16em; text-transform: uppercase;
+  color: var(--black); background: var(--gold);
+  padding: 16px 40px; text-decoration: none; display: inline-block;
+  position: relative; transition: background .2s, transform .2s;
+}
+.btn-primary::after {
+  content: ''; position: absolute;
+  bottom: -4px; right: -4px; width: 100%; height: 100%;
+  border: 1px solid var(--gold-dim); transition: transform .2s;
+}
+.btn-primary:hover { background: var(--white); transform: translate(-2px,-2px); }
+.btn-primary:hover::after { transform: translate(2px,2px); }
+.btn-ghost {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--text-dim); text-decoration: none;
+  display: flex; align-items: center; gap: 10px; transition: color .2s;
+}
+.btn-ghost:hover { color: var(--text); }
+.btn-ghost::after { content: '→'; transition: transform .2s; }
+.btn-ghost:hover::after { transform: translateX(4px); }
+.hero-stat-row {
+  position: absolute; bottom: 48px; left: 56px; right: 56px;
+  display: flex; align-items: center; gap: 0;
+  border-top: 1px solid var(--border);
+  padding-top: 24px; z-index: 2;
+  opacity: 0; animation: fadeIn 1s ease 1s forwards;
+}
+.hero-stat {
+  flex: 1; padding: 0 40px 0 0;
+  border-right: 1px solid var(--border);
+}
+.hero-stat:first-child { padding-left: 0; }
+.hero-stat:last-child { border-right: none; }
+.stat-val {
+  font-family: 'Bebas Neue', sans-serif; font-size: 28px;
+  letter-spacing: .06em; color: var(--white); margin-bottom: 4px;
+}
+.stat-val em { color: var(--gold); font-style: normal; }
+.stat-label {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 300;
+  letter-spacing: .18em; color: var(--text-dim); text-transform: uppercase;
+}
 
-  /* HERO */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 0 48px;
-    position: relative;
-    overflow: hidden;
-  }
+/* ── MARQUEE ── */
+.marquee-strip {
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  background: var(--deep); padding: 18px 0; overflow: hidden;
+}
+.marquee-track {
+  display: flex; white-space: nowrap;
+  animation: marquee 30s linear infinite;
+}
+.marquee-item {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
+  letter-spacing: .2em; color: var(--text-dim); text-transform: uppercase;
+  padding: 0 48px; display: flex; align-items: center; gap: 48px;
+}
+.marquee-item::after { content: '◆'; font-size: 5px; color: var(--gold); }
 
-  /* Vertical lines background */
-  .hero::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: 
-      repeating-linear-gradient(
-        90deg,
-        transparent,
-        transparent calc(100% / 12 - 1px),
-        rgba(255,255,255,0.018) calc(100% / 12 - 1px),
-        rgba(255,255,255,0.018) calc(100% / 12)
-      );
-    pointer-events: none;
-  }
+/* ── DASHBOARD SECTION ── */
+.section-dashboard {
+  padding: 140px 56px;
+  background: var(--deep);
+  border-bottom: 1px solid var(--border);
+  position: relative; overflow: hidden;
+}
+.section-dashboard::before {
+  content: 'SDE™';
+  position: absolute; right: -60px; top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Bebas Neue', sans-serif; font-size: 320px;
+  color: rgba(255,255,255,.012); pointer-events: none;
+  letter-spacing: .04em;
+}
+.dash-inner { max-width: 1200px; margin: 0 auto; }
+.section-tag {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 300;
+  letter-spacing: .28em; color: var(--gold); text-transform: uppercase;
+  display: flex; align-items: center; gap: 16px; margin-bottom: 64px;
+}
+.section-tag::before { content: attr(data-n); color: var(--text-dim); }
+.dash-header { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; margin-bottom: 80px; align-items: end; }
+.dash-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(40px, 5vw, 64px);
+  letter-spacing: .04em; line-height: 1.0; color: var(--white);
+}
+.dash-title span {
+  display: block; font-family: 'Cormorant Garamond', serif;
+  font-weight: 300; font-style: italic;
+  font-size: .52em; color: var(--gold); letter-spacing: .1em; margin-bottom: 8px;
+}
+.dash-tagline {
+  font-size: 24px; font-weight: 300; font-style: italic;
+  line-height: 1.6; color: var(--text-mid);
+  border-left: 1px solid var(--gold); padding-left: 32px;
+}
 
-  .hero-inner {
-    max-width: 1200px;
-    position: relative;
-    z-index: 2;
-  }
+/* ── DASHBOARD MOCKUP ── */
+.dashboard-mockup {
+  background: var(--surface); border: 1px solid var(--border);
+  position: relative; overflow: hidden;
+}
+.mockup-topbar {
+  background: var(--surface2); border-bottom: 1px solid var(--border);
+  padding: 14px 24px; display: flex; align-items: center; justify-content: space-between;
+}
+.mockup-dots { display: flex; gap: 6px; }
+.mockup-dots span { width: 8px; height: 8px; border-radius: 50%; background: var(--border-light); }
+.mockup-title {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
+  letter-spacing: .14em; color: var(--text-dim); text-transform: uppercase;
+}
+.mockup-badge {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 400;
+  letter-spacing: .12em; color: var(--gold); border: 1px solid var(--gold-dim);
+  padding: 3px 8px; text-transform: uppercase;
+}
+.mockup-body { display: grid; grid-template-columns: 200px 1fr; min-height: 480px; }
+.mockup-sidebar {
+  border-right: 1px solid var(--border);
+  padding: 24px 0; display: flex; flex-direction: column; gap: 2px;
+}
+.mock-nav-item {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
+  letter-spacing: .1em; color: var(--text-dim); text-transform: uppercase;
+  padding: 10px 20px; border-left: 2px solid transparent;
+  transition: all .2s; display: flex; align-items: center; gap: 10px;
+}
+.mock-nav-item:hover, .mock-nav-item.active {
+  color: var(--text); background: var(--surface2); border-left-color: var(--gold);
+}
+.mock-nav-item .dot { width: 4px; height: 4px; background: currentColor; border-radius: 50%; opacity: .4; }
+.mock-nav-item.active .dot { background: var(--gold); opacity: 1; }
+.mockup-main { padding: 28px 32px; display: flex; flex-direction: column; gap: 24px; }
 
-  .hero-eyebrow {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    font-weight: 300;
-    letter-spacing: 0.2em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 32px;
-    opacity: 0;
-    animation: fadeUp 0.8s ease 0.2s forwards;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .hero-eyebrow::before {
-    content: '';
-    width: 40px;
-    height: 1px;
-    background: var(--gold);
-    display: block;
-  }
+/* Verdict row */
+.verdict-row { display: flex; align-items: center; gap: 24px; }
+.verdict-score {
+  font-family: 'Bebas Neue', sans-serif; font-size: 72px;
+  letter-spacing: .02em; line-height: 1; color: var(--amber);
+}
+.verdict-meta { flex: 1; }
+.verdict-label {
+  font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 400;
+  letter-spacing: .1em; color: var(--text); text-transform: uppercase;
+}
+.verdict-sub {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
+  letter-spacing: .1em; color: var(--text-dim); text-transform: uppercase; margin-top: 4px;
+}
+.verdict-voice {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 300;
+  letter-spacing: .16em; color: var(--gold-dim); text-transform: uppercase;
+  border: 1px solid var(--border-light); padding: 6px 12px;
+}
 
-  .hero-headline {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(72px, 10vw, 148px);
-    line-height: 0.92;
-    letter-spacing: 0.02em;
-    color: var(--white);
-    margin-bottom: 0;
-    opacity: 0;
-    animation: fadeUp 0.9s ease 0.35s forwards;
-  }
-  .hero-headline em {
-    font-style: italic;
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 300;
-    color: var(--gold);
-    font-size: 0.78em;
-    display: block;
-    margin-left: 4px;
-  }
+/* Diagnostic bars */
+.diag-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.diag-item { }
+.diag-label {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 300;
+  letter-spacing: .12em; color: var(--text-dim); text-transform: uppercase;
+  margin-bottom: 6px; display: flex; justify-content: space-between;
+}
+.diag-bar { height: 3px; background: var(--border); position: relative; overflow: hidden; }
+.diag-fill {
+  height: 100%; position: absolute; left: 0; top: 0;
+  animation: barGrow 1.4s ease forwards;
+}
+.fill-gold { background: var(--gold); }
+.fill-green { background: var(--green); }
+.fill-red { background: var(--red); }
+.fill-amber { background: var(--amber); }
 
-  .hero-sub {
-    margin-top: 48px;
-    max-width: 560px;
-    opacity: 0;
-    animation: fadeUp 0.9s ease 0.5s forwards;
-  }
-  .hero-sub p {
-    font-size: 22px;
-    font-weight: 300;
-    line-height: 1.6;
-    color: var(--text-mid);
-    font-style: italic;
-  }
-  .hero-sub p strong {
-    color: var(--text);
-    font-weight: 400;
-    font-style: normal;
-  }
+/* Alerts */
+.alert-list { display: flex; flex-direction: column; gap: 8px; }
+.alert-item {
+  background: var(--surface2); border-left: 2px solid var(--border-light);
+  padding: 12px 16px; display: flex; align-items: flex-start; gap: 12px;
+}
+.alert-item.critical { border-left-color: var(--red); }
+.alert-item.warning { border-left-color: var(--amber); }
+.alert-item.ok { border-left-color: var(--green); }
+.alert-icon {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 400;
+  letter-spacing: .1em; text-transform: uppercase; padding-top: 2px; flex-shrink: 0;
+}
+.alert-item.critical .alert-icon { color: var(--red); }
+.alert-item.warning .alert-icon { color: var(--amber); }
+.alert-item.ok .alert-icon { color: var(--green); }
+.alert-text {
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 300;
+  letter-spacing: .06em; color: var(--text-mid); line-height: 1.6;
+}
+.alert-text strong { color: var(--text); font-weight: 400; }
 
-  .hero-actions {
-    margin-top: 56px;
-    display: flex;
-    align-items: center;
-    gap: 32px;
-    opacity: 0;
-    animation: fadeUp 0.9s ease 0.65s forwards;
-  }
+/* ── WHY SECTION ── */
+.section-why {
+  padding: 160px 56px;
+  max-width: 100%;
+}
+.why-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 120px; align-items: start; }
+.why-left { }
+.why-quote {
+  font-size: clamp(36px, 4.5vw, 58px);
+  font-weight: 300; font-style: italic; line-height: 1.25;
+  color: var(--white); position: relative; padding-left: 40px;
+}
+.why-quote::before {
+  content: '"'; position: absolute; left: -12px; top: -24px;
+  font-size: 130px; color: var(--gold); opacity: .12;
+  font-family: 'Cormorant Garamond', serif; line-height: 1;
+}
+.why-quote cite {
+  display: block; font-family: 'DM Mono', monospace; font-size: 10px;
+  font-weight: 300; letter-spacing: .2em; color: var(--gold);
+  font-style: normal; text-transform: uppercase; margin-top: 36px;
+}
+.why-right { padding-top: 16px; }
+.why-body {
+  font-size: 20px; font-weight: 300; font-style: italic;
+  line-height: 1.85; color: var(--text-mid); margin-bottom: 48px;
+}
+.why-body strong { color: var(--text); font-style: normal; font-weight: 400; }
+.why-pillars { display: flex; flex-direction: column; gap: 0; }
+.pillar {
+  padding: 20px 0; border-bottom: 1px solid var(--border);
+  display: grid; grid-template-columns: 36px 1fr; gap: 16px; align-items: start;
+  transition: padding-left .2s;
+}
+.pillar:hover { padding-left: 8px; }
+.pillar-n {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
+  letter-spacing: .1em; color: var(--gold-dim); padding-top: 3px;
+}
+.pillar-t {
+  font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 300;
+  letter-spacing: .1em; color: var(--text-mid); text-transform: uppercase;
+  line-height: 1.7; transition: color .2s;
+}
+.pillar:hover .pillar-t { color: var(--text); }
 
-  .btn-primary {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    font-weight: 400;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--black);
-    background: var(--gold);
-    padding: 16px 36px;
-    text-decoration: none;
-    display: inline-block;
-    transition: background 0.2s ease, transform 0.2s ease;
-    position: relative;
-  }
-  .btn-primary::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    right: -4px;
-    width: 100%;
-    height: 100%;
-    border: 1px solid var(--gold-dim);
-    transition: transform 0.2s ease;
-  }
-  .btn-primary:hover {
-    background: var(--white);
-    transform: translate(-2px, -2px);
-  }
-  .btn-primary:hover::after {
-    transform: translate(2px, 2px);
-  }
+/* ── HOW IT THINKS ── */
+.section-thinks {
+  padding: 140px 56px;
+  background: var(--deep); border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.thinks-inner { max-width: 1200px; margin: 0 auto; }
+.thinks-header { margin-bottom: 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: end; }
+.thinks-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(40px, 5vw, 64px);
+  letter-spacing: .04em; line-height: 1.0; color: var(--white);
+}
+.thinks-title span {
+  display: block; font-family: 'Cormorant Garamond', serif;
+  font-weight: 300; font-style: italic;
+  font-size: .5em; color: var(--gold); letter-spacing: .1em; margin-bottom: 10px;
+}
+.thinks-intro {
+  font-size: 20px; font-weight: 300; font-style: italic;
+  line-height: 1.7; color: var(--text-mid);
+}
+.thinks-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); }
+.think-card {
+  background: var(--surface); padding: 36px 28px;
+  position: relative; overflow: hidden; transition: background .3s;
+}
+.think-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--gold); transform: scaleX(0); transform-origin: left;
+  transition: transform .3s;
+}
+.think-card:hover { background: var(--surface2); }
+.think-card:hover::before { transform: scaleX(1); }
+.think-n {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 300;
+  letter-spacing: .2em; color: var(--gold-dim); text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.think-title {
+  font-family: 'Bebas Neue', sans-serif; font-size: 20px;
+  letter-spacing: .06em; color: var(--white); margin-bottom: 12px; line-height: 1.1;
+}
+.think-desc {
+  font-size: 15px; font-weight: 300; font-style: italic;
+  line-height: 1.65; color: var(--text-dim);
+}
 
-  .btn-ghost {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    font-weight: 300;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: color 0.2s ease;
-  }
-  .btn-ghost:hover { color: var(--text); }
-  .btn-ghost::after {
-    content: '→';
-    transition: transform 0.2s ease;
-  }
-  .btn-ghost:hover::after { transform: translateX(4px); }
+/* ── PREVIEW SECTION ── */
+.section-preview {
+  padding: 140px 56px;
+  border-top: 1px solid var(--border);
+}
+.preview-inner { max-width: 1200px; margin: 0 auto; }
+.preview-header { margin-bottom: 64px; display: flex; align-items: flex-end; justify-content: space-between; }
+.preview-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(40px, 5vw, 64px); letter-spacing: .04em; color: var(--white);
+}
+.preview-title span {
+  display: block; font-family: 'Cormorant Garamond', serif;
+  font-weight: 300; font-style: italic; font-size: .5em; color: var(--gold);
+  letter-spacing: .1em; margin-bottom: 8px;
+}
+.genre-tabs { display: flex; gap: 0; border: 1px solid var(--border); }
+.genre-tab {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--text-dim);
+  background: none; border: none; padding: 10px 20px; cursor: none;
+  border-right: 1px solid var(--border); transition: all .2s;
+}
+.genre-tab:last-child { border-right: none; }
+.genre-tab.active { background: var(--gold); color: var(--black); font-weight: 400; }
+.genre-tab:hover:not(.active) { background: var(--surface); color: var(--text); }
+.preview-panels { position: relative; }
+.preview-panel { display: none; }
+.preview-panel.active { display: grid; grid-template-columns: 1fr 1.4fr; gap: 1px; background: var(--border); }
+.panel-info { background: var(--surface); padding: 40px 36px; }
+.panel-info h3 {
+  font-family: 'Bebas Neue', sans-serif; font-size: 28px;
+  letter-spacing: .06em; color: var(--white); margin-bottom: 8px;
+}
+.panel-info .genre-label {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 300;
+  letter-spacing: .18em; color: var(--gold); text-transform: uppercase; margin-bottom: 24px;
+}
+.panel-info p {
+  font-size: 16px; font-weight: 300; font-style: italic;
+  line-height: 1.75; color: var(--text-dim); margin-bottom: 32px;
+}
+.panel-score-row { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
+.panel-score {
+  font-family: 'Bebas Neue', sans-serif; font-size: 56px;
+  letter-spacing: .02em; line-height: 1;
+}
+.panel-verdict { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 400; letter-spacing: .1em; text-transform: uppercase; }
+.panel-diags { display: flex; flex-direction: column; gap: 10px; }
+.pd-row { }
+.pd-label {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 300;
+  letter-spacing: .12em; color: var(--text-dim); text-transform: uppercase;
+  margin-bottom: 5px; display: flex; justify-content: space-between;
+}
+.pd-bar { height: 2px; background: var(--border); position: relative; }
+.pd-fill { height: 100%; position: absolute; left: 0; top: 0; transition: width 1s ease; }
+.panel-result { background: var(--surface2); padding: 32px; display: flex; flex-direction: column; gap: 16px; }
+.result-block { }
+.rb-title {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 400;
+  letter-spacing: .2em; color: var(--gold); text-transform: uppercase;
+  margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+.rb-text { font-size: 15px; font-weight: 300; font-style: italic; line-height: 1.7; color: var(--text-mid); }
+.rb-text strong { color: var(--text); font-style: normal; font-weight: 400; }
+.rb-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.rb-list li {
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 300;
+  letter-spacing: .06em; color: var(--text-mid); padding: 10px 14px;
+  background: var(--surface3); border-left: 2px solid var(--gold-dim); line-height: 1.5;
+}
 
-  .hero-scroll-indicator {
-    position: absolute;
-    bottom: 40px;
-    left: 48px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    opacity: 0;
-    animation: fadeIn 1s ease 1.2s forwards;
-  }
-  .scroll-line {
-    width: 1px;
-    height: 48px;
-    background: linear-gradient(to bottom, var(--gold), transparent);
-    animation: scrollPulse 2s ease infinite;
-  }
-  .scroll-text {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    font-weight: 300;
-    letter-spacing: 0.2em;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-  }
+/* ── ECOSYSTEM ── */
+.section-ecosystem {
+  padding: 140px 56px; background: var(--deep);
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+}
+.eco-inner { max-width: 1200px; margin: 0 auto; }
+.eco-header { margin-bottom: 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: end; }
+.eco-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(40px, 5vw, 64px); letter-spacing: .04em; color: var(--white);
+}
+.eco-title span {
+  display: block; font-family: 'Cormorant Garamond', serif;
+  font-weight: 300; font-style: italic;
+  font-size: .5em; color: var(--gold); letter-spacing: .1em; margin-bottom: 8px;
+}
+.eco-intro { font-size: 20px; font-weight: 300; font-style: italic; line-height: 1.7; color: var(--text-mid); }
+.eco-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); }
+.eco-card {
+  background: var(--surface); padding: 32px 28px; position: relative;
+  transition: background .3s;
+}
+.eco-card:hover { background: var(--surface2); }
+.eco-card.live::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--gold);
+}
+.eco-card-n {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 300;
+  letter-spacing: .2em; color: var(--gold-dim); text-transform: uppercase;
+  margin-bottom: 18px;
+}
+.eco-card-title {
+  font-family: 'Bebas Neue', sans-serif; font-size: 20px;
+  letter-spacing: .06em; color: var(--white); margin-bottom: 10px; line-height: 1.1;
+}
+.eco-card-desc {
+  font-size: 14px; font-weight: 300; font-style: italic;
+  line-height: 1.6; color: var(--text-dim); margin-bottom: 20px;
+}
+.eco-badge {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 400;
+  letter-spacing: .12em; text-transform: uppercase;
+  padding: 4px 10px; display: inline-block;
+}
+.badge-live { color: var(--gold); border: 1px solid var(--gold-dim); }
+.badge-soon { color: var(--text-dim); border: 1px solid var(--border-light); }
 
-  /* MANIFESTO STRIP */
-  .manifesto-strip {
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    padding: 20px 0;
-    overflow: hidden;
-    background: var(--deep);
-  }
-  .strip-track {
-    display: flex;
-    gap: 0;
-    animation: marquee 28s linear infinite;
-    white-space: nowrap;
-  }
-  .strip-item {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    font-weight: 300;
-    letter-spacing: 0.16em;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    padding: 0 40px;
-    display: flex;
-    align-items: center;
-    gap: 40px;
-  }
-  .strip-item::after {
-    content: '◆';
-    font-size: 6px;
-    color: var(--gold);
-  }
+/* ── PRICING ── */
+.section-pricing {
+  padding: 160px 56px;
+}
+.pricing-inner { max-width: 1200px; margin: 0 auto; }
+.pricing-header { text-align: center; margin-bottom: 96px; }
+.pricing-header h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(48px, 6vw, 80px); letter-spacing: .04em; color: var(--white);
+  margin-bottom: 16px;
+}
+.pricing-header p { font-size: 20px; font-weight: 300; font-style: italic; color: var(--text-dim); }
+.pricing-philosophy {
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 3px solid var(--gold); padding: 24px 32px;
+  margin-bottom: 64px;
+  display: flex; align-items: center; gap: 24px;
+}
+.pp-icon {
+  font-family: 'Bebas Neue', sans-serif; font-size: 32px;
+  letter-spacing: .04em; color: var(--gold); flex-shrink: 0;
+}
+.pp-text { font-size: 18px; font-weight: 300; font-style: italic; line-height: 1.6; color: var(--text-mid); }
+.pp-text strong { color: var(--text); font-style: normal; font-weight: 400; }
+.pricing-grid { display: grid; grid-template-columns: 1fr 1.1fr 1fr 1fr; gap: 1px; background: var(--border); margin-bottom: 40px; }
+.pricing-card { background: var(--surface); padding: 48px 36px; position: relative; }
+.pricing-card.featured { background: var(--surface2); }
+.pricing-card.featured::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--gold-dim), var(--gold), var(--gold-dim));
+}
+.pricing-tier {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 300;
+  letter-spacing: .24em; color: var(--text-dim); text-transform: uppercase;
+  margin-bottom: 28px; display: flex; align-items: center; justify-content: space-between;
+}
+.founding-badge {
+  font-family: 'DM Mono', monospace; font-size: 8px; font-weight: 400;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--gold); border: 1px solid var(--gold-dim); padding: 3px 8px;
+}
+.pricing-price {
+  font-family: 'Bebas Neue', sans-serif; font-size: 52px;
+  letter-spacing: .02em; color: var(--white); line-height: 1; margin-bottom: 6px;
+}
+.pricing-price sub {
+  font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 300;
+  color: var(--text-dim); letter-spacing: .06em; vertical-align: baseline;
+}
+.pricing-cadence {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
+  letter-spacing: .1em; color: var(--text-dim); text-transform: uppercase;
+  margin-bottom: 32px;
+}
+.pricing-compare {
+  font-size: 14px; font-weight: 300; font-style: italic;
+  color: var(--gold); margin-bottom: 32px; line-height: 1.5;
+}
+.pricing-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 40px; }
+.pricing-features li {
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 300;
+  letter-spacing: .06em; color: var(--text-mid); display: flex; align-items: center; gap: 10px;
+}
+.pricing-features li::before { content: '—'; color: var(--gold); }
+.pricing-features li.dim { color: var(--text-dim); }
+.pricing-features li.dim::before { color: var(--border-light); }
+.btn-tier {
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 400;
+  letter-spacing: .14em; text-transform: uppercase; text-decoration: none;
+  display: block; padding: 14px 24px; text-align: center; transition: all .2s;
+}
+.btn-tier-free { color: var(--text-dim); border: 1px solid var(--border-light); }
+.btn-tier-free:hover { color: var(--text); border-color: var(--text-dim); }
+.btn-tier-founding { color: var(--black); background: var(--gold); position: relative; }
+.btn-tier-founding::after {
+  content: ''; position: absolute; bottom: -3px; right: -3px;
+  width: 100%; height: 100%; border: 1px solid var(--gold-dim);
+}
+.btn-tier-founding:hover { background: var(--white); }
+.btn-tier-pro { color: var(--text); border: 1px solid var(--border-light); }
+.btn-tier-pro:hover { border-color: var(--text-dim); color: var(--white); }
+.btn-tier-studio { color: var(--text-dim); border: 1px solid var(--border); cursor: default; opacity: .5; }
+.founding-note {
+  background: var(--surface); border: 1px solid var(--border);
+  padding: 20px 28px; display: flex; align-items: center; gap: 16px;
+}
+.fn-label {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
+  letter-spacing: .14em; color: var(--gold); text-transform: uppercase; flex-shrink: 0;
+}
+.fn-text {
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 300;
+  letter-spacing: .06em; color: var(--text-dim); line-height: 1.6;
+}
 
-  /* PROBLEM SECTION */
-  .section-problem {
-    padding: 140px 48px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  .section-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    font-weight: 300;
-    letter-spacing: 0.25em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 64px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .section-label::before {
-    content: attr(data-num);
-    font-size: 10px;
-    color: var(--text-dim);
-  }
+/* ── FINAL CTA ── */
+.section-cta {
+  padding: 180px 56px; text-align: center;
+  border-top: 1px solid var(--border); position: relative; overflow: hidden;
+}
+.cta-glow {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 700px; height: 700px;
+  background: radial-gradient(ellipse, rgba(200,164,86,.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+.cta-eyebrow {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
+  letter-spacing: .24em; color: var(--gold); text-transform: uppercase;
+  margin-bottom: 36px;
+}
+.cta-headline {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(60px, 9vw, 136px);
+  letter-spacing: .02em; line-height: .92; color: var(--white);
+  margin-bottom: 20px;
+}
+.cta-headline em {
+  font-style: italic; font-family: 'Cormorant Garamond', serif;
+  font-weight: 300; color: var(--gold); font-size: .72em;
+  display: block; letter-spacing: .04em;
+}
+.cta-sub {
+  font-size: 21px; font-weight: 300; font-style: italic;
+  color: var(--text-dim); margin-bottom: 64px; max-width: 560px; margin-left: auto; margin-right: auto;
+  line-height: 1.6;
+}
+.cta-sub strong { color: var(--text-mid); font-weight: 400; font-style: normal; }
 
-  .problem-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-  }
-  .problem-left {
-    padding-right: 80px;
-    border-right: 1px solid var(--border);
-  }
-  .problem-right {
-    padding-left: 80px;
-  }
+/* ── FOOTER ── */
+footer {
+  padding: 48px 56px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.footer-logo {
+  font-family: 'Bebas Neue', sans-serif; font-size: 18px;
+  letter-spacing: .2em; color: var(--text-dim);
+}
+.footer-logo em { color: var(--gold); font-style: normal; }
+.footer-copy {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
+  letter-spacing: .12em; color: var(--text-dim); text-align: center;
+}
+.footer-links { display: flex; gap: 36px; }
+.footer-links a {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
+  letter-spacing: .12em; color: var(--text-dim); text-decoration: none;
+  text-transform: uppercase; transition: color .2s;
+}
+.footer-links a:hover { color: var(--text); }
 
-  .problem-headline {
-    font-size: clamp(42px, 5vw, 72px);
-    font-weight: 300;
-    line-height: 1.1;
-    color: var(--white);
-    margin-bottom: 40px;
-  }
-  .problem-headline em {
-    font-style: italic;
-    color: var(--text-mid);
-  }
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes marquee { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+@keyframes barGrow { from { width:0; } to { width:var(--w); } }
+.reveal { opacity:0; transform:translateY(32px); transition:opacity .8s ease, transform .8s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+.reveal-d1 { transition-delay: .1s; }
+.reveal-d2 { transition-delay: .2s; }
+.reveal-d3 { transition-delay: .3s; }
+.reveal-d4 { transition-delay: .4s; }
 
-  .problem-body {
-    font-size: 19px;
-    font-weight: 300;
-    line-height: 1.75;
-    color: var(--text-mid);
-    font-style: italic;
-  }
-  .problem-body strong {
-    color: var(--text);
-    font-style: normal;
-    font-weight: 400;
-  }
-
-  .problem-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-  .problem-list li {
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    font-weight: 300;
-    letter-spacing: 0.06em;
-    color: var(--text-mid);
-    padding: 18px 0;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    transition: color 0.2s ease;
-  }
-  .problem-list li:hover { color: var(--text); }
-  .problem-list li::before {
-    content: '';
-    width: 4px;
-    height: 4px;
-    background: var(--gold);
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  /* PRODUCT SECTION */
-  .section-product {
-    padding: 140px 48px;
-    background: var(--deep);
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    position: relative;
-    overflow: hidden;
-  }
-  .section-product::before {
-    content: 'SDE';
-    position: absolute;
-    right: -40px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 280px;
-    color: rgba(255,255,255,0.018);
-    letter-spacing: 0.05em;
-    pointer-events: none;
-    user-select: none;
-  }
-
-  .product-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 2;
-  }
-
-  .product-header {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    margin-bottom: 100px;
-    align-items: end;
-  }
-
-  .product-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(36px, 4vw, 56px);
-    line-height: 1.05;
-    letter-spacing: 0.04em;
-    color: var(--white);
-  }
-  .product-title span {
-    display: block;
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 300;
-    font-style: italic;
-    font-size: 0.52em;
-    color: var(--gold);
-    letter-spacing: 0.08em;
-    margin-bottom: 8px;
-  }
-
-  .product-tagline {
-    font-size: 26px;
-    font-weight: 300;
-    font-style: italic;
-    line-height: 1.5;
-    color: var(--text-mid);
-    border-left: 1px solid var(--gold);
-    padding-left: 32px;
-  }
-
-  .engine-cards {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1px;
-    background: var(--border);
-  }
-
-  .engine-card {
-    background: var(--surface);
-    padding: 40px 32px;
-    position: relative;
-    transition: background 0.3s ease;
-    overflow: hidden;
-  }
-  .engine-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--gold);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s ease;
-  }
-  .engine-card:hover { background: #151515; }
-  .engine-card:hover::before { transform: scaleX(1); }
-
-  .card-num {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    font-weight: 300;
-    letter-spacing: 0.2em;
-    color: var(--gold-dim);
-    margin-bottom: 24px;
-  }
-  .card-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    letter-spacing: 0.06em;
-    color: var(--white);
-    margin-bottom: 16px;
-    line-height: 1.1;
-  }
-  .card-desc {
-    font-size: 15px;
-    font-weight: 300;
-    font-style: italic;
-    line-height: 1.6;
-    color: var(--text-dim);
-  }
-  .card-badge {
-    margin-top: 24px;
-    display: inline-block;
-    font-family: 'DM Mono', monospace;
-    font-size: 9px;
-    font-weight: 400;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--gold);
-    border: 1px solid var(--gold-dim);
-    padding: 4px 10px;
-  }
-
-  /* COVERAGE ENGINE FEATURE */
-  .section-coverage {
-    padding: 140px 48px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .coverage-layout {
-    display: grid;
-    grid-template-columns: 1fr 1.2fr;
-    gap: 100px;
-    align-items: start;
-  }
-
-  .coverage-info h2 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(40px, 5vw, 68px);
-    letter-spacing: 0.04em;
-    line-height: 1.0;
-    color: var(--white);
-    margin-bottom: 32px;
-  }
-  .coverage-info h2 em {
-    display: block;
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 300;
-    font-style: italic;
-    font-size: 0.5em;
-    color: var(--gold);
-    letter-spacing: 0.1em;
-    margin-bottom: 4px;
-  }
-
-  .coverage-info p {
-    font-size: 19px;
-    font-weight: 300;
-    font-style: italic;
-    line-height: 1.75;
-    color: var(--text-mid);
-    margin-bottom: 48px;
-  }
-
-  .coverage-modes {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-  .mode-item {
-    padding: 20px 0;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    transition: padding-left 0.2s ease;
-  }
-  .mode-item:hover { padding-left: 8px; }
-  .mode-name {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    font-weight: 300;
-    letter-spacing: 0.1em;
-    color: var(--text-mid);
-    text-transform: uppercase;
-    transition: color 0.2s ease;
-  }
-  .mode-item:hover .mode-name { color: var(--text); }
-  .mode-tag {
-    font-family: 'DM Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 0.12em;
-    color: var(--gold-dim);
-    text-transform: uppercase;
-    border: 1px solid var(--border-light);
-    padding: 3px 8px;
-  }
-  .mode-tag.free { color: var(--text-dim); border-color: var(--border); }
-
-  /* MOCK INTERFACE */
-  .coverage-mock {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    position: relative;
-  }
-  .mock-header {
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .mock-dots {
-    display: flex;
-    gap: 6px;
-  }
-  .mock-dots span {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--border-light);
-  }
-  .mock-title-bar {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    font-weight: 300;
-    letter-spacing: 0.14em;
-    color: var(--text-dim);
-    text-transform: uppercase;
-  }
-  .mock-body {
-    padding: 32px 24px;
-  }
-  .mock-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    font-weight: 300;
-    letter-spacing: 0.18em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 12px;
-  }
-  .mock-score-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 28px;
-  }
-  .mock-score {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 72px;
-    letter-spacing: 0.02em;
-    line-height: 1;
-  }
-  .score-consider { color: #e8a030; }
-  .score-pass { color: #4caf7d; }
-  .score-fail { color: var(--red); }
-  .mock-score-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    line-height: 1.6;
-  }
-
-  .mock-bars {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 28px;
-  }
-  .bar-row {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
-  .bar-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    font-weight: 300;
-    letter-spacing: 0.1em;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    display: flex;
-    justify-content: space-between;
-  }
-  .bar-track {
-    height: 3px;
-    background: var(--border);
-    position: relative;
-    overflow: hidden;
-  }
-  .bar-fill {
-    height: 100%;
-    background: var(--gold);
-    position: absolute;
-    left: 0;
-    top: 0;
-    animation: barGrow 1.2s ease forwards;
-    animation-delay: var(--delay, 0s);
-    width: 0;
-  }
-  .bar-fill.low { background: var(--red); }
-  .bar-fill.mid { background: #e8a030; }
-
-  .mock-note {
-    font-size: 14px;
-    font-style: italic;
-    font-weight: 300;
-    color: var(--text-dim);
-    line-height: 1.65;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-  }
-  .mock-note strong {
-    color: var(--text-mid);
-    font-weight: 400;
-    font-style: normal;
-  }
-
-  .mock-footer {
-    padding: 16px 24px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .mock-voice {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    font-weight: 300;
-    letter-spacing: 0.14em;
-    color: var(--gold-dim);
-    text-transform: uppercase;
-  }
-  .mock-btn {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    font-weight: 400;
-    letter-spacing: 0.12em;
-    color: var(--black);
-    background: var(--gold);
-    padding: 8px 16px;
-    text-transform: uppercase;
-    border: none;
-    cursor: none;
-  }
-
-  /* PHILOSOPHY */
-  .section-philosophy {
-    padding: 140px 48px;
-    background: var(--deep);
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-  }
-  .philosophy-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 120px;
-    align-items: center;
-  }
-  .philosophy-quote {
-    font-size: clamp(32px, 4vw, 52px);
-    font-weight: 300;
-    font-style: italic;
-    line-height: 1.3;
-    color: var(--white);
-    position: relative;
-    padding-left: 40px;
-  }
-  .philosophy-quote::before {
-    content: '"';
-    position: absolute;
-    left: -10px;
-    top: -20px;
-    font-size: 120px;
-    color: var(--gold);
-    opacity: 0.15;
-    font-family: 'Cormorant Garamond', serif;
-    line-height: 1;
-  }
-  .philosophy-quote cite {
-    display: block;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    font-weight: 300;
-    letter-spacing: 0.16em;
-    color: var(--gold);
-    font-style: normal;
-    text-transform: uppercase;
-    margin-top: 32px;
-  }
-
-  .philosophy-pillars {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-  .pillar {
-    padding: 28px 0;
-    border-bottom: 1px solid var(--border);
-    display: grid;
-    grid-template-columns: 32px 1fr;
-    gap: 20px;
-    align-items: start;
-  }
-  .pillar-num {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    font-weight: 300;
-    letter-spacing: 0.1em;
-    color: var(--gold-dim);
-    padding-top: 4px;
-  }
-  .pillar-text {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    font-weight: 300;
-    letter-spacing: 0.1em;
-    color: var(--text-mid);
-    text-transform: uppercase;
-    line-height: 1.7;
-    transition: color 0.2s ease;
-  }
-  .pillar:hover .pillar-text { color: var(--text); }
-
-  /* PRICING */
-  .section-pricing {
-    padding: 140px 48px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  .pricing-header {
-    text-align: center;
-    margin-bottom: 80px;
-  }
-  .pricing-header h2 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(40px, 5vw, 68px);
-    letter-spacing: 0.04em;
-    color: var(--white);
-    margin-bottom: 16px;
-  }
-  .pricing-header p {
-    font-size: 18px;
-    font-weight: 300;
-    font-style: italic;
-    color: var(--text-dim);
-  }
-
-  .pricing-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1px;
-    background: var(--border);
-    max-width: 800px;
-    margin: 0 auto;
-  }
-  .pricing-card {
-    background: var(--surface);
-    padding: 56px 48px;
-    position: relative;
-  }
-  .pricing-card.featured {
-    background: #131313;
-  }
-  .pricing-card.featured::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--gold);
-  }
-
-  .pricing-tier {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    font-weight: 300;
-    letter-spacing: 0.2em;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    margin-bottom: 24px;
-  }
-  .pricing-price {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 56px;
-    letter-spacing: 0.02em;
-    color: var(--white);
-    line-height: 1;
-    margin-bottom: 8px;
-  }
-  .pricing-price span {
-    font-family: 'DM Mono', monospace;
-    font-size: 14px;
-    font-weight: 300;
-    color: var(--text-dim);
-    letter-spacing: 0.06em;
-  }
-  .pricing-note {
-    font-size: 15px;
-    font-weight: 300;
-    font-style: italic;
-    color: var(--text-dim);
-    margin-bottom: 40px;
-  }
-  .pricing-features {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    margin-bottom: 48px;
-  }
-  .pricing-features li {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    font-weight: 300;
-    letter-spacing: 0.08em;
-    color: var(--text-mid);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .pricing-features li::before {
-    content: '—';
-    color: var(--gold);
-    font-size: 10px;
-  }
-
-  .btn-tier {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    font-weight: 400;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    text-decoration: none;
-    display: inline-block;
-    padding: 14px 28px;
-    transition: all 0.2s ease;
-  }
-  .btn-tier-free {
-    color: var(--text-dim);
-    border: 1px solid var(--border-light);
-  }
-  .btn-tier-free:hover {
-    color: var(--text);
-    border-color: var(--text-dim);
-  }
-  .btn-tier-pro {
-    color: var(--black);
-    background: var(--gold);
-  }
-  .btn-tier-pro:hover { background: var(--white); }
-
-  /* CTA FINAL */
-  .section-cta {
-    padding: 160px 48px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-    border-top: 1px solid var(--border);
-  }
-  .section-cta::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(ellipse, rgba(201,168,76,0.06) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .cta-eyebrow {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    font-weight: 300;
-    letter-spacing: 0.2em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 32px;
-  }
-  .cta-headline {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(52px, 8vw, 120px);
-    letter-spacing: 0.03em;
-    line-height: 0.95;
-    color: var(--white);
-    margin-bottom: 16px;
-  }
-  .cta-sub {
-    font-size: 20px;
-    font-weight: 300;
-    font-style: italic;
-    color: var(--text-dim);
-    margin-bottom: 56px;
-  }
-
-  /* FOOTER */
-  footer {
-    padding: 48px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .footer-logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 18px;
-    letter-spacing: 0.18em;
-    color: var(--text-dim);
-  }
-  .footer-logo span { color: var(--gold); }
-  .footer-copy {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    font-weight: 300;
-    letter-spacing: 0.14em;
-    color: var(--text-dim);
-    text-align: center;
-  }
-  .footer-links {
-    display: flex;
-    gap: 32px;
-  }
-  .footer-links a {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    font-weight: 300;
-    letter-spacing: 0.14em;
-    color: var(--text-dim);
-    text-decoration: none;
-    text-transform: uppercase;
-    transition: color 0.2s ease;
-  }
-  .footer-links a:hover { color: var(--text); }
-
-  /* ANIMATIONS */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  @keyframes marquee {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-  }
-  @keyframes scrollPulse {
-    0%, 100% { opacity: 0.4; }
-    50% { opacity: 1; }
-  }
-  @keyframes barGrow {
-    from { width: 0; }
-    to { width: var(--width); }
-  }
-
-  /* REVEAL ON SCROLL */
-  .reveal {
-    opacity: 0;
-    transform: translateY(32px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-  }
-  .reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .reveal-delay-1 { transition-delay: 0.1s; }
-  .reveal-delay-2 { transition-delay: 0.2s; }
-  .reveal-delay-3 { transition-delay: 0.3s; }
-  .reveal-delay-4 { transition-delay: 0.4s; }
+@media (max-width: 1024px) {
+  nav { padding: 20px 28px; }
+  .nav-links { display: none; }
+  .hero { padding: 0 28px; }
+  .hero-stat-row { left: 28px; right: 28px; }
+  .hero-stat { padding: 0 20px 0 0; }
+  .section-dashboard, .section-why, .section-thinks, .section-preview,
+  .section-ecosystem, .section-pricing, .section-cta { padding: 80px 28px; }
+  .dash-header, .thinks-header, .eco-header, .why-inner { grid-template-columns: 1fr; gap: 40px; }
+  .thinks-grid, .eco-grid { grid-template-columns: 1fr 1fr; }
+  .pricing-grid { grid-template-columns: 1fr 1fr; }
+  footer { padding: 40px 28px; flex-direction: column; gap: 24px; text-align: center; }
+  .preview-panel.active { grid-template-columns: 1fr; }
+  .mockup-body { grid-template-columns: 1fr; }
+  .mockup-sidebar { display: none; }
+}
 </style>
 </head>
 <body>
 
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
+<div class="cursor" id="cur"></div>
+<div class="cursor-ring" id="ring"></div>
 
 <!-- NAV -->
 <nav id="nav">
-  <a href="#" class="nav-logo">WRITH<span>E</span>ON</a>
+  <a href="#" class="nav-logo">WRITH<em>E</em>ON</a>
   <ul class="nav-links">
-    <li><a href="#product">The Engine</a></li>
-    <li><a href="/coverage">Coverage</a></li>
+    <li><a href="#engine">The Engine</a></li>
+    <li><a href="#coverage">Coverage</a></li>
     <li><a href="#pricing">Pricing</a></li>
     <li><a href="https://writheon.gumroad.com" target="_blank">Resources</a></li>
     <li><a href="/coverage" class="nav-cta">Run Free Coverage</a></li>
@@ -1147,228 +773,446 @@
 
 <!-- HERO -->
 <section class="hero">
+  <div class="hero-grid-lines"></div>
+  <div class="hero-radial"></div>
   <div class="hero-inner">
-    <div class="hero-eyebrow">For Writers. Narrative Development Intelligence.</div>
+    <div class="hero-eyebrow">Narrative Development Intelligence · Coverage Engine™ Now Live</div>
     <h1 class="hero-headline">
-      Diagnose<br>
+      Know What's<br>Broken
       <em>before you rewrite.</em>
     </h1>
     <div class="hero-sub">
-      <p>Most writers are not lazy. They are <strong>overwhelmed.</strong> Writheon gives you the clarity professionals use — without the gatekeeping.</p>
-      <p style="margin-top: 16px; font-size: 15px; font-style: normal; font-family: 'DM Mono', monospace; font-weight: 300; letter-spacing: 0.08em; color: var(--text-dim);">Screenplay Development Engine™ &nbsp;→&nbsp; Coverage Engine™ &nbsp;→&nbsp; Now Live</p>
+      <p>Most writers are not lazy. They are <strong>overwhelmed.</strong> WRITHEON gives working writers the precision diagnostic tools that studio development departments use — without the gatekeeping, the vague notes, or the endless blind rewrites.</p>
     </div>
     <div class="hero-actions">
-      <a href="/coverage" class="btn-primary">Run Free Coverage</a>
-      <a href="#product" class="btn-ghost">See the Engine</a>
+      <a href="/coverage" class="btn-primary">Run Free Coverage →</a>
+      <a href="#engine" class="btn-ghost">See the Engine</a>
     </div>
   </div>
-  <div class="hero-scroll-indicator">
-    <div class="scroll-line"></div>
-    <span class="scroll-text">Scroll</span>
+  <div class="hero-stat-row">
+    <div class="hero-stat">
+      <div class="stat-val">6<em>+</em></div>
+      <div class="stat-label">Coverage Voice Modes</div>
+    </div>
+    <div class="hero-stat">
+      <div class="stat-val">4<em>+</em></div>
+      <div class="stat-label">Diagnostic Modes</div>
+    </div>
+    <div class="hero-stat">
+      <div class="stat-val">SDE<em>™</em></div>
+      <div class="stat-label">Screenplay Development Engine</div>
+    </div>
+    <div class="hero-stat">
+      <div class="stat-val">$0<em>+</em></div>
+      <div class="stat-label">Start Free · No Credit Card</div>
+    </div>
   </div>
 </section>
 
-<!-- MARQUEE STRIP -->
-<div class="manifesto-strip">
-  <div class="strip-track">
-    <div class="strip-item">Screenplay Development Engine™</div>
-    <div class="strip-item">Coverage Engine™ — First System</div>
-    <div class="strip-item">Diagnose Before You Rewrite</div>
-    <div class="strip-item">Diagnosis Before Rewrite</div>
-    <div class="strip-item">6 Coverage Voice Modes</div>
-    <div class="strip-item">Professional Development Intelligence</div>
-    
-    <div class="strip-item">Screenplay Development Engine™</div>
-    <div class="strip-item">Coverage Engine™ — First System</div>
-    <div class="strip-item">Diagnose Before You Rewrite</div>
-    <div class="strip-item">Diagnosis Before Rewrite</div>
-    <div class="strip-item">6 Coverage Voice Modes</div>
-    <div class="strip-item">Professional Development Intelligence</div>
-    
+<!-- MARQUEE -->
+<div class="marquee-strip">
+  <div class="marquee-track">
+    <div class="marquee-item">Narrative Pressure Analysis</div>
+    <div class="marquee-item">Structural Diagnostics</div>
+    <div class="marquee-item">Coverage Engine™</div>
+    <div class="marquee-item">Scene Pressure Detection</div>
+    <div class="marquee-item">Character Imbalance</div>
+    <div class="marquee-item">Rewrite Intelligence</div>
+    <div class="marquee-item">Pacing Architecture</div>
+    <div class="marquee-item">Diagnose Before You Rewrite</div>
+    <div class="marquee-item">Narrative Pressure Analysis</div>
+    <div class="marquee-item">Structural Diagnostics</div>
+    <div class="marquee-item">Coverage Engine™</div>
+    <div class="marquee-item">Scene Pressure Detection</div>
+    <div class="marquee-item">Character Imbalance</div>
+    <div class="marquee-item">Rewrite Intelligence</div>
+    <div class="marquee-item">Pacing Architecture</div>
+    <div class="marquee-item">Diagnose Before You Rewrite</div>
   </div>
 </div>
 
-<!-- PROBLEM -->
-<section class="section-problem">
-  <div class="section-label" data-num="01">The Problem</div>
-  <div class="problem-grid">
-    <div class="problem-left reveal">
-      <h2 class="problem-headline">Most notes are vague.<br><em>Most feedback is reactive.</em></h2>
-      <p class="problem-body">Most development systems explain theory without helping you <strong>apply it.</strong> You are handed a red pen and a vague sense of what's wrong. You are not told why structure is breaking. You are not shown where pressure is absent.</p>
-    </div>
-    <div class="problem-right reveal reveal-delay-2">
-      <ul class="problem-list">
-        <li>Rewrite exhaustion from unclear direction</li>
-        <li>Structural confusion with no framework</li>
-        <li>Emotional attachment to scenes that aren't working</li>
-        <li>Isolation — no professional feedback loop</li>
-        <li>Idea overload with no prioritization system</li>
-        <li>Vague notes that don't tell you what to fix</li>
-        <li>Unfinished drafts accumulating</li>
-        <li>No way to measure pacing or pressure</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<!-- PRODUCT -->
-<section class="section-product" id="product">
-  <div class="product-inner">
-    <div class="section-label" data-num="02">The System</div>
-    <div class="product-header reveal">
-      <div class="product-title">
+<!-- DASHBOARD -->
+<section class="section-dashboard" id="engine">
+  <div class="dash-inner">
+    <div class="section-tag" data-n="01">The System</div>
+    <div class="dash-header reveal">
+      <div class="dash-title">
         <span>Powered by the</span>
         Screenplay<br>Development<br>Engine™
       </div>
-      <p class="product-tagline">A story is not just written. It is engineered through development. Writheon gives you the system to do that.<br><br><span style="font-size: 0.7em; font-family: 'DM Mono', monospace; font-weight: 300; font-style: normal; letter-spacing: 0.1em; color: var(--text-dim);">WRITHEON → SDE™ → Coverage Engine™ (Live) → Draft Comparison → Scene Pressure Meter → Character Lab</span></p>
+      <p class="dash-tagline">A story is not just written. It is engineered through development. WRITHEON gives you the diagnostic framework to do that — precisely, intelligently, and without wasted rewrites.</p>
     </div>
-    <div class="engine-cards">
-      <div class="engine-card reveal">
-        <div class="card-num">CE — 01</div>
-        <div class="card-title">Coverage Engine™</div>
-        <p class="card-desc">Professional script coverage in six industry voices. From first 10 pages to full coverage reports. The first system inside the Screenplay Development Engine™.</p>
-        <span class="card-badge">Live Now</span>
+
+    <!-- MOCKUP -->
+    <div class="dashboard-mockup reveal reveal-d1">
+      <div class="mockup-topbar">
+        <div class="mockup-dots"><span></span><span></span><span></span></div>
+        <div class="mockup-title">Coverage Engine™ — Narrative Diagnostic Interface</div>
+        <div class="mockup-badge">SDE™ Live</div>
       </div>
-      <div class="engine-card reveal reveal-delay-1">
-        <div class="card-num">CE — 02</div>
-        <div class="card-title">Draft Comparison</div>
-        <p class="card-desc">Paste Draft A and Draft B. Get a precise delta report showing what improved, regressed, or shifted.</p>
-        <span class="card-badge">Phase 2</span>
-      </div>
-      <div class="engine-card reveal reveal-delay-2">
-        <div class="card-num">CE — 03</div>
-        <div class="card-title">Scene Pressure Meter</div>
-        <p class="card-desc">Visual tension and escalation indicators. See exactly where your script loses momentum.</p>
-        <span class="card-badge">Phase 2</span>
-      </div>
-      <div class="engine-card reveal reveal-delay-3">
-        <div class="card-num">CE — 04</div>
-        <div class="card-title">Character Lab</div>
-        <p class="card-desc">Deep character pressure diagnostics. Track motivation, conflict, and arc integrity across your script.</p>
-        <span class="card-badge">Coming</span>
+      <div class="mockup-body">
+        <div class="mockup-sidebar">
+          <div class="mock-nav-item active"><span class="dot"></span>Act Structure</div>
+          <div class="mock-nav-item"><span class="dot"></span>Pressure Map</div>
+          <div class="mock-nav-item"><span class="dot"></span>Character Lab</div>
+          <div class="mock-nav-item"><span class="dot"></span>Scene Function</div>
+          <div class="mock-nav-item"><span class="dot"></span>Momentum</div>
+          <div class="mock-nav-item"><span class="dot"></span>Rewrite Matrix</div>
+          <div class="mock-nav-item"><span class="dot"></span>Export Report</div>
+        </div>
+        <div class="mockup-main">
+          <div class="verdict-row">
+            <div class="verdict-score">C+</div>
+            <div class="verdict-meta">
+              <div class="verdict-label">CONSIDER — With Significant Notes</div>
+              <div class="verdict-sub">Development Executive · Full Coverage Mode</div>
+            </div>
+            <div class="verdict-voice">Voice: Dev Executive</div>
+          </div>
+          <div class="diag-grid">
+            <div class="diag-item">
+              <div class="diag-label"><span>Act Structure</span><span>71%</span></div>
+              <div class="diag-bar"><div class="diag-fill fill-gold" style="--w:71%"></div></div>
+            </div>
+            <div class="diag-item">
+              <div class="diag-label"><span>Premise Clarity</span><span>88%</span></div>
+              <div class="diag-bar"><div class="diag-fill fill-green" style="--w:88%"></div></div>
+            </div>
+            <div class="diag-item">
+              <div class="diag-label"><span>Pacing</span><span>38%</span></div>
+              <div class="diag-bar"><div class="diag-fill fill-red" style="--w:38%"></div></div>
+            </div>
+            <div class="diag-item">
+              <div class="diag-label"><span>Char. Pressure</span><span>62%</span></div>
+              <div class="diag-bar"><div class="diag-fill fill-amber" style="--w:62%"></div></div>
+            </div>
+            <div class="diag-item">
+              <div class="diag-label"><span>Dialogue</span><span>79%</span></div>
+              <div class="diag-bar"><div class="diag-fill fill-gold" style="--w:79%"></div></div>
+            </div>
+            <div class="diag-item">
+              <div class="diag-label"><span>Commerciality</span><span>55%</span></div>
+              <div class="diag-bar"><div class="diag-fill fill-amber" style="--w:55%"></div></div>
+            </div>
+          </div>
+          <div class="alert-list">
+            <div class="alert-item critical">
+              <div class="alert-icon">CRITICAL</div>
+              <div class="alert-text"><strong>Pressure Collapse Detected — Pages 54–78.</strong> Act Two midpoint lacks consequential event. Protagonist agency is absent for 24 pages. Structural instability confirmed.</div>
+            </div>
+            <div class="alert-item warning">
+              <div class="alert-icon">WARNING</div>
+              <div class="alert-text"><strong>Character Imbalance — Antagonist Underdeveloped.</strong> Antagonist motivation is established at page 12 but receives no escalation through Act Two. Pressure asymmetry weakens the climax.</div>
+            </div>
+            <div class="alert-item ok">
+              <div class="alert-icon">STRONG</div>
+              <div class="alert-text"><strong>Premise Architecture — High Confidence.</strong> Central concept is market-viable, genre-clear, and emotionally grounded. The premise supports the structural demands of the genre.</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- COVERAGE ENGINE -->
-<section class="section-coverage" id="coverage">
-  <div class="section-label" data-num="03">First System</div>
-  <div class="coverage-layout">
-    <div class="coverage-info reveal">
-      <h2>
-        <em>Writheon</em>
-        Coverage<br>Engine™
-      </h2>
-      <p>The first system inside the Writheon Screenplay Development Engine™. Six industry coverage voices. Four diagnostic modes. Built for writers serious about development.</p>
-
-      <div class="coverage-modes">
-        <div class="mode-item">
-          <span class="mode-name">First 10 Pages</span>
-          <span class="mode-tag free">Always Free</span>
-        </div>
-        <div class="mode-item">
-          <span class="mode-name">Concept Test</span>
-          <span class="mode-tag free">Free (3x)</span>
-        </div>
-        <div class="mode-item">
-          <span class="mode-name">Scene Diagnostic</span>
-          <span class="mode-tag free">Free (3x)</span>
-        </div>
-        <div class="mode-item">
-          <span class="mode-name">Full Coverage Report</span>
-          <span class="mode-tag">Pro</span>
-        </div>
-        <div class="mode-item">
-          <span class="mode-name">PDF Export</span>
-          <span class="mode-tag">Pro</span>
-        </div>
-        <div class="mode-item">
-          <span class="mode-name">All 6 Voice Modes</span>
-          <span class="mode-tag">Pro</span>
-        </div>
-      </div>
+<!-- WHY -->
+<section class="section-why" id="why">
+  <div class="why-inner">
+    <div class="why-left reveal">
+      <div class="section-tag" data-n="02" style="margin-bottom:48px;">Why WRITHEON Exists</div>
+      <blockquote class="why-quote">
+        Serious writers deserve precise feedback. Not encouragement. Not theory. <em>Diagnosis.</em>
+        <cite>— WRITHEON Manifesto</cite>
+      </blockquote>
     </div>
-
-    <!-- MOCK UI -->
-    <div class="coverage-mock reveal reveal-delay-2">
-      <div class="mock-header">
-        <div class="mock-dots">
-          <span></span><span></span><span></span>
-        </div>
-        <div class="mock-title-bar">Coverage Engine™ — Development Executive</div>
-        <div></div>
-      </div>
-      <div class="mock-body">
-        <div class="mock-label">Overall Assessment</div>
-        <div class="mock-score-row">
-          <div class="mock-score score-consider">C+</div>
-          <div class="mock-score-label">
-            CONSIDER<br>
-            <span style="color: var(--text-dim); font-size: 10px;">With Significant Notes</span>
-          </div>
-        </div>
-        <div class="mock-bars">
-          <div class="bar-row">
-            <div class="bar-label"><span>Structure</span><span>72%</span></div>
-            <div class="bar-track"><div class="bar-fill" style="--width: 72%; --delay: 0.2s;"></div></div>
-          </div>
-          <div class="bar-row">
-            <div class="bar-label"><span>Premise</span><span>84%</span></div>
-            <div class="bar-track"><div class="bar-fill" style="--width: 84%; --delay: 0.35s;"></div></div>
-          </div>
-          <div class="bar-row">
-            <div class="bar-label"><span>Pacing</span><span>43%</span></div>
-            <div class="bar-track"><div class="bar-fill low" style="--width: 43%; --delay: 0.5s;"></div></div>
-          </div>
-          <div class="bar-row">
-            <div class="bar-label"><span>Character Pressure</span><span>61%</span></div>
-            <div class="bar-track"><div class="bar-fill mid" style="--width: 61%; --delay: 0.65s;"></div></div>
-          </div>
-          <div class="bar-row">
-            <div class="bar-label"><span>Dialogue</span><span>77%</span></div>
-            <div class="bar-track"><div class="bar-fill" style="--width: 77%; --delay: 0.8s;"></div></div>
-          </div>
-        </div>
-        <div class="mock-note">
-          <strong>Priority Note:</strong> Act Two pacing collapses between pages 54–78. Protagonist lacks consequential pressure at the midpoint. The premise is strong — the architecture needs engineering.
-        </div>
-      </div>
-      <div class="mock-footer">
-        <span class="mock-voice">Voice: Dev Executive</span>
-        <button class="mock-btn">Export PDF</button>
+    <div class="why-right reveal reveal-d2">
+      <p class="why-body">WRITHEON was built by a working writer who understood the math of creative exhaustion. <strong>You have limited time. You have financial pressure. You have a script that keeps failing for reasons you can't name.</strong> Most feedback systems hand you a red pen and a vague sense of wrongness. They don't tell you why Act Two collapses. They don't show you where pressure is absent. They don't identify the structural instability beneath the scenes you love most.</p>
+      <div class="why-pillars">
+        <div class="pillar"><span class="pillar-n">01</span><span class="pillar-t">Rewrite exhaustion comes from unclear direction. Precision eliminates it.</span></div>
+        <div class="pillar"><span class="pillar-n">02</span><span class="pillar-t">Vague notes are the enemy of craft development. Diagnostics replace them.</span></div>
+        <div class="pillar"><span class="pillar-n">03</span><span class="pillar-t">Structure is architecture. Pressure is engineering. Both are learnable.</span></div>
+        <div class="pillar"><span class="pillar-n">04</span><span class="pillar-t">AI should assist development intelligence — never replace creative authorship.</span></div>
+        <div class="pillar"><span class="pillar-n">05</span><span class="pillar-t">Working writers deserve the same precision tools that studios use internally.</span></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- PHILOSOPHY -->
-<section class="section-philosophy">
-  <div class="philosophy-inner">
-    <div class="philosophy-quote reveal">
-      A story is not just written. It is engineered through development.
-      <cite>— Writheon Manifesto</cite>
+<!-- HOW IT THINKS -->
+<section class="section-thinks" id="coverage">
+  <div class="thinks-inner">
+    <div class="thinks-header">
+      <div class="thinks-title reveal">
+        <span>The Intelligence Layer</span>
+        How WRITHEON<br>Thinks
+      </div>
+      <p class="thinks-intro reveal reveal-d2">WRITHEON does not generate content. It diagnoses narrative architecture. Every analysis draws from a precision framework built on story structure theory, professional coverage methodology, and narrative pressure systems.</p>
     </div>
-    <div class="philosophy-pillars reveal reveal-delay-2">
-      <div class="pillar">
-        <span class="pillar-num">01</span>
-        <span class="pillar-text">Architecture matters. Pressure matters. Escalation matters.</span>
+    <div class="thinks-grid">
+      <div class="think-card reveal">
+        <div class="think-n">01 — Diagnostic</div>
+        <div class="think-title">Narrative Pressure Analysis</div>
+        <p class="think-desc">Identifies where story pressure is absent, collapsed, or asymmetric — across acts, scenes, and character arcs.</p>
       </div>
-      <div class="pillar">
-        <span class="pillar-num">02</span>
-        <span class="pillar-text">AI should assist development, not replace imagination.</span>
+      <div class="think-card reveal reveal-d1">
+        <div class="think-n">02 — Structural</div>
+        <div class="think-title">Architecture Intelligence</div>
+        <p class="think-desc">Evaluates act structure health, turning point precision, midpoint consequence, and climax architecture for instability.</p>
       </div>
-      <div class="pillar">
-        <span class="pillar-num">03</span>
-        <span class="pillar-text">Emotional carryover matters. Scene function matters. Rewrite order matters.</span>
+      <div class="think-card reveal reveal-d2">
+        <div class="think-n">03 — Character</div>
+        <div class="think-title">Character Pressure System</div>
+        <p class="think-desc">Measures protagonist agency, antagonist development, supporting character function, and arc trajectory alignment.</p>
       </div>
-      <div class="pillar">
-        <span class="pillar-num">04</span>
-        <span class="pillar-text">Technology should support creativity, not flatten it.</span>
+      <div class="think-card reveal reveal-d3">
+        <div class="think-n">04 — Scene</div>
+        <div class="think-title">Scene Functionality</div>
+        <p class="think-desc">Assesses every scene for dramatic function, pressure contribution, dialogue authenticity, and narrative necessity.</p>
       </div>
-      <div class="pillar">
-        <span class="pillar-num">05</span>
-        <span class="pillar-text">Writers deserve better tools. This is what better looks like.</span>
+      <div class="think-card reveal">
+        <div class="think-n">05 — Pacing</div>
+        <div class="think-title">Momentum Architecture</div>
+        <p class="think-desc">Tracks emotional momentum through escalation mapping, detecting pacing collapse zones and flat dramatic arcs.</p>
+      </div>
+      <div class="think-card reveal reveal-d1">
+        <div class="think-n">06 — Coverage</div>
+        <div class="think-title">Professional Voice Modes</div>
+        <p class="think-desc">Six industry coverage voices: Development Executive, Studio Notes, Contest Reader, Brutal Truth, Streaming Platform, Manager Notes.</p>
+      </div>
+      <div class="think-card reveal reveal-d2">
+        <div class="think-n">07 — Rewrite</div>
+        <div class="think-title">Rewrite Intelligence</div>
+        <p class="think-desc">Generates priority-ranked rewrite targets so you know exactly what to fix first — not everything at once, blindly.</p>
+      </div>
+      <div class="think-card reveal reveal-d3">
+        <div class="think-n">08 — Pattern</div>
+        <div class="think-title">Narrative Pattern Recognition</div>
+        <p class="think-desc">Identifies recurring structural failure patterns — the invisible habits that cause the same scenes to keep not working.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PREVIEW -->
+<section class="section-preview">
+  <div class="preview-inner">
+    <div class="preview-header reveal">
+      <div class="preview-title">
+        <span>Coverage Engine™ — Live Preview</span>
+        See It In<br>Action
+      </div>
+      <div class="genre-tabs">
+        <button class="genre-tab active" onclick="showGenre('horror', this)">Horror</button>
+        <button class="genre-tab" onclick="showGenre('thriller', this)">Thriller</button>
+        <button class="genre-tab" onclick="showGenre('drama', this)">Drama</button>
+        <button class="genre-tab" onclick="showGenre('pilot', this)">TV Pilot</button>
+      </div>
+    </div>
+    <div class="preview-panels reveal reveal-d1">
+
+      <div class="preview-panel active" id="panel-horror">
+        <div class="panel-info">
+          <h3>The Waiting Room</h3>
+          <div class="genre-label">Horror · Feature · First 10 Pages</div>
+          <p>A hospital waiting room where patients begin disappearing one by one — but no one can leave. The premise is strong; the execution reveals structural pressure collapse in Act One.</p>
+          <div class="panel-score-row">
+            <div class="panel-score score-consider" style="color:var(--amber)">B−</div>
+            <div>
+              <div class="panel-verdict" style="color:var(--text)">CONSIDER</div>
+              <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--text-dim);margin-top:4px">Dev Executive Voice</div>
+            </div>
+          </div>
+          <div class="panel-diags">
+            <div class="pd-row"><div class="pd-label"><span>Atmosphere</span><span>91%</span></div><div class="pd-bar"><div class="pd-fill fill-green" style="background:var(--green);width:91%"></div></div></div>
+            <div class="pd-row"><div class="pd-label"><span>Tension Architecture</span><span>58%</span></div><div class="pd-bar"><div class="pd-fill" style="background:var(--amber);width:58%"></div></div></div>
+            <div class="pd-row"><div class="pd-label"><span>Protagonist Agency</span><span>34%</span></div><div class="pd-bar"><div class="pd-fill" style="background:var(--red);width:34%"></div></div></div>
+            <div class="pd-row"><div class="pd-label"><span>Hook Strength</span><span>82%</span></div><div class="pd-bar"><div class="pd-fill fill-green" style="background:var(--green);width:82%"></div></div></div>
+          </div>
+        </div>
+        <div class="panel-result">
+          <div class="result-block">
+            <div class="rb-title">Coverage Notes</div>
+            <p class="rb-text">The opening image is <strong>cinematically precise</strong> and the premise communicates genre clarity immediately. However, the protagonist exists in the first ten pages as a passive observer rather than an active participant in the central threat. <strong>Pressure requires agency.</strong> The atmosphere is exceptional; the architecture needs engineering.</p>
+          </div>
+          <div class="result-block">
+            <div class="rb-title">Priority Rewrites</div>
+            <ul class="rb-list">
+              <li>Give the protagonist a specific goal in the first 3 pages — she must want something before the threat arrives</li>
+              <li>The disappearance of the first patient needs a direct consequence for the protagonist — not just atmosphere</li>
+              <li>Establish a concrete rule about the space on page 5, not page 12 — genre audiences need the logic early</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="preview-panel" id="panel-thriller">
+        <div class="panel-info">
+          <h3>Protocol Black</h3>
+          <div class="genre-label">Thriller · Feature · Concept Test</div>
+          <p>A government analyst discovers a classified protocol designed to eliminate domestic threats — and realizes she is the next target. High-concept with structural integrity issues at the midpoint.</p>
+          <div class="panel-score-row">
+            <div class="panel-score" style="color:var(--green)">B+</div>
+            <div>
+              <div class="panel-verdict" style="color:var(--text)">CONSIDER</div>
+              <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--text-dim);margin-top:4px">Studio Notes Voice</div>
+            </div>
+          </div>
+          <div class="panel-diags">
+            <div class="pd-row"><div class="pd-label"><span>Concept Strength</span><span>88%</span></div><div class="pd-bar"><div class="pd-fill" style="background:var(--green);width:88%"></div></div></div>
+            <div class="pd-row"><div class="pd-label"><span>Marketability</span><span>85%</span></div><div class="pd-bar"><div class="pd-fill" style="background:var(--green);width:85%"></div></div></div>
+            <div class="pd-row"><div class="pd-label"><span>Stakes Escalation</span><span>61%</span></div><div class="pd-bar"><div class="pd-fill" style="background:var(--amber);width:61%"></div></div></div>
+            <div class="pd-row"><div class="pd-label"><span>Third Act Clarity</span><span>44%</span></div><div class="pd-bar"><div class="pd-fill" style="background:var(--amber);width:44%"></div></div></div>
+          </div>
+        </div>
+        <div class="panel-result">
+          <div class="result-block">
+            <div class="rb-title">Coverage Notes</div>
+            <p class="rb-text">The concept is <strong>commercially viable and genre-clear.</strong> The central irony — a government analyst targeted by her own system — carries genuine dramatic weight. The third act resolution requires significant architectural work. <strong>The machinery is sound; the climax needs engineering.</strong></p>
+          </div>
+          <div class="result-block">
+            <div class="rb-title">Priority Rewrites</div>
+            <ul class="rb-list">
+              <li>The antagonist's motivation needs to be revealed earlier — page 45 is too late for this genre</li>
+              <li>The midpoint decision must have irreversible consequences — currently the protagonist can still retreat</li>
+              <li>Third act needs a clock — establish the deadline no later than page 75</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="preview-panel" id="panel-drama">
+        <div class="panel-info">
+          <h3>What the River Remembers</h3>
+          <div class="genre-label">Drama · Feature · Scene Diagnostic</div>
+          <p>A daughter returns to her childhood home after her mother's death and discovers the family's history is nothing like she was told. A quiet, literary drama with pacing collapse in Act Two.</p>
+          <div class="panel-score-row">
+            <div class="panel-score" style="color:var(--amber)">C+</div>
+            <div>
+              <div class="panel-verdict" style="color:var(--text)">CONSIDER</div>
+              <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--text-dim);margin-top:4px">Manager Notes Voice</div>
+            </div>
+          </div>
+          <div class="panel-diags">
+            <div class="pd-row"><div class="pd-label"><span>Emotional Authenticity</span><span>94%</span></div><div class="pd-bar"><div class="pd-fill" style="background:var(--green);width:94%"></div></div></div>
+            <div class="pd-row"><div class="pd-label"><span>Dialogue Craft</span><span>87%</span></div><div class="pd-bar"><div class="pd-fill" style="background:var(--green);width:87%"></div></div></div>
+            <div class="pd-row"><div class="pd-label"><span>Dramatic Pressure</span><span>42%</span></div><div class="pd-bar"><div class="pd-fill" style="background:var(--red);width:42%"></div></div></div>
+            <div class="pd-row"><div class="pd-label"><span>Pacing</span><span>39%</span></div><div class="pd-bar"><div class="pd-fill" style="background:var(--red);width:39%"></div></div></div>
+          </div>
+        </div>
+        <div class="panel-result">
+          <div class="result-block">
+            <div class="rb-title">Coverage Notes</div>
+            <p class="rb-text">The emotional intelligence in this script is <strong>genuinely rare.</strong> The dialogue reads as lived experience. However, the dramatic pressure in Acts Two and Three is almost entirely absent — the script confuses emotional resonance with dramatic escalation. <strong>Beauty without pressure is not enough to hold the screen.</strong></p>
+          </div>
+          <div class="result-block">
+            <div class="rb-title">Priority Rewrites</div>
+            <ul class="rb-list">
+              <li>The revelation on page 58 needs to cost the protagonist something immediate — currently it's absorbed without consequence</li>
+              <li>Add a secondary conflict that forces the protagonist to choose between the truth and her relationship with her sister</li>
+              <li>Act Two needs at least two scenes where the protagonist takes action she cannot undo</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="preview-panel" id="panel-pilot">
+        <div class="panel-info">
+          <h3>Night Protocol</h3>
+          <div class="genre-label">TV Pilot · Drama · Full Coverage</div>
+          <p>A covert crisis negotiator operates outside all official channels — solving cases the government cannot officially acknowledge. Pilot structure is strong; series engine needs definition.</p>
+          <div class="panel-score-row">
+            <div class="panel-score" style="color:var(--green)">A−</div>
+            <div>
+              <div class="panel-verdict" style="color:var(--text)">PASS</div>
+              <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--text-dim);margin-top:4px">Streaming Platform Voice</div>
+            </div>
+          </div>
+          <div class="panel-diags">
+            <div class="pd-row"><div class="pd-label"><span>Pilot Architecture</span><span>89%</span></div><div class="pd-bar"><div class="pd-fill" style="background:var(--green);width:89%"></div></div></div>
+            <div class="pd-row"><div class="pd-label"><span>Series Engine Clarity</span><span>71%</span></div><div class="pd-bar"><div class="pd-fill" style="background:var(--gold);width:71%"></div></div></div>
+            <div class="pd-row"><div class="pd-label"><span>Character Architecture</span><span>84%</span></div><div class="pd-bar"><div class="pd-fill" style="background:var(--green);width:84%"></div></div></div>
+            <div class="pd-row"><div class="pd-label"><span>Platform Viability</span><span>82%</span></div><div class="pd-bar"><div class="pd-fill" style="background:var(--green);width:82%"></div></div></div>
+          </div>
+        </div>
+        <div class="panel-result">
+          <div class="result-block">
+            <div class="rb-title">Coverage Notes</div>
+            <p class="rb-text">This pilot functions as a pilot should — it establishes character, world, and procedural engine with confidence. The protagonist is <strong>platform-ready.</strong> The series engine needs one additional layer of mythology to sustain multi-season development. The final scene is the strongest in the script.</p>
+          </div>
+          <div class="result-block">
+            <div class="rb-title">Priority Rewrites</div>
+            <ul class="rb-list">
+              <li>Define the one rule that governs which cases the protagonist takes — this is the series engine constraint</li>
+              <li>The antagonist introduced in Act Three needs a clearer seasonal arc — what does this relationship become?</li>
+              <li>Add 2 pages of world mythology in Act One — not exposition, but lived detail that implies larger infrastructure</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ECOSYSTEM -->
+<section class="section-ecosystem" id="roadmap">
+  <div class="eco-inner">
+    <div class="section-tag" data-n="04">Platform Roadmap</div>
+    <div class="eco-header">
+      <div class="eco-title reveal">
+        <span>The WRITHEON Platform</span>
+        The Full<br>Development<br>Ecosystem
+      </div>
+      <p class="eco-intro reveal reveal-d2">WRITHEON is not a single tool. It is a precision development platform built to grow with your craft — from first coverage to full story architecture intelligence.</p>
+    </div>
+    <div class="eco-grid">
+      <div class="eco-card live reveal">
+        <div class="eco-card-n">CE — 01</div>
+        <div class="eco-card-title">Coverage Engine™</div>
+        <p class="eco-card-desc">Professional screenplay coverage in six industry voices. Four diagnostic modes. The first system inside the SDE™.</p>
+        <span class="eco-badge badge-live">Live Now</span>
+      </div>
+      <div class="eco-card reveal reveal-d1">
+        <div class="eco-card-n">CE — 02</div>
+        <div class="eco-card-title">Scene Pressure Engine</div>
+        <p class="eco-card-desc">Scene-by-scene pressure mapping. Visual tension indicators. Momentum collapse detection across your full script.</p>
+        <span class="eco-badge badge-soon">Phase 2</span>
+      </div>
+      <div class="eco-card reveal reveal-d2">
+        <div class="eco-card-n">CE — 03</div>
+        <div class="eco-card-title">Character Diagnostics</div>
+        <p class="eco-card-desc">Deep character pressure analysis. Arc integrity tracking. Motivation-consequence alignment scoring across all major characters.</p>
+        <span class="eco-badge badge-soon">Phase 2</span>
+      </div>
+      <div class="eco-card reveal reveal-d3">
+        <div class="eco-card-n">CE — 04</div>
+        <div class="eco-card-title">Draft Comparison</div>
+        <p class="eco-card-desc">Paste Draft A and Draft B. Receive a precise delta report showing exactly what improved, regressed, or shifted between rewrites.</p>
+        <span class="eco-badge badge-soon">Phase 2</span>
+      </div>
+      <div class="eco-card reveal">
+        <div class="eco-card-n">CE — 05</div>
+        <div class="eco-card-title">Rewrite Matrix</div>
+        <p class="eco-card-desc">Priority-ordered rewrite intelligence. Structural intervention sequencing. Know what to fix first and in what order.</p>
+        <span class="eco-badge badge-soon">Coming</span>
+      </div>
+      <div class="eco-card reveal reveal-d1">
+        <div class="eco-card-n">CE — 06</div>
+        <div class="eco-card-title">Series Engine</div>
+        <p class="eco-card-desc">Pilot architecture scoring. Series engine definition. Season arc diagnostics for television and streaming development.</p>
+        <span class="eco-badge badge-soon">Coming</span>
+      </div>
+      <div class="eco-card reveal reveal-d2">
+        <div class="eco-card-n">CE — 07</div>
+        <div class="eco-card-title">Story Architecture Intelligence</div>
+        <p class="eco-card-desc">Full narrative pattern recognition. Cross-draft intelligence. Structural DNA mapping across your entire body of work.</p>
+        <span class="eco-badge badge-soon">Coming</span>
+      </div>
+      <div class="eco-card reveal reveal-d3">
+        <div class="eco-card-n">CE — 08</div>
+        <div class="eco-card-title">Studio Collaboration</div>
+        <p class="eco-card-desc">Writers room support. Producer-ready exports. Team workflow. Collaborative development intelligence for production environments.</p>
+        <span class="eco-badge badge-soon">Coming</span>
       </div>
     </div>
   </div>
@@ -1376,57 +1220,123 @@
 
 <!-- PRICING -->
 <section class="section-pricing" id="pricing">
-  <div class="pricing-header reveal">
-    <div class="section-label" data-num="04" style="justify-content: center;">Access</div>
-    <h2>Start Free.<br>Go Pro When Ready.</h2>
-    <p>No credit card. No commitment. Run your first analysis in under 60 seconds.</p>
-  </div>
-  <div class="pricing-grid reveal">
-    <div class="pricing-card">
-      <div class="pricing-tier">Free Access</div>
-      <div class="pricing-price">$0 <span>/ forever</span></div>
-      <p class="pricing-note">Start diagnosing your script today.</p>
-      <ul class="pricing-features">
-        <li>First 10 Pages — always unlimited</li>
-        <li>3 full analyses (any mode)</li>
-        <li>Concept Test & Scene Diagnostic</li>
-        <li>Development Executive voice</li>
-        <li>Analysis history on device</li>
-      </ul>
-      <a href="/coverage" class="btn-tier btn-tier-free">Start Free</a>
+  <div class="pricing-inner">
+    <div class="section-tag" data-n="05" style="justify-content:center">Access</div>
+    <div class="pricing-header reveal">
+      <h2>Precision Development.<br>Accessible Pricing.</h2>
+      <p>Less than one professional coverage report. More than any single coverage can tell you.</p>
     </div>
-    <div class="pricing-card featured">
-      <div class="pricing-tier">Pro Access</div>
-      <div class="pricing-price">$19–29 <span>/ month</span></div>
-      <p class="pricing-note">Unlimited development. Every voice. Every mode.</p>
-      <ul class="pricing-features">
-        <li>Unlimited analyses — all modes</li>
-        <li>All 6 Coverage Voice Modes</li>
-        <li>PDF coverage report export</li>
-        <li>Cloud history — all devices</li>
-        <li>Draft Comparison (Phase 2)</li>
-        <li>Scene Pressure Meter (Phase 2)</li>
-        <li>Priority Gumroad resource access</li>
-      </ul>
-      <a href="#" class="btn-tier btn-tier-pro">Upgrade to Pro</a>
+    <div class="pricing-philosophy reveal">
+      <div class="pp-icon">SDE™</div>
+      <p class="pp-text">Professional screenplay coverage costs <strong>$75–$250 per report.</strong> WRITHEON gives you unlimited diagnostic intelligence for less than the cost of two reports per month — with precision that generic coverage cannot match.</p>
+    </div>
+    <div class="pricing-grid reveal">
+
+      <!-- FREE -->
+      <div class="pricing-card">
+        <div class="pricing-tier">Free Access</div>
+        <div class="pricing-price">$0 <sub>/ forever</sub></div>
+        <div class="pricing-cadence">No credit card required</div>
+        <p class="pricing-compare" style="color:var(--text-dim);font-style:italic">Start diagnosing your script today.</p>
+        <ul class="pricing-features">
+          <li>First 10 Pages — always unlimited</li>
+          <li>3 full analyses (any mode)</li>
+          <li>Concept Test & Scene Diagnostic</li>
+          <li>Development Executive voice</li>
+          <li>On-device analysis history</li>
+          <li class="dim">Pro voice modes</li>
+          <li class="dim">PDF export</li>
+          <li class="dim">Full Coverage mode</li>
+        </ul>
+        <a href="/coverage" class="btn-tier btn-tier-free">Start Free</a>
+      </div>
+
+      <!-- FOUNDING -->
+      <div class="pricing-card featured">
+        <div class="pricing-tier">
+          Founding Writer Access
+          <span class="founding-badge">First 250 Only</span>
+        </div>
+        <div class="pricing-price">$15 <sub>/ month</sub></div>
+        <div class="pricing-cadence">Locked for life · Charter pricing</div>
+        <p class="pricing-compare">This is not a discount. It is <em>founding member positioning.</em> The writers who build WRITHEON with us earn this rate permanently.</p>
+        <ul class="pricing-features">
+          <li>Everything in Pro — forever</li>
+          <li>Unlimited analyses — all modes</li>
+          <li>All 6 Coverage Voice Modes</li>
+          <li>PDF coverage report export</li>
+          <li>Founding member designation</li>
+          <li>Direct input on platform development</li>
+          <li>Early access to all new systems</li>
+          <li>Rate locked for life</li>
+        </ul>
+        <a href="/coverage" class="btn-tier btn-tier-founding">Claim Founding Access →</a>
+      </div>
+
+      <!-- PRO -->
+      <div class="pricing-card">
+        <div class="pricing-tier">Pro Access</div>
+        <div class="pricing-price">$29 <sub>/ month</sub></div>
+        <div class="pricing-cadence">Or $249/year — less than two coverage reports</div>
+        <p class="pricing-compare">Full narrative intelligence suite. Every voice. Every mode. Every diagnostic.</p>
+        <ul class="pricing-features">
+          <li>Unlimited analyses — all modes</li>
+          <li>All 6 Coverage Voice Modes</li>
+          <li>Full Coverage Report mode</li>
+          <li>PDF export + cloud history</li>
+          <li>Draft Comparison (Phase 2)</li>
+          <li>Scene Pressure Engine (Phase 2)</li>
+          <li>Character Diagnostics (Phase 2)</li>
+          <li class="dim">Studio collaboration features</li>
+        </ul>
+        <a href="/coverage" class="btn-tier btn-tier-pro">Upgrade to Pro</a>
+      </div>
+
+      <!-- STUDIO -->
+      <div class="pricing-card">
+        <div class="pricing-tier">Studio Access</div>
+        <div class="pricing-price" style="color:var(--text-dim)">TBD</div>
+        <div class="pricing-cadence">Coming — by application</div>
+        <p class="pricing-compare" style="color:var(--text-dim)">For production companies, writers rooms, and development teams.</p>
+        <ul class="pricing-features">
+          <li class="dim">Writers room collaboration</li>
+          <li class="dim">Multi-script management</li>
+          <li class="dim">Producer-ready export formats</li>
+          <li class="dim">Team diagnostic workflows</li>
+          <li class="dim">Development pipeline integration</li>
+          <li class="dim">Priority support</li>
+          <li class="dim">Custom voice modes</li>
+          <li class="dim">API access</li>
+        </ul>
+        <a href="#" class="btn-tier btn-tier-studio">Coming Soon</a>
+      </div>
+
+    </div>
+    <div class="founding-note reveal">
+      <span class="fn-label">Founding Writer Access</span>
+      <p class="fn-text">The first 250 writers who commit to WRITHEON's development earn charter pricing — $15/month, locked for life. This is not a promotional rate. It is a recognition that the writers who build with us in the early stages deserve permanent access to what they helped create. Once 250 spots are filled, this tier closes permanently.</p>
     </div>
   </div>
 </section>
 
 <!-- FINAL CTA -->
 <section class="section-cta">
-  <div class="cta-eyebrow">Coverage Engine™ — First System Inside the SDE™</div>
-  <h2 class="cta-headline reveal">Your Script<br>Deserves Better.</h2>
-  <p class="cta-sub reveal reveal-delay-1">Stop guessing. Start diagnosing.</p>
-  <a href="/coverage" class="btn-primary reveal reveal-delay-2">Run Free Coverage →</a>
+  <div class="cta-glow"></div>
+  <div class="cta-eyebrow">Coverage Engine™ — Screenplay Development Engine™ — Now Live</div>
+  <h2 class="cta-headline reveal">
+    Stop Rewriting<br>Blindly.
+    <em>Know what's broken first.</em>
+  </h2>
+  <p class="cta-sub reveal" style="margin-bottom:64px">Serious writers deserve <strong>precise feedback.</strong> Not encouragement. Not theory. Diagnosis. Run your first analysis in under 60 seconds — no credit card required.</p>
+  <a href="/coverage" class="btn-primary reveal" style="font-size:12px;padding:18px 48px">Run Free Coverage →</a>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo">WRITH<span>E</span>ON</div>
+  <div class="footer-logo">WRITH<em>E</em>ON</div>
   <div class="footer-copy">
     © 2025 Wesvane LLC. All rights reserved.<br>
-    Screenplay Development Engine™ · Coverage Engine™
+    Screenplay Development Engine™ · Coverage Engine™ · Narrative Development Intelligence
   </div>
   <div class="footer-links">
     <a href="https://writheon.gumroad.com" target="_blank">Resources</a>
@@ -1436,54 +1346,38 @@
 </footer>
 
 <script>
-  // Custom cursor
-  const cursor = document.getElementById('cursor');
-  const ring = document.getElementById('cursorRing');
-  let mx = 0, my = 0, rx = 0, ry = 0;
-  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-  function animCursor() {
-    cursor.style.left = mx + 'px';
-    cursor.style.top = my + 'px';
-    rx += (mx - rx) * 0.12;
-    ry += (my - ry) * 0.12;
-    ring.style.left = rx + 'px';
-    ring.style.top = ry + 'px';
-    requestAnimationFrame(animCursor);
-  }
-  animCursor();
+// Cursor
+const cur = document.getElementById('cur'), ring = document.getElementById('ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+(function animCur(){
+  cur.style.left=mx+'px';cur.style.top=my+'px';
+  rx+=(mx-rx)*.1;ry+=(my-ry)*.1;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(animCur);
+})();
+document.querySelectorAll('a,button').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.width='14px';cur.style.height='14px';ring.style.width='44px';ring.style.height='44px';});
+  el.addEventListener('mouseleave',()=>{cur.style.width='6px';cur.style.height='6px';ring.style.width='28px';ring.style.height='28px';});
+});
 
-  document.querySelectorAll('a, button').forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      cursor.style.width = '16px';
-      cursor.style.height = '16px';
-      ring.style.width = '48px';
-      ring.style.height = '48px';
-    });
-    el.addEventListener('mouseleave', () => {
-      cursor.style.width = '8px';
-      cursor.style.height = '8px';
-      ring.style.width = '32px';
-      ring.style.height = '32px';
-    });
-  });
+// Nav scroll
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>40));
 
-  // Nav scroll
-  const nav = document.getElementById('nav');
-  window.addEventListener('scroll', () => {
-    nav.classList.toggle('scrolled', window.scrollY > 40);
-  });
+// Scroll reveal
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});
+},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-  // Reveal on scroll
-  const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        observer.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.12 });
-  reveals.forEach(el => observer.observe(el));
+// Genre tabs
+function showGenre(g, el) {
+  document.querySelectorAll('.genre-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.preview-panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-'+g).classList.add('active');
+}
 </script>
 </body>
 </html>

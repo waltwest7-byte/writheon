@@ -162,18 +162,76 @@ nav {
 
 /* INPUT AREA */
 .input-area { margin-bottom: 32px; }
-.input-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 12px;
+.input-tabs {
+  display: flex; align-items: center; gap: 0;
+  margin-bottom: 0; border-bottom: 1px solid var(--border);
+}
+.input-tab {
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 400;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--text-dim); background: none; border: none;
+  padding: 12px 24px; cursor: none;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color .2s, border-color .2s;
+}
+.input-tab:hover { color: var(--text); }
+.input-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+.input-hint {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
+  letter-spacing: .1em; color: var(--text-dim); text-transform: uppercase;
+  padding: 12px 0 12px 4px; margin-left: auto;
 }
 .input-label {
   font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
   letter-spacing: .18em; color: var(--gold); text-transform: uppercase;
 }
-.input-hint {
-  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
-  letter-spacing: .1em; color: var(--text-dim); text-transform: uppercase;
+
+/* UPLOAD ZONE */
+.upload-zone {
+  display: none;
+  border: 1px dashed var(--border-light);
+  background: var(--surface);
+  min-height: 280px;
+  align-items: center; justify-content: center;
+  flex-direction: column; gap: 16px;
+  transition: border-color .2s, background .2s;
+  cursor: none; position: relative;
 }
+.upload-zone.active-tab { display: flex; }
+.upload-zone.dragover { border-color: var(--gold); background: var(--surface2); }
+.upload-icon {
+  font-family: 'Bebas Neue', sans-serif; font-size: 48px;
+  letter-spacing: .06em; color: var(--border-light);
+}
+.upload-title {
+  font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 400;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--text-dim);
+}
+.upload-sub {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--border-light);
+}
+.upload-btn {
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 400;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--black); background: var(--gold);
+  border: none; padding: 12px 28px; cursor: none;
+  transition: background .2s;
+}
+.upload-btn:hover { background: var(--white); }
+.upload-file-info {
+  display: none; align-items: center; gap: 12px;
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 300;
+  letter-spacing: .1em; color: var(--text-mid); text-transform: uppercase;
+}
+.upload-file-info.visible { display: flex; }
+.upload-file-name { color: var(--gold); }
+.upload-clear {
+  font-size: 10px; color: var(--text-dim); background: none; border: none;
+  cursor: none; letter-spacing: .1em; font-family: 'DM Mono', monospace;
+  text-transform: uppercase; transition: color .2s;
+}
+.upload-clear:hover { color: var(--red); }
 
 textarea {
   width: 100%; min-height: 280px;
@@ -605,11 +663,32 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
     </div>
 
     <div class="input-area">
-      <div class="input-header">
-        <span class="input-label" id="inputLabel">Paste Your Opening Pages</span>
+      <div class="input-tabs">
+        <button class="input-tab active" id="tabUpload" onclick="switchTab('upload')">↑ Upload File</button>
+        <button class="input-tab" id="tabPaste" onclick="switchTab('paste')">Paste Text</button>
         <span class="input-hint" id="inputHint">Approx. first 10 pages · ~1,000 words</span>
       </div>
-      <textarea id="scriptInput" placeholder="Paste your screenplay pages here. Fountain format, Final Draft export, or plain text — all accepted. The Coverage Engine will assess structure, pressure, character function, and narrative momentum..." spellcheck="false"></textarea>
+
+      <!-- UPLOAD TAB -->
+      <div class="upload-zone active-tab" id="uploadZone"
+           ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+        <div id="uploadPrompt" style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+          <div class="upload-icon">CE™</div>
+          <div class="upload-title">Drop your screenplay here</div>
+          <div class="upload-sub">PDF · Fountain · FDX · TXT · Any format</div>
+          <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Browse Files</button>
+          <input type="file" id="fileInput" accept=".pdf,.fountain,.fdx,.txt,.md" style="display:none" onchange="handleFileSelect(event)">
+        </div>
+        <div class="upload-file-info" id="fileInfo">
+          <span>File loaded:</span>
+          <span class="upload-file-name" id="fileName"></span>
+          <button class="upload-clear" onclick="clearFile()">✕ Clear</button>
+        </div>
+      </div>
+
+      <!-- PASTE TAB -->
+      <textarea id="scriptInput" style="display:none;" placeholder="Paste your screenplay pages here. Fountain format, Final Draft export, or plain text — all accepted. The Coverage Engine will assess structure, pressure, character function, and narrative momentum..." spellcheck="false"></textarea>
+
       <div class="input-footer">
         <span class="char-count" id="charCount">0 characters</span>
         <button class="run-btn" id="runBtn" onclick="runAnalysis()">Run Coverage →</button>
@@ -794,7 +873,7 @@ function selectVoice(voice, el) {
 
 // ─── ANALYSIS ─────────────────────────────────────────────
 async function runAnalysis() {
-  const text = document.getElementById('scriptInput').value.trim();
+  const text = getInputText();
   if (!text || text.length < 100) { showToast('Paste at least a few paragraphs to analyze'); return; }
 
   const unlimited = currentMode === 'first10';
@@ -809,7 +888,7 @@ async function runAnalysis() {
   const prompt = buildPrompt(text);
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/api/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1002,7 +1081,7 @@ function unlockPro() {
 
 // ─── UTILS ────────────────────────────────────────────────
 function updateCharCount() {
-  const len = document.getElementById('scriptInput').value.length;
+  const len = (activeTab === 'upload' ? uploadedText : document.getElementById('scriptInput').value).length;
   document.getElementById('charCount').textContent = len.toLocaleString() + ' characters';
 }
 
@@ -1027,6 +1106,95 @@ document.querySelectorAll('a,button,textarea').forEach(el => {
   el.addEventListener('mouseenter', () => { cur.style.width='14px'; cur.style.height='14px'; ring.style.width='44px'; ring.style.height='44px'; });
   el.addEventListener('mouseleave', () => { cur.style.width='8px'; cur.style.height='8px'; ring.style.width='32px'; ring.style.height='32px'; });
 });
+
+// ─── UPLOAD & TABS ───────────────────────────────────────
+let uploadedText = '';
+let activeTab = 'upload';
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.getElementById('tabUpload').className = 'input-tab' + (tab === 'upload' ? ' active' : '');
+  document.getElementById('tabPaste').className = 'input-tab' + (tab === 'paste' ? ' active' : '');
+  document.getElementById('uploadZone').className = 'upload-zone' + (tab === 'upload' ? ' active-tab' : '');
+  document.getElementById('scriptInput').style.display = tab === 'paste' ? 'block' : 'none';
+  updateCharCount();
+}
+
+function getInputText() {
+  if (activeTab === 'upload') return uploadedText;
+  return document.getElementById('scriptInput').value.trim();
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.add('dragover');
+}
+function handleDragLeave(e) {
+  document.getElementById('uploadZone').classList.remove('dragover');
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+}
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) processFile(file);
+}
+
+async function processFile(file) {
+  const name = file.name;
+  const ext = name.split('.').pop().toLowerCase();
+  document.getElementById('uploadPrompt').style.display = 'none';
+  document.getElementById('fileInfo').className = 'upload-file-info visible';
+  document.getElementById('fileName').textContent = name;
+  showToast('Reading file...');
+
+  try {
+    if (ext === 'pdf') {
+      uploadedText = await extractPDF(file);
+    } else {
+      uploadedText = await file.text();
+    }
+    updateCharCount();
+    showToast(`Loaded: ${uploadedText.length.toLocaleString()} characters`);
+  } catch(e) {
+    showToast('Could not read file — try copy/paste instead');
+    clearFile();
+  }
+}
+
+async function extractPDF(file) {
+  // Load PDF.js from CDN
+  if (!window.pdfjsLib) {
+    await new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let text = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    text += content.items.map(item => item.str).join(' ') + '\n';
+  }
+  return text;
+}
+
+function clearFile() {
+  uploadedText = '';
+  document.getElementById('fileInput').value = '';
+  document.getElementById('uploadPrompt').style.display = 'flex';
+  document.getElementById('fileInfo').className = 'upload-file-info';
+  document.getElementById('fileName').textContent = '';
+  updateCharCount();
+}
 
 // ─── START ────────────────────────────────────────────────
 init();
