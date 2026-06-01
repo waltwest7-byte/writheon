@@ -77,7 +77,6 @@ nav {
   border-bottom: 1px solid var(--border);
   display: flex; align-items: flex-end; justify-content: space-between;
 }
-.app-title { }
 .app-title h1 {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 32px; letter-spacing: .06em; color: var(--white);
@@ -102,57 +101,36 @@ nav {
 .usage-note { font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 300; letter-spacing: .1em; color: var(--text-dim); margin-top: 6px; text-transform: uppercase; }
 
 /* SIDEBAR */
-.sidebar {
-  border-right: 1px solid var(--border);
-  padding: 32px 0;
-  overflow-y: auto;
-}
-
+.sidebar { border-right: 1px solid var(--border); padding: 32px 0; overflow-y: auto; }
 .sidebar-section { margin-bottom: 32px; }
 .sidebar-label {
   font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 300;
   letter-spacing: .2em; color: var(--gold-dim); text-transform: uppercase;
   padding: 0 24px; margin-bottom: 8px;
 }
-
 .mode-btn {
   width: 100%; padding: 14px 24px;
   display: flex; flex-direction: column; gap: 4px;
   background: none; border: none; cursor: none;
   border-left: 2px solid transparent;
-  transition: background .2s, border-color .2s;
-  text-align: left;
+  transition: background .2s, border-color .2s; text-align: left;
 }
 .mode-btn:hover { background: var(--surface); }
 .mode-btn.active { background: var(--surface); border-left-color: var(--gold); }
-.mode-btn-name {
-  font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 400;
-  letter-spacing: .08em; color: var(--text-mid); text-transform: uppercase;
-  transition: color .2s;
-}
+.mode-btn-name { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 400; letter-spacing: .08em; color: var(--text-mid); text-transform: uppercase; transition: color .2s; }
 .mode-btn.active .mode-btn-name { color: var(--text); }
 .mode-btn-desc { font-size: 13px; font-weight: 300; font-style: italic; color: var(--text-dim); line-height: 1.4; }
-.mode-btn-tag {
-  font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .12em;
-  color: var(--gold); text-transform: uppercase; margin-top: 4px;
-}
+.mode-btn-tag { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .12em; color: var(--gold); text-transform: uppercase; margin-top: 4px; }
 .mode-btn-tag.pro-tag { color: var(--text-dim); }
-
 .sidebar-divider { height: 1px; background: var(--border); margin: 8px 0; }
-
 .voice-btn {
   width: 100%; padding: 11px 24px;
   display: flex; align-items: center; justify-content: space-between;
-  background: none; border: none; cursor: none;
-  transition: background .2s;
+  background: none; border: none; cursor: none; transition: background .2s;
 }
 .voice-btn:hover { background: var(--surface); }
 .voice-btn.active { background: var(--surface2); }
-.voice-btn-name {
-  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 300;
-  letter-spacing: .08em; color: var(--text-dim); text-transform: uppercase;
-  transition: color .2s;
-}
+.voice-btn-name { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 300; letter-spacing: .08em; color: var(--text-dim); text-transform: uppercase; transition: color .2s; }
 .voice-btn.active .voice-btn-name { color: var(--text); }
 .voice-lock { font-size: 10px; color: var(--border-light); }
 .voice-btn.active .voice-lock { color: var(--gold-dim); }
@@ -160,77 +138,60 @@ nav {
 /* MAIN PANEL */
 .main-panel { padding: 40px 48px; overflow-y: auto; }
 
+/* ── SCRIPT META (Upgrade 1) ── */
+.script-meta {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;
+}
+.meta-field { display: flex; flex-direction: column; gap: 6px; }
+.meta-label {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 300;
+  letter-spacing: .2em; color: var(--gold); text-transform: uppercase;
+}
+.meta-input, .meta-select {
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); font-family: 'DM Mono', monospace;
+  font-size: 13px; font-weight: 300; letter-spacing: .04em;
+  padding: 10px 14px; outline: none; transition: border-color .2s;
+  -webkit-appearance: none; appearance: none;
+}
+.meta-input:focus, .meta-select:focus { border-color: var(--gold-dim); }
+.meta-input::placeholder { color: var(--text-dim); font-style: italic; font-family: 'Cormorant Garamond', serif; font-size: 15px; }
+.meta-select { cursor: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a7570'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
+.meta-select option { background: var(--surface); color: var(--text); }
+
 /* INPUT AREA */
 .input-area { margin-bottom: 32px; }
-.input-tabs {
-  display: flex; align-items: center; gap: 0;
-  margin-bottom: 0; border-bottom: 1px solid var(--border);
-}
+.input-tabs { display: flex; align-items: center; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border); }
 .input-tab {
   font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 400;
   letter-spacing: .14em; text-transform: uppercase;
   color: var(--text-dim); background: none; border: none;
   padding: 12px 24px; cursor: none;
-  border-bottom: 2px solid transparent; margin-bottom: -1px;
-  transition: color .2s, border-color .2s;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color .2s, border-color .2s;
 }
 .input-tab:hover { color: var(--text); }
 .input-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
-.input-hint {
-  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
-  letter-spacing: .1em; color: var(--text-dim); text-transform: uppercase;
-  padding: 12px 0 12px 4px; margin-left: auto;
-}
-.input-label {
-  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
-  letter-spacing: .18em; color: var(--gold); text-transform: uppercase;
-}
+.input-hint { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300; letter-spacing: .1em; color: var(--text-dim); text-transform: uppercase; padding: 12px 0 12px 4px; margin-left: auto; }
 
 /* UPLOAD ZONE */
 .upload-zone {
-  display: none;
-  border: 1px dashed var(--border-light);
-  background: var(--surface);
-  min-height: 280px;
+  display: none; border: 1px dashed var(--border-light);
+  background: var(--surface); min-height: 280px;
   align-items: center; justify-content: center;
   flex-direction: column; gap: 16px;
-  transition: border-color .2s, background .2s;
-  cursor: none; position: relative;
+  transition: border-color .2s, background .2s; cursor: none; position: relative;
 }
 .upload-zone.active-tab { display: flex; }
 .upload-zone.dragover { border-color: var(--gold); background: var(--surface2); }
-.upload-icon {
-  font-family: 'Bebas Neue', sans-serif; font-size: 48px;
-  letter-spacing: .06em; color: var(--border-light);
-}
-.upload-title {
-  font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 400;
-  letter-spacing: .14em; text-transform: uppercase; color: var(--text-dim);
-}
-.upload-sub {
-  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
-  letter-spacing: .1em; text-transform: uppercase; color: var(--border-light);
-}
-.upload-btn {
-  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 400;
-  letter-spacing: .12em; text-transform: uppercase;
-  color: var(--black); background: var(--gold);
-  border: none; padding: 12px 28px; cursor: none;
-  transition: background .2s;
-}
+.upload-icon { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: .06em; color: var(--border-light); }
+.upload-title { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--text-dim); }
+.upload-sub { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300; letter-spacing: .1em; text-transform: uppercase; color: var(--border-light); }
+.upload-btn { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 400; letter-spacing: .12em; text-transform: uppercase; color: var(--black); background: var(--gold); border: none; padding: 12px 28px; cursor: none; transition: background .2s; }
 .upload-btn:hover { background: var(--white); }
-.upload-file-info {
-  display: none; align-items: center; gap: 12px;
-  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 300;
-  letter-spacing: .1em; color: var(--text-mid); text-transform: uppercase;
-}
+.upload-file-info { display: none; align-items: center; gap: 12px; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 300; letter-spacing: .1em; color: var(--text-mid); text-transform: uppercase; }
 .upload-file-info.visible { display: flex; }
 .upload-file-name { color: var(--gold); }
-.upload-clear {
-  font-size: 10px; color: var(--text-dim); background: none; border: none;
-  cursor: none; letter-spacing: .1em; font-family: 'DM Mono', monospace;
-  text-transform: uppercase; transition: color .2s;
-}
+.upload-clear { font-size: 10px; color: var(--text-dim); background: none; border: none; cursor: none; letter-spacing: .1em; font-family: 'DM Mono', monospace; text-transform: uppercase; transition: color .2s; }
 .upload-clear:hover { color: var(--red); }
 
 textarea {
@@ -238,21 +199,13 @@ textarea {
   background: var(--surface); border: 1px solid var(--border);
   color: var(--text); font-family: 'DM Mono', monospace;
   font-size: 13px; font-weight: 300; line-height: 1.8;
-  padding: 24px; resize: vertical; outline: none;
-  transition: border-color .2s;
-  letter-spacing: .03em;
+  padding: 24px; resize: vertical; outline: none; transition: border-color .2s; letter-spacing: .03em;
 }
 textarea:focus { border-color: var(--border-light); }
 textarea::placeholder { color: var(--text-dim); font-style: italic; font-family: 'Cormorant Garamond', serif; font-size: 15px; }
 
-.input-footer {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-top: 12px;
-}
-.char-count {
-  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
-  letter-spacing: .1em; color: var(--text-dim);
-}
+.input-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+.char-count { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300; letter-spacing: .1em; color: var(--text-dim); }
 
 .run-btn {
   font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 400;
@@ -261,62 +214,28 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
   border: none; padding: 14px 36px; cursor: none;
   position: relative; transition: background .2s, transform .2s;
 }
-.run-btn::after {
-  content: ''; position: absolute;
-  bottom: -3px; right: -3px; width: 100%; height: 100%;
-  border: 1px solid var(--gold-dim); transition: transform .2s;
-}
+.run-btn::after { content: ''; position: absolute; bottom: -3px; right: -3px; width: 100%; height: 100%; border: 1px solid var(--gold-dim); transition: transform .2s; }
 .run-btn:hover { background: var(--white); transform: translate(-2px,-2px); }
 .run-btn:hover::after { transform: translate(2px,2px); }
 .run-btn:disabled { background: var(--border-light); color: var(--text-dim); cursor: not-allowed; transform: none; }
 .run-btn:disabled::after { display: none; }
 
 /* MODE INFO BAR */
-.mode-info-bar {
-  background: var(--surface); border: 1px solid var(--border);
-  padding: 16px 24px; margin-bottom: 24px;
-  display: flex; align-items: center; justify-content: space-between;
-}
+.mode-info-bar { background: var(--surface); border: 1px solid var(--border); padding: 16px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; }
 .mode-info-left { display: flex; align-items: center; gap: 16px; }
-.mode-info-name {
-  font-family: 'Bebas Neue', sans-serif; font-size: 18px;
-  letter-spacing: .06em; color: var(--white);
-}
-.mode-info-desc {
-  font-size: 15px; font-weight: 300; font-style: italic; color: var(--text-dim);
-}
-.voice-indicator {
-  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
-  letter-spacing: .14em; color: var(--gold-dim); text-transform: uppercase;
-  display: flex; align-items: center; gap: 8px;
-}
+.mode-info-name { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: .06em; color: var(--white); }
+.mode-info-desc { font-size: 15px; font-weight: 300; font-style: italic; color: var(--text-dim); }
+.voice-indicator { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300; letter-spacing: .14em; color: var(--gold-dim); text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
 .voice-indicator::before { content: ''; width: 6px; height: 6px; background: var(--gold); border-radius: 50%; }
 
 /* RESULTS */
-.results-area { }
-
-.loading-state {
-  display: none; padding: 80px 0; text-align: center;
-}
+.loading-state { display: none; padding: 80px 0; text-align: center; }
 .loading-state.active { display: block; }
-.loading-spinner {
-  width: 40px; height: 40px; border: 1px solid var(--border);
-  border-top-color: var(--gold); border-radius: 50%;
-  animation: spin 1s linear infinite; margin: 0 auto 24px;
-}
-.loading-text {
-  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 300;
-  letter-spacing: .18em; color: var(--text-dim); text-transform: uppercase;
-}
-.loading-sub {
-  font-size: 16px; font-weight: 300; font-style: italic;
-  color: var(--text-dim); margin-top: 8px;
-}
+.loading-spinner { width: 40px; height: 40px; border: 1px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 24px; }
+.loading-text { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 300; letter-spacing: .18em; color: var(--text-dim); text-transform: uppercase; }
+.loading-sub { font-size: 16px; font-weight: 300; font-style: italic; color: var(--text-dim); margin-top: 8px; }
 
-.result-card {
-  background: var(--surface); border: 1px solid var(--border);
-  margin-bottom: 16px; display: none;
-}
+.result-card { background: var(--surface); border: 1px solid var(--border); margin-bottom: 16px; display: none; }
 .result-card.visible { display: block; }
 
 .result-header {
@@ -324,197 +243,180 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
   display: flex; align-items: center; justify-content: space-between;
 }
 .result-score-block { display: flex; align-items: center; gap: 20px; }
-.result-score {
-  font-family: 'Bebas Neue', sans-serif; font-size: 56px;
-  letter-spacing: .02em; line-height: 1;
-}
+.result-score { font-family: 'Bebas Neue', sans-serif; font-size: 56px; letter-spacing: .02em; line-height: 1; }
 .score-pass { color: var(--green); }
 .score-consider { color: var(--amber); }
 .score-fail { color: var(--red); }
-.result-score-meta { }
-.result-verdict {
-  font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 400;
-  letter-spacing: .1em; color: var(--text); text-transform: uppercase;
-}
-.result-voice-tag {
-  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
-  letter-spacing: .12em; color: var(--text-dim); text-transform: uppercase;
-  margin-top: 4px;
-}
+.result-verdict { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 400; letter-spacing: .1em; color: var(--text); text-transform: uppercase; }
+.result-voice-tag { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300; letter-spacing: .12em; color: var(--text-dim); text-transform: uppercase; margin-top: 4px; }
 .result-actions { display: flex; gap: 12px; }
-.btn-small {
-  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 400;
-  letter-spacing: .12em; text-transform: uppercase; border: none;
-  padding: 10px 18px; cursor: none; transition: all .2s;
-}
+.btn-small { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 400; letter-spacing: .12em; text-transform: uppercase; border: none; padding: 10px 18px; cursor: none; transition: all .2s; }
 .btn-export { color: var(--black); background: var(--gold); }
 .btn-export:hover { background: var(--white); }
 .btn-copy { color: var(--text-dim); background: var(--surface2); border: 1px solid var(--border-light); }
 .btn-copy:hover { color: var(--text); border-color: var(--text-dim); }
+.btn-share { color: var(--text-dim); background: var(--surface2); border: 1px solid var(--border-light); }
+.btn-share:hover { color: var(--text); border-color: var(--text-dim); }
+
+/* ── WRITHEON SCORE (Upgrade 4) ── */
+.writheon-score-block {
+  border-bottom: 1px solid var(--border);
+  padding: 20px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--surface2);
+}
+.writheon-score-left { display: flex; align-items: flex-end; gap: 16px; }
+.writheon-score-number {
+  font-family: 'Bebas Neue', sans-serif; font-size: 64px;
+  letter-spacing: .02em; line-height: 1; color: var(--gold);
+}
+.writheon-score-meta { padding-bottom: 8px; }
+.writheon-score-label {
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 400;
+  letter-spacing: .16em; color: var(--text); text-transform: uppercase;
+}
+.writheon-score-sub {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 300;
+  letter-spacing: .12em; color: var(--text-dim); text-transform: uppercase; margin-top: 4px;
+}
+.btn-copy-score {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 400;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--black); background: var(--gold); border: none;
+  padding: 10px 20px; cursor: none; transition: background .2s;
+}
+.btn-copy-score:hover { background: var(--white); }
 
 .result-body { padding: 28px; }
 
-.scores-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
-  margin-bottom: 28px;
-}
+.scores-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
 .score-item { }
-.score-item-label {
-  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 300;
-  letter-spacing: .14em; color: var(--text-dim); text-transform: uppercase;
-  margin-bottom: 6px; display: flex; justify-content: space-between;
-}
+.score-item-label { font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 300; letter-spacing: .14em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px; display: flex; justify-content: space-between; }
 .score-bar { height: 3px; background: var(--border); position: relative; overflow: hidden; }
-.score-bar-fill {
-  height: 100%; position: absolute; left: 0; top: 0;
-  transition: width 1s ease;
-}
+.score-bar-fill { height: 100%; position: absolute; left: 0; top: 0; transition: width 1s ease; }
 .fill-high { background: var(--green); }
 .fill-mid { background: var(--amber); }
 .fill-low { background: var(--red); }
+
+/* ── SUGGESTIONS (Upgrade 3) ── */
+.suggestions-section { margin-bottom: 24px; }
+.suggestion-area { margin-bottom: 8px; }
+.suggestion-area-header {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 400;
+  letter-spacing: .14em; color: var(--text-mid); text-transform: uppercase;
+  padding: 10px 16px; background: var(--surface2); border: 1px solid var(--border);
+  border-left: 2px solid var(--gold-dim); cursor: none;
+  display: flex; justify-content: space-between; align-items: center;
+  transition: background .2s, border-left-color .2s;
+}
+.suggestion-area-header:hover { background: var(--surface); border-left-color: var(--gold); }
+.toggle-icon { color: var(--gold-dim); font-size: 14px; }
+.suggestion-body { background: var(--surface2); border: 1px solid var(--border); border-top: none; padding: 0; max-height: 0; overflow: hidden; transition: max-height .3s ease, padding .3s ease; }
+.suggestion-body.open { max-height: 300px; padding: 12px 16px; }
+.suggestion-item {
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 300;
+  letter-spacing: .06em; color: var(--text-mid); line-height: 1.6;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.suggestion-item:last-child { border-bottom: none; padding-bottom: 0; }
+.suggestion-item::before { content: '→'; color: var(--gold-dim); flex-shrink: 0; margin-top: 1px; }
 
 .result-section { margin-bottom: 24px; }
 .result-section-title {
   font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 400;
   letter-spacing: .18em; color: var(--gold); text-transform: uppercase;
-  margin-bottom: 12px; padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
 }
-.result-text {
-  font-size: 17px; font-weight: 300; line-height: 1.85;
-  color: var(--text-mid);
-}
+.result-text { font-size: 17px; font-weight: 300; line-height: 1.85; color: var(--text-mid); }
 .result-text strong { color: var(--text); font-weight: 400; font-style: normal; }
 
 .priority-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-.priority-item {
-  font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 300;
-  letter-spacing: .06em; color: var(--text-mid); padding: 12px 16px;
-  background: var(--surface2); border-left: 2px solid var(--gold-dim);
-  line-height: 1.6;
-}
+.priority-item { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 300; letter-spacing: .06em; color: var(--text-mid); padding: 12px 16px; background: var(--surface2); border-left: 2px solid var(--gold-dim); line-height: 1.6; }
 
-/* UPGRADE GATE */
-.upgrade-gate {
-  display: none; background: var(--surface); border: 1px solid var(--border);
-  padding: 48px; text-align: center; margin-top: 24px;
+/* ── LOCKED PANEL (Upgrade 8) ── */
+.locked-panel {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-left: 2px solid var(--gold-dim); padding: 28px; text-align: center;
 }
-.upgrade-gate.visible { display: block; }
-.upgrade-gate h3 {
-  font-family: 'Bebas Neue', sans-serif; font-size: 28px;
-  letter-spacing: .06em; color: var(--white); margin-bottom: 12px;
+.locked-panel-title {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 400;
+  letter-spacing: .18em; color: var(--gold-dim); text-transform: uppercase;
+  margin-bottom: 12px;
 }
-.upgrade-gate p {
-  font-size: 17px; font-weight: 300; font-style: italic;
-  color: var(--text-dim); margin-bottom: 32px;
+.locked-panel-body {
+  font-size: 16px; font-weight: 300; font-style: italic;
+  color: var(--text-dim); line-height: 1.65; margin-bottom: 20px;
 }
 .btn-upgrade {
   font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 400;
   letter-spacing: .14em; text-transform: uppercase;
   color: var(--black); background: var(--gold);
-  border: none; padding: 16px 40px; cursor: none;
-  text-decoration: none; display: inline-block;
-  transition: background .2s;
+  border: none; padding: 14px 32px; cursor: none;
+  text-decoration: none; display: inline-block; transition: background .2s;
 }
 .btn-upgrade:hover { background: var(--white); }
 
+/* UPGRADE GATE */
+.upgrade-gate { display: none; background: var(--surface); border: 1px solid var(--border); padding: 48px; text-align: center; margin-top: 24px; }
+.upgrade-gate.visible { display: block; }
+.upgrade-gate h3 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: .06em; color: var(--white); margin-bottom: 12px; }
+.upgrade-gate p { font-size: 17px; font-weight: 300; font-style: italic; color: var(--text-dim); margin-bottom: 32px; }
+
 /* HISTORY */
-.history-panel {
-  margin-top: 40px; border-top: 1px solid var(--border); padding-top: 32px;
-}
-.history-title {
-  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
-  letter-spacing: .2em; color: var(--text-dim); text-transform: uppercase;
-  margin-bottom: 16px;
-}
+.history-panel { margin-top: 40px; border-top: 1px solid var(--border); padding-top: 32px; }
+.history-title { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300; letter-spacing: .2em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 16px; }
 .history-list { display: flex; flex-direction: column; gap: 8px; }
-.history-item {
-  padding: 14px 20px; background: var(--surface); border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-  cursor: none; transition: background .2s;
-}
+.history-item { padding: 14px 20px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; cursor: none; transition: background .2s; }
 .history-item:hover { background: var(--surface2); }
 .history-meta { display: flex; align-items: center; gap: 16px; }
-.history-mode {
-  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300;
-  letter-spacing: .1em; color: var(--text-dim); text-transform: uppercase;
-}
+.history-mode { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300; letter-spacing: .1em; color: var(--text-dim); text-transform: uppercase; }
 .history-preview { font-size: 14px; font-weight: 300; font-style: italic; color: var(--text-dim); }
-.history-score {
-  font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: .04em;
-}
+.history-score { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: .04em; }
 
 /* EMPTY STATE */
-.empty-state {
-  padding: 100px 0; text-align: center;
-}
-.empty-icon {
-  font-family: 'Bebas Neue', sans-serif; font-size: 72px;
-  letter-spacing: .06em; color: var(--border); margin-bottom: 24px;
-}
-.empty-text {
-  font-size: 20px; font-weight: 300; font-style: italic; color: var(--text-dim);
-  margin-bottom: 8px;
-}
-.empty-sub {
-  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 300;
-  letter-spacing: .14em; color: var(--border-light); text-transform: uppercase;
-}
+.empty-state { padding: 100px 0; text-align: center; }
+.empty-icon { font-family: 'Bebas Neue', sans-serif; font-size: 72px; letter-spacing: .06em; color: var(--border); margin-bottom: 24px; }
+.empty-text { font-size: 20px; font-weight: 300; font-style: italic; color: var(--text-dim); margin-bottom: 8px; }
+.empty-sub { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 300; letter-spacing: .14em; color: var(--border-light); text-transform: uppercase; }
 
-/* UNLOCK MODAL */
-.modal-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(8,8,8,.92); z-index: 200;
-  align-items: center; justify-content: center;
-}
+/* MODALS */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(8,8,8,.92); z-index: 200; align-items: center; justify-content: center; }
 .modal-overlay.active { display: flex; }
-.modal {
-  background: var(--surface); border: 1px solid var(--border);
-  padding: 48px; max-width: 480px; width: 90%;
-  position: relative;
-}
-.modal::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0;
-  height: 2px; background: var(--gold);
-}
-.modal h3 {
-  font-family: 'Bebas Neue', sans-serif; font-size: 28px;
-  letter-spacing: .06em; color: var(--white); margin-bottom: 8px;
-}
-.modal p {
-  font-size: 16px; font-weight: 300; font-style: italic;
-  color: var(--text-dim); margin-bottom: 28px; line-height: 1.6;
-}
-.modal-input {
-  width: 100%; background: var(--deep); border: 1px solid var(--border);
-  color: var(--text); font-family: 'DM Mono', monospace;
-  font-size: 14px; font-weight: 300; letter-spacing: .1em;
-  padding: 14px 18px; outline: none; margin-bottom: 16px;
-  transition: border-color .2s;
-}
+.modal { background: var(--surface); border: 1px solid var(--border); padding: 48px; max-width: 480px; width: 90%; position: relative; }
+.modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--gold); }
+.modal h3 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: .06em; color: var(--white); margin-bottom: 8px; }
+.modal p { font-size: 16px; font-weight: 300; font-style: italic; color: var(--text-dim); margin-bottom: 28px; line-height: 1.6; }
+.modal-input { width: 100%; background: var(--deep); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 300; letter-spacing: .1em; padding: 14px 18px; outline: none; margin-bottom: 16px; transition: border-color .2s; }
 .modal-input:focus { border-color: var(--gold-dim); }
 .modal-actions { display: flex; gap: 12px; }
-.modal-close {
-  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 300;
-  letter-spacing: .12em; text-transform: uppercase; cursor: none;
-  color: var(--text-dim); background: none; border: 1px solid var(--border);
-  padding: 12px 24px; transition: all .2s;
-}
+.modal-close { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 300; letter-spacing: .12em; text-transform: uppercase; cursor: none; color: var(--text-dim); background: none; border: 1px solid var(--border); padding: 12px 24px; transition: all .2s; }
 .modal-close:hover { color: var(--text); border-color: var(--text-dim); }
-.modal-or {
-  font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-dim);
-  text-align: center; margin: 20px 0;
-  display: flex; align-items: center; gap: 12px;
-}
+.modal-or { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-dim); text-align: center; margin: 20px 0; display: flex; align-items: center; gap: 12px; }
 .modal-or::before, .modal-or::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-.btn-stripe {
-  width: 100%; font-family: 'DM Mono', monospace; font-size: 12px;
-  font-weight: 400; letter-spacing: .14em; text-transform: uppercase;
-  color: var(--black); background: var(--gold); border: none;
-  padding: 14px; cursor: none; transition: background .2s;
-  text-decoration: none; display: block; text-align: center;
-}
+.btn-stripe { width: 100%; font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--black); background: var(--gold); border: none; padding: 14px; cursor: none; transition: background .2s; text-decoration: none; display: block; text-align: center; }
 .btn-stripe:hover { background: var(--white); }
+.modal-note { font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 300; letter-spacing: .1em; color: var(--text-dim); text-align: center; margin-top: 12px; text-transform: uppercase; }
+
+/* ── PRINT / WATERMARK (Upgrade 7) ── */
+.print-watermark { display: none; }
+@media print {
+  .print-watermark.show-on-print {
+    display: block;
+    position: fixed; top: 50%; left: 50%;
+    transform: rotate(-35deg) translate(-50%, -50%);
+    font-family: 'DM Mono', monospace; font-size: 28px; font-weight: 300;
+    letter-spacing: .06em; color: rgba(201,168,76,0.15);
+    pointer-events: none; z-index: 9999;
+    text-align: center; width: 100%; white-space: nowrap;
+  }
+  nav, .sidebar, .input-area, .mode-info-bar, .history-panel,
+  .modal-overlay, .upgrade-gate, .run-btn, .char-count { display: none !important; }
+  .app-shell { display: block; padding-top: 0; }
+  .app-header { position: static; padding: 20px; }
+  .main-panel { padding: 20px; }
+  .result-card { border: none; }
+}
 
 /* ANIMATIONS */
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -524,13 +426,11 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
 /* TOAST */
 .toast {
   position: fixed; bottom: 32px; right: 32px;
-  background: var(--surface); border: 1px solid var(--border);
-  border-left: 3px solid var(--gold);
+  background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--gold);
   padding: 14px 20px; z-index: 500;
   font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 300;
   letter-spacing: .1em; color: var(--text-mid); text-transform: uppercase;
-  transform: translateY(20px); opacity: 0;
-  transition: transform .3s ease, opacity .3s ease;
+  transform: translateY(20px); opacity: 0; transition: transform .3s ease, opacity .3s ease;
 }
 .toast.show { transform: translateY(0); opacity: 1; }
 
@@ -540,6 +440,7 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
   nav { padding: 16px 24px; }
   .app-header, .main-panel { padding: 24px; }
   .scores-grid { grid-template-columns: 1fr 1fr; }
+  .script-meta { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -547,6 +448,9 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
 
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursorRing"></div>
+
+<!-- PRINT WATERMARK (Upgrade 7) -->
+<div class="print-watermark" id="printWatermark">WRITHEON FREE COVERAGE — Upgrade to Pro for full diagnostic report — writheon.com</div>
 
 <nav>
   <div style="display:flex;align-items:center;gap:0">
@@ -580,75 +484,58 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-
     <div class="sidebar-section">
       <div class="sidebar-label">Analysis Mode</div>
-
       <button class="mode-btn active" data-mode="first10" onclick="selectMode('first10', this)">
         <span class="mode-btn-name">First 10 Pages</span>
         <span class="mode-btn-desc">Immediate hook, premise clarity, opening momentum</span>
         <span class="mode-btn-tag">Always Free</span>
       </button>
-
       <button class="mode-btn" data-mode="concept" onclick="selectMode('concept', this)">
         <span class="mode-btn-name">Concept Test</span>
         <span class="mode-btn-desc">Premise strength, marketability, concept execution</span>
         <span class="mode-btn-tag">Free · 3x</span>
       </button>
-
       <button class="mode-btn" data-mode="scene" onclick="selectMode('scene', this)">
         <span class="mode-btn-name">Scene Diagnostic</span>
         <span class="mode-btn-desc">Function, pressure, dialogue, transition analysis</span>
         <span class="mode-btn-tag">Free · 3x</span>
       </button>
-
       <button class="mode-btn" data-mode="full" onclick="selectMode('full', this)">
         <span class="mode-btn-name">Full Coverage</span>
         <span class="mode-btn-desc">Complete professional coverage report with all scoring</span>
-        <span class="mode-btn-tag pro-tag">Pro</span>
+        <span class="mode-btn-tag pro-tag">1 Free · Then Pro</span>
       </button>
     </div>
-
     <div class="sidebar-divider"></div>
-
     <div class="sidebar-section">
       <div class="sidebar-label">Coverage Voice</div>
-
       <button class="voice-btn active" data-voice="devexec" onclick="selectVoice('devexec', this)">
-        <span class="voice-btn-name">Dev Executive</span>
-        <span class="voice-lock">✓</span>
+        <span class="voice-btn-name">Dev Executive</span><span class="voice-lock">✓</span>
       </button>
       <button class="voice-btn" data-voice="studio" onclick="selectVoice('studio', this)">
-        <span class="voice-btn-name">Studio Notes</span>
-        <span class="voice-lock" id="lock-studio">🔒</span>
+        <span class="voice-btn-name">Studio Notes</span><span class="voice-lock" id="lock-studio">🔒</span>
       </button>
       <button class="voice-btn" data-voice="contest" onclick="selectVoice('contest', this)">
-        <span class="voice-btn-name">Contest Reader</span>
-        <span class="voice-lock" id="lock-contest">🔒</span>
+        <span class="voice-btn-name">Contest Reader</span><span class="voice-lock" id="lock-contest">🔒</span>
       </button>
       <button class="voice-btn" data-voice="brutal" onclick="selectVoice('brutal', this)">
-        <span class="voice-btn-name">Brutal Truth</span>
-        <span class="voice-lock" id="lock-brutal">🔒</span>
+        <span class="voice-btn-name">Brutal Truth</span><span class="voice-lock" id="lock-brutal">🔒</span>
       </button>
       <button class="voice-btn" data-voice="streaming" onclick="selectVoice('streaming', this)">
-        <span class="voice-btn-name">Streaming Platform</span>
-        <span class="voice-lock" id="lock-streaming">🔒</span>
+        <span class="voice-btn-name">Streaming Platform</span><span class="voice-lock" id="lock-streaming">🔒</span>
       </button>
       <button class="voice-btn" data-voice="manager" onclick="selectVoice('manager', this)">
-        <span class="voice-btn-name">Manager Notes</span>
-        <span class="voice-lock" id="lock-manager">🔒</span>
+        <span class="voice-btn-name">Manager Notes</span><span class="voice-lock" id="lock-manager">🔒</span>
       </button>
     </div>
-
     <div class="sidebar-divider"></div>
-
     <div class="sidebar-section" style="padding: 0 24px;">
       <button onclick="showUpgradeModal()" style="width:100%;font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--black);background:var(--gold);border:none;padding:12px;cursor:none;transition:background .2s;" onmouseenter="this.style.background='var(--white)'" onmouseleave="this.style.background='var(--gold)'">
         Unlock Pro Access
       </button>
       <p style="font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.1em;color:var(--text-dim);text-transform:uppercase;text-align:center;margin-top:10px;">Unlimited · All Voices · PDF Export</p>
     </div>
-
   </aside>
 
   <!-- MAIN PANEL -->
@@ -663,6 +550,31 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
     </div>
 
     <div class="input-area">
+
+      <!-- UPGRADE 1: Script Title + Genre -->
+      <div class="script-meta">
+        <div class="meta-field">
+          <label class="meta-label" for="titleInput">Script Title</label>
+          <input type="text" id="titleInput" class="meta-input" placeholder="e.g. Protocol Black" autocomplete="off">
+        </div>
+        <div class="meta-field">
+          <label class="meta-label" for="genreSelect">Genre</label>
+          <select id="genreSelect" class="meta-select">
+            <option value="">— Select Genre —</option>
+            <option value="Drama">Drama</option>
+            <option value="Thriller">Thriller</option>
+            <option value="Horror">Horror</option>
+            <option value="Sci-Fi">Sci-Fi</option>
+            <option value="Comedy">Comedy</option>
+            <option value="Action">Action</option>
+            <option value="Romance">Romance</option>
+            <option value="TV Pilot">TV Pilot</option>
+            <option value="Limited Series">Limited Series</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+
       <div class="input-tabs">
         <button class="input-tab active" id="tabUpload" onclick="switchTab('upload')">↑ Upload File</button>
         <button class="input-tab" id="tabPaste" onclick="switchTab('paste')">Paste Text</button>
@@ -705,7 +617,6 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
     <!-- RESULTS -->
     <div id="resultsArea">
 
-      <!-- EMPTY STATE -->
       <div class="empty-state" id="emptyState">
         <div class="empty-icon">CE™</div>
         <div class="empty-text">Paste your pages. Run coverage.</div>
@@ -714,6 +625,8 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
 
       <!-- RESULT CARD -->
       <div class="result-card" id="resultCard">
+
+        <!-- Verdict header -->
         <div class="result-header">
           <div class="result-score-block">
             <div class="result-score" id="resultScore">—</div>
@@ -724,13 +637,40 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
           </div>
           <div class="result-actions">
             <button class="btn-small btn-copy" onclick="copyResult()">Copy</button>
+            <button class="btn-small btn-share" onclick="shareResult()">Share</button>
             <button class="btn-small btn-export" id="exportBtn" onclick="exportPDF()">Export PDF</button>
           </div>
         </div>
 
+        <!-- UPGRADE 4: Writheon Score -->
+        <div class="writheon-score-block" id="writheonScoreBlock">
+          <div class="writheon-score-left">
+            <div class="writheon-score-number" id="writheonScoreNumber">—</div>
+            <div class="writheon-score-meta">
+              <div class="writheon-score-label">WRITHEON SCORE™</div>
+              <div class="writheon-score-sub" id="writheonScoreSub">Composite SDE™ diagnostic</div>
+            </div>
+          </div>
+          <button class="btn-copy-score" onclick="copyScore()">Copy Score</button>
+        </div>
+
+        <!-- Result body -->
         <div class="result-body">
 
+          <!-- Scores grid -->
           <div class="scores-grid" id="scoresGrid"></div>
+
+          <!-- UPGRADE 3: Suggestions section -->
+          <div class="suggestions-section result-section" id="suggestionsSection" style="display:none">
+            <div class="result-section-title">Diagnostic Suggestions</div>
+            <div id="suggestionsContent"></div>
+          </div>
+
+          <!-- Gumroad upsell (moved here, below suggestions per spec) -->
+          <div class="result-section" id="gumroadSection" style="display:none">
+            <div class="result-section-title">Recommended Development Resources</div>
+            <div id="gumroadLinks"></div>
+          </div>
 
           <div class="result-section">
             <div class="result-section-title">Coverage Notes</div>
@@ -742,14 +682,16 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
             <div class="result-text" id="structuralAssessment"></div>
           </div>
 
-          <div class="result-section">
+          <!-- Priority Rewrites / Locked Panel -->
+          <div class="result-section" id="prioritySection">
             <div class="result-section-title">Priority Rewrites</div>
             <ul class="priority-list" id="priorityList"></ul>
-          </div>
-
-          <div class="result-section" id="gumroadSection" style="display:none">
-            <div class="result-section-title">Recommended Development Resources</div>
-            <div id="gumroadLinks"></div>
+            <!-- UPGRADE 8: Locked panel for free full coverage -->
+            <div class="locked-panel" id="lockedPanel" style="display:none">
+              <div class="locked-panel-title">PRIORITY REWRITES — PRO ONLY</div>
+              <p class="locked-panel-body">You've identified the structural problems. Now get the precise fixes. Upgrade to unlock priority rewrites, inline suggestions, and unlimited coverage.</p>
+              <button onclick="showUpgradeModal()" class="btn-upgrade">Upgrade to Pro →</button>
+            </div>
           </div>
 
         </div>
@@ -790,65 +732,116 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
   </div>
 </div>
 
+<!-- UPGRADE 5: Email Capture Modal -->
+<div class="modal-overlay" id="emailModal">
+  <div class="modal">
+    <h3>Save Your Coverage Report</h3>
+    <p>Enter your email to save this report and receive development notes.</p>
+    <input type="email" class="modal-input" id="emailInput" placeholder="your@email.com" />
+    <button class="run-btn" style="width:100%;margin-bottom:12px;" onclick="submitEmail()">Continue to Analysis →</button>
+    <p class="modal-note">No spam. Unsubscribe anytime.</p>
+    <div class="modal-or">or</div>
+    <div class="modal-actions">
+      <button class="modal-close" style="width:100%" onclick="skipEmail()">Skip for now</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-// ─── STATE ───────────────────────────────────────────────
+// ─── CONSTANTS ────────────────────────────────────────────
 const STRIPE_PAYMENT_LINK = 'https://STRIPE_PAYMENT_LINK_HERE';
 const FREE_LIMIT = 3;
-const FIRST10_FREE = true;
+const FULL_SCRIPT_FREE = true;
 
+// ─── STATE ────────────────────────────────────────────────
 let currentMode = 'first10';
 let currentVoice = 'devexec';
 let isPro = false;
 let analysisCount = 0;
+let first10Count = 0;
+let fullScriptUsed = false;
+let emailCaptured = false;
+let pendingAnalysis = false;
 let currentResult = null;
 let history = [];
+let scriptTitle = '';
+let scriptGenre = '';
 
 const MODES = {
-  first10: { name: 'First 10 Pages', desc: 'Immediate hook, premise clarity, opening momentum', label: 'Paste Your Opening Pages', hint: 'Approx. first 10 pages · ~1,000 words', free: true },
-  concept: { name: 'Concept Test', desc: 'Premise strength, marketability, concept execution', label: 'Describe Your Concept', hint: 'Logline, premise, or full concept summary', free: true },
-  scene: { name: 'Scene Diagnostic', desc: 'Function, pressure, dialogue, transition analysis', label: 'Paste Your Scene', hint: 'Single scene or sequence · Any format', free: true },
-  full: { name: 'Full Coverage', desc: 'Complete professional coverage report with all scoring', label: 'Paste Your Full Script', hint: 'Complete screenplay · Fountain or plain text', free: false }
+  first10: { name: 'First 10 Pages', desc: 'Immediate hook, premise clarity, opening momentum', hint: 'Approx. first 10 pages · ~1,000 words', free: true },
+  concept: { name: 'Concept Test', desc: 'Premise strength, marketability, concept execution', hint: 'Logline, premise, or full concept summary', free: true },
+  scene:   { name: 'Scene Diagnostic', desc: 'Function, pressure, dialogue, transition analysis', hint: 'Single scene or sequence · Any format', free: true },
+  full:    { name: 'Full Coverage', desc: 'Complete professional coverage report with all scoring', hint: 'Complete screenplay · Fountain or plain text', free: false }
 };
 
 const VOICES = {
-  devexec: 'Development Executive',
-  studio: 'Studio Notes',
-  contest: 'Contest Reader',
-  brutal: 'Brutal Truth',
+  devexec:   'Development Executive',
+  studio:    'Studio Notes',
+  contest:   'Contest Reader',
+  brutal:    'Brutal Truth',
   streaming: 'Streaming Platform',
-  manager: 'Manager Notes'
+  manager:   'Manager Notes'
 };
 
 const GUMROAD_MAP = {
-  structure: { title: 'Structure Rewrite Toolkit', url: 'https://writheon.gumroad.com' },
-  character: { title: 'Character Pressure System', url: 'https://writheon.gumroad.com' },
-  dialogue: { title: 'Dialogue Diagnostic Guide', url: 'https://writheon.gumroad.com' },
-  pacing: { title: 'Pacing & Escalation Framework', url: 'https://writheon.gumroad.com' },
+  structure:     { title: 'Structure Rewrite Toolkit', url: 'https://writheon.gumroad.com' },
+  character:     { title: 'Character Pressure System', url: 'https://writheon.gumroad.com' },
+  dialogue:      { title: 'Dialogue Diagnostic Guide', url: 'https://writheon.gumroad.com' },
+  pacing:        { title: 'Pacing & Escalation Framework', url: 'https://writheon.gumroad.com' },
+  premise:       { title: 'Premise Architecture Guide', url: 'https://writheon.gumroad.com' },
+  commerciality: { title: 'Market Positioning Toolkit', url: 'https://writheon.gumroad.com' },
 };
+
+// ─── GENRE FOCUS (Upgrade 2) ──────────────────────────────
+function getGenreFocus(genre) {
+  const map = {
+    'Horror':         'Genre Focus — Horror: Prioritize dread escalation, internal threat logic, protagonist vulnerability, and setup/payoff precision. Horror lives on pressure architecture — every scene must tighten the vice.',
+    'Thriller':       'Genre Focus — Thriller: Prioritize clock mechanics and stakes clarity, reversal architecture, information asymmetry between character and audience, and sustained escalation design. Thriller requires relentless forward momentum.',
+    'Drama':          'Genre Focus — Drama: Prioritize emotional pressure, relationship stakes, transformation arc clarity, and subtext embedded in dialogue. Drama requires earned emotional consequence — surface conflict is not enough.',
+    'Sci-Fi':         'Genre Focus — Sci-Fi: Prioritize world rule consistency, concept execution clarity, and the quality of human stakes embedded inside the speculative premise. The concept must serve character, not replace it.',
+    'Comedy':         'Genre Focus — Comedy: Prioritize comedic premise execution, escalation of comedic pressure, character likeability and distinctiveness, and tonal consistency throughout.',
+    'Action':         'Genre Focus — Action: Prioritize set-piece architecture, stakes escalation across sequences, protagonist agency and reactive capability, and pacing discipline.',
+    'Romance':        'Genre Focus — Romance: Prioritize romantic tension escalation, obstacle architecture (internal and external), emotional authenticity, and genre expectation management.',
+    'TV Pilot':       'Genre Focus — TV Pilot: Prioritize series engine clarity, character architecture (the pilot must establish relationships that can sustain multiple seasons), world establishment, and franchise potential. The pilot must function as a complete story while implying infinite stories.',
+    'Limited Series': 'Genre Focus — Limited Series: Prioritize the contained narrative engine, character architecture, and how well the story justifies its episodic form. Assess the opening episode against the full arc potential.',
+  };
+  return map[genre] || 'Apply rigorous professional coverage standards across all narrative dimensions. Prioritize structural integrity, character pressure, and the relationship between premise and execution.';
+}
 
 // ─── INIT ─────────────────────────────────────────────────
 function init() {
-  const stored = localStorage.getItem('writheon_state');
-  if (stored) {
-    const s = JSON.parse(stored);
-    analysisCount = s.count || 0;
-    isPro = s.pro || false;
-    history = s.history || [];
-  }
+  try {
+    const stored = localStorage.getItem('writheon_state');
+    if (stored) {
+      const s = JSON.parse(stored);
+      analysisCount  = s.count        || 0;
+      first10Count   = s.first10Count || 0;
+      isPro          = s.pro          || false;
+      history        = s.history      || [];
+      fullScriptUsed = s.fullScriptUsed || false;
+      emailCaptured  = s.emailCaptured  || false;
+    }
+  } catch(e) {}
+
+  if (!isPro) document.getElementById('printWatermark').classList.add('show-on-print');
   updateUsageUI();
   renderHistory();
   document.getElementById('scriptInput').addEventListener('input', updateCharCount);
+  document.getElementById('titleInput').addEventListener('input', e => { scriptTitle = e.target.value.trim(); });
+  document.getElementById('genreSelect').addEventListener('change', e => { scriptGenre = e.target.value; });
 }
 
 function saveState() {
-  localStorage.setItem('writheon_state', JSON.stringify({ count: analysisCount, pro: isPro, history }));
+  localStorage.setItem('writheon_state', JSON.stringify({
+    count: analysisCount, first10Count, pro: isPro, history,
+    fullScriptUsed, emailCaptured
+  }));
 }
 
 // ─── MODE & VOICE ─────────────────────────────────────────
 function selectMode(mode, el) {
-  if (mode === 'full' && !isPro) { showUpgradeModal(); return; }
   currentMode = mode;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
@@ -875,15 +868,41 @@ async function runAnalysis() {
   const text = getInputText();
   if (!text || text.length < 100) { showToast('Paste at least a few paragraphs to analyze'); return; }
 
-  const unlimited = currentMode === 'first10';
-
-  if (!unlimited && !isPro && analysisCount >= FREE_LIMIT) {
+  // Full Coverage gate (Upgrade 8)
+  if (currentMode === 'full' && !isPro && fullScriptUsed) {
     showUpgradeModal(); return;
   }
+
+  // Concept/Scene free limit gate
+  if ((currentMode === 'concept' || currentMode === 'scene') && !isPro && analysisCount >= FREE_LIMIT) {
+    showUpgradeModal(); return;
+  }
+
+  // Email capture trigger (Upgrade 5):
+  // a) Free user on first10, has used all 3
+  // b) Any user on full coverage mode
+  if (!emailCaptured) {
+    const needsEmail = (currentMode === 'first10' && first10Count >= FREE_LIMIT) ||
+                       (currentMode === 'full');
+    if (needsEmail) {
+      pendingAnalysis = true;
+      showEmailModal();
+      return;
+    }
+  }
+
+  await executeAnalysis(text);
+}
+
+async function executeAnalysis(text) {
+  // Capture free-full state BEFORE updating fullScriptUsed
+  const isFirstFreeFull = (currentMode === 'full' && !isPro && !fullScriptUsed);
 
   setLoading(true);
   clearResults();
 
+  const title = scriptTitle || 'Untitled';
+  const genre = scriptGenre || 'Unspecified';
   const prompt = buildPrompt(text);
 
   try {
@@ -892,12 +911,17 @@ async function runAnalysis() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
-        max_tokens: 1000,
-        system: `You are the Writheon Coverage Engine™ — a professional screenplay diagnostic system. You operate as a ${VOICES[currentVoice]} providing coverage in the Writheon Screenplay Development Engine™ framework.
+        max_tokens: 1500,
+        system: `You are the Writheon Coverage Engine™ — a professional screenplay diagnostic system. You operate as a ${VOICES[currentVoice]} providing coverage within the Writheon Screenplay Development Engine™ framework.
 
-Your job is to DIAGNOSE, not encourage. Be precise, direct, and professional. Use industry-standard coverage language.
+Script Title: ${title}
+Genre: ${genre}
 
-You MUST respond with ONLY valid JSON in this exact structure — no preamble, no markdown:
+${getGenreFocus(scriptGenre)}
+
+Your job is to DIAGNOSE, not encourage. Be precise, direct, and professional. Use industry-standard coverage language. All suggestions must be specific to the material provided — never give generic advice.
+
+You MUST respond with ONLY valid JSON in this exact structure — no preamble, no markdown, no code block:
 {
   "verdict": "PASS" | "CONSIDER" | "FAIL",
   "score": "A" | "B+" | "B" | "C+" | "C" | "D",
@@ -911,8 +935,12 @@ You MUST respond with ONLY valid JSON in this exact structure — no preamble, n
   },
   "coverageNotes": "<2-3 sentences of overall assessment in the voice of ${VOICES[currentVoice]}>",
   "structuralAssessment": "<2-3 sentences on structure, architecture, and narrative pressure>",
-  "priorities": ["<rewrite priority 1>", "<rewrite priority 2>", "<rewrite priority 3>"],
-  "weakAreas": ["structure" | "character" | "dialogue" | "pacing"]
+  "priorities": ["<specific rewrite priority 1>", "<specific rewrite priority 2>", "<specific rewrite priority 3>"],
+  "weakAreas": ["structure" | "character" | "dialogue" | "pacing" | "premise" | "commerciality"],
+  "suggestions": {
+    "<weakArea1>": ["<specific script-based fix 1>", "<specific script-based fix 2>"],
+    "<weakArea2>": ["<specific script-based fix 1>", "<specific script-based fix 2>"]
+  }
 }`,
         messages: [{ role: 'user', content: prompt }]
       })
@@ -923,13 +951,34 @@ You MUST respond with ONLY valid JSON in this exact structure — no preamble, n
     const clean = raw.replace(/```json|```/g, '').trim();
     const result = JSON.parse(clean);
 
-    if (!unlimited) { analysisCount++; }
+    // Track usage
+    if (currentMode === 'first10') {
+      first10Count++;
+    } else if (currentMode === 'concept' || currentMode === 'scene') {
+      analysisCount++;
+    }
+    if (isFirstFreeFull) fullScriptUsed = true;
+
+    // Attach metadata for rendering
+    result._title          = title;
+    result._genre          = genre;
+    result._isFirstFreeFull = isFirstFreeFull;
+
+    // Compute composite score
+    const vals = Object.values(result.scores);
+    result._writheonScore = Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+
     currentResult = result;
-    history.unshift({ mode: MODES[currentMode].name, voice: VOICES[currentVoice], verdict: result.verdict, score: result.score, preview: text.substring(0, 60) + '...', timestamp: Date.now() });
+    history.unshift({
+      mode: MODES[currentMode].name, voice: VOICES[currentVoice],
+      verdict: result.verdict, score: result.score,
+      preview: text.substring(0, 60) + '...', timestamp: Date.now()
+    });
     if (history.length > 10) history.pop();
     saveState();
     renderResult(result);
-  } catch (e) {
+
+  } catch(e) {
     showToast('Analysis failed — check connection and try again');
     console.error(e);
   } finally {
@@ -937,29 +986,35 @@ You MUST respond with ONLY valid JSON in this exact structure — no preamble, n
   }
 }
 
+// ─── BUILD PROMPT (Upgrades 1+2) ──────────────────────────
 function buildPrompt(text) {
   const modeInstructions = {
-    first10: `Analyze the FIRST 10 PAGES of this screenplay. Focus on: opening image, premise establishment, protagonist introduction, world-building, hook strength, and whether the first 10 pages compel a reader to continue.`,
-    concept: `Analyze this SCREENPLAY CONCEPT/LOGLINE. Focus on: premise originality, marketability, genre clarity, concept execution potential, and whether the central conflict is compelling enough to sustain a feature.`,
-    scene: `Analyze this INDIVIDUAL SCENE. Focus on: scene function, dramatic pressure, dialogue authenticity, character action/reaction, and how effectively it advances story or character.`,
-    full: `Provide FULL COVERAGE of this complete screenplay. Assess all elements comprehensively: structure, character arcs, dialogue, pacing, theme, premise execution, and commercial viability.`
+    first10: 'Analyze the FIRST 10 PAGES of this screenplay. Assess: opening image, premise establishment, protagonist introduction, world-building efficiency, hook strength, and whether these pages compel a reader to continue.',
+    concept: 'Analyze this SCREENPLAY CONCEPT or LOGLINE. Assess: premise originality, marketability, genre clarity, concept execution potential, and whether the central conflict is strong enough to sustain a feature.',
+    scene:   'Analyze this INDIVIDUAL SCENE. Assess: scene function, dramatic pressure, dialogue authenticity, character action/reaction, and how effectively it advances story or character.',
+    full:    'Provide FULL PROFESSIONAL COVERAGE of this complete screenplay. Assess comprehensively: three-act structure, character arcs, dialogue craft, pacing, theme, premise execution, and commercial viability.'
   };
   return `${modeInstructions[currentMode]}\n\nSCRIPT MATERIAL:\n${text.substring(0, 4000)}`;
 }
 
-// ─── RENDER ───────────────────────────────────────────────
+// ─── RENDER RESULT ────────────────────────────────────────
 function renderResult(r) {
   document.getElementById('emptyState').style.display = 'none';
   const card = document.getElementById('resultCard');
   card.className = 'result-card visible fade-in';
 
+  // Verdict + score letter
   const scoreEl = document.getElementById('resultScore');
   scoreEl.textContent = r.score;
   scoreEl.className = 'result-score ' + (r.verdict === 'PASS' ? 'score-pass' : r.verdict === 'CONSIDER' ? 'score-consider' : 'score-fail');
-
   document.getElementById('resultVerdict').textContent = r.verdict;
   document.getElementById('resultVoiceTag').textContent = `Voice: ${VOICES[currentVoice]} · ${MODES[currentMode].name}`;
 
+  // Writheon Score (Upgrade 4)
+  document.getElementById('writheonScoreNumber').textContent = r._writheonScore;
+  document.getElementById('writheonScoreSub').textContent = `${r._title} · ${r._genre}`;
+
+  // Score bars
   const grid = document.getElementById('scoresGrid');
   grid.innerHTML = '';
   const scoreLabels = { premise: 'Premise', structure: 'Structure', character: 'Character', dialogue: 'Dialogue', pacing: 'Pacing', commerciality: 'Commerciality' };
@@ -969,23 +1024,63 @@ function renderResult(r) {
   });
   setTimeout(() => { document.querySelectorAll('.score-bar-fill').forEach(el => { el.style.width = el.dataset.width; }); }, 100);
 
-  document.getElementById('coverageNotes').innerHTML = r.coverageNotes;
-  document.getElementById('structuralAssessment').innerHTML = r.structuralAssessment;
+  // Suggestions (Upgrade 3) — hide for free full coverage
+  const sugSection = document.getElementById('suggestionsSection');
+  const sugContent = document.getElementById('suggestionsContent');
+  sugSection.style.display = 'none';
+  sugContent.innerHTML = '';
+  if (!r._isFirstFreeFull && (r.verdict === 'FAIL' || r.verdict === 'CONSIDER') && r.suggestions) {
+    const areaLabels = { structure: 'Structure', character: 'Character', dialogue: 'Dialogue', pacing: 'Pacing', premise: 'Premise', commerciality: 'Commerciality' };
+    const entries = Object.entries(r.suggestions).filter(([, s]) => s && s.length);
+    if (entries.length) {
+      sugSection.style.display = 'block';
+      entries.forEach(([area, sugs]) => {
+        const div = document.createElement('div');
+        div.className = 'suggestion-area';
+        div.innerHTML = `
+          <div class="suggestion-area-header" onclick="toggleSuggestion(this)">
+            <span>${areaLabels[area] || area} — Actionable Fixes</span>
+            <span class="toggle-icon">+</span>
+          </div>
+          <div class="suggestion-body">
+            ${sugs.map(s => `<div class="suggestion-item">${s}</div>`).join('')}
+          </div>`;
+        sugContent.appendChild(div);
+      });
+    }
+  }
 
-  const pl = document.getElementById('priorityList');
-  pl.innerHTML = r.priorities.map(p => `<li class="priority-item">${p}</li>`).join('');
-
+  // Gumroad upsell (below suggestions per spec)
+  const gs = document.getElementById('gumroadSection');
+  const gl = document.getElementById('gumroadLinks');
+  gs.style.display = 'none';
   if ((r.verdict === 'FAIL' || r.verdict === 'CONSIDER') && r.weakAreas?.length) {
-    const gs = document.getElementById('gumroadSection');
-    const gl = document.getElementById('gumroadLinks');
     gs.style.display = 'block';
-    gl.innerHTML = r.weakAreas.slice(0,2).map(area => {
+    gl.innerHTML = r.weakAreas.slice(0, 2).map(area => {
       const g = GUMROAD_MAP[area] || GUMROAD_MAP.structure;
       return `<a href="${g.url}" target="_blank" style="display:block;padding:14px 18px;background:var(--surface2);border:1px solid var(--border);margin-bottom:8px;text-decoration:none;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;transition:background .2s;" onmouseenter="this.style.background='var(--surface)'" onmouseleave="this.style.background='var(--surface2)'">${g.title} → Writheon Resources</a>`;
     }).join('');
   }
 
-  document.getElementById('exportBtn').style.opacity = isPro ? '1' : '0.4';
+  // Coverage text
+  document.getElementById('coverageNotes').innerHTML = r.coverageNotes;
+  document.getElementById('structuralAssessment').innerHTML = r.structuralAssessment;
+
+  // Priority rewrites / locked panel (Upgrade 8)
+  const pl = document.getElementById('priorityList');
+  const locked = document.getElementById('lockedPanel');
+  if (r._isFirstFreeFull) {
+    pl.style.display = 'none';
+    locked.style.display = 'block';
+  } else {
+    pl.style.display = '';
+    locked.style.display = 'none';
+    pl.innerHTML = r.priorities.map(p => `<li class="priority-item">${p}</li>`).join('');
+  }
+
+  // Export always enabled (Upgrade 7 — watermark handles free tier)
+  document.getElementById('exportBtn').style.opacity = '1';
+
   updateUsageUI();
   renderHistory();
 }
@@ -995,13 +1090,16 @@ function clearResults() {
   document.getElementById('emptyState').style.display = analysisCount === 0 ? 'block' : 'none';
   document.getElementById('upgradeGate').className = 'upgrade-gate';
   document.getElementById('gumroadSection').style.display = 'none';
+  document.getElementById('suggestionsSection').style.display = 'none';
+  document.getElementById('lockedPanel').style.display = 'none';
+  document.getElementById('priorityList').style.display = '';
 }
 
 // ─── HISTORY ──────────────────────────────────────────────
 function renderHistory() {
   if (history.length === 0) return;
   const panel = document.getElementById('historyPanel');
-  const list = document.getElementById('historyList');
+  const list  = document.getElementById('historyList');
   panel.style.display = 'block';
   list.innerHTML = history.map(h => {
     const cls = h.verdict === 'PASS' ? 'score-pass' : h.verdict === 'CONSIDER' ? 'score-consider' : 'score-fail';
@@ -1016,7 +1114,7 @@ function updateUsageUI() {
   ['pip1','pip2','pip3'].forEach((id, i) => {
     document.getElementById(id).className = 'pip ' + (i < analysisCount && !isPro ? 'used' : 'free');
   });
-  if (!isPro && analysisCount >= FREE_LIMIT && currentMode !== 'first10') {
+  if (!isPro && analysisCount >= FREE_LIMIT && currentMode !== 'first10' && currentMode !== 'full') {
     document.getElementById('upgradeGate').className = 'upgrade-gate visible';
   }
 }
@@ -1027,7 +1125,7 @@ const loadingLines = [
   ['Assessing Structure', 'Evaluating act architecture and pressure points...'],
   ['Analyzing Character', 'Measuring protagonist pressure and arc integrity...'],
   ['Evaluating Dialogue', 'Checking authenticity and scene function...'],
-  ['Generating Coverage', 'Formulating professional notes...'],
+  ['Generating Coverage', 'Formulating professional diagnostic notes...'],
 ];
 
 function setLoading(on) {
@@ -1035,18 +1133,17 @@ function setLoading(on) {
   document.getElementById('runBtn').disabled = on;
   if (on) {
     let i = 0;
-    const interval = setInterval(() => {
-      if (i >= loadingLines.length) { clearInterval(interval); return; }
+    const iv = setInterval(() => {
+      if (i >= loadingLines.length) { clearInterval(iv); return; }
       document.getElementById('loadingText').textContent = loadingLines[i][0];
-      document.getElementById('loadingSub').textContent = loadingLines[i][1];
+      document.getElementById('loadingSub').textContent  = loadingLines[i][1];
       i++;
     }, 900);
   }
 }
 
-// ─── EXPORT ───────────────────────────────────────────────
+// ─── EXPORT / COPY (Upgrades 6+7) ─────────────────────────
 function exportPDF() {
-  if (!isPro) { showUpgradeModal(); return; }
   window.print();
 }
 
@@ -1056,16 +1153,39 @@ function copyResult() {
   navigator.clipboard.writeText(text).then(() => showToast('Coverage copied to clipboard'));
 }
 
-// ─── MODAL ────────────────────────────────────────────────
+function copyScore() {
+  if (!currentResult) return;
+  const title = currentResult._title || scriptTitle || 'My script';
+  const score = currentResult._writheonScore;
+  const text = `${title} scored ${score}/100 on the Writheon SDE™ — writheon.com`;
+  navigator.clipboard.writeText(text).then(() => showToast('Score copied to clipboard'));
+}
+
+function shareResult() {
+  if (!currentResult) return;
+  const title  = currentResult._title || 'Untitled';
+  const genre  = currentResult._genre || '';
+  const score  = currentResult._writheonScore || '—';
+  const text =
+`${title}${genre ? ' — ' + genre : ''}
+Writheon Score: ${score}/100
+Verdict: ${currentResult.verdict}
+Voice: ${VOICES[currentVoice]}
+
+Diagnosed by Writheon Coverage Engine™
+writheon.com/coverage`;
+  navigator.clipboard.writeText(text).then(() => showToast('Share card copied to clipboard'));
+}
+
+// ─── UPGRADE MODAL ────────────────────────────────────────
 function showUpgradeModal() { document.getElementById('upgradeModal').className = 'modal-overlay active'; }
-function closeModal() { document.getElementById('upgradeModal').className = 'modal-overlay'; }
+function closeModal()       { document.getElementById('upgradeModal').className = 'modal-overlay'; }
 
 function verifyCode() {
   const code = document.getElementById('unlockCode').value.trim().toUpperCase();
   if (code.startsWith('WR-') && code.length >= 8) {
     isPro = true; saveState();
-    closeModal();
-    unlockPro();
+    closeModal(); unlockPro();
     showToast('Pro access unlocked — welcome to Writheon.');
   } else {
     showToast('Invalid code — check your email or upgrade via Stripe');
@@ -1076,6 +1196,57 @@ function unlockPro() {
   document.querySelectorAll('.voice-lock').forEach(el => { if (el.id) el.textContent = '✓'; });
   document.getElementById('freeLabel').textContent = 'Pro — Unlimited';
   ['pip1','pip2','pip3'].forEach(id => { document.getElementById(id).className = 'pip free'; });
+  document.getElementById('printWatermark').classList.remove('show-on-print');
+}
+
+// ─── EMAIL MODAL (Upgrade 5) ──────────────────────────────
+function showEmailModal() { document.getElementById('emailModal').className = 'modal-overlay active'; }
+function closeEmailModal() {
+  document.getElementById('emailModal').className = 'modal-overlay';
+  pendingAnalysis = false;
+}
+
+async function submitEmail() {
+  const email = document.getElementById('emailInput').value.trim();
+  if (!email || !email.includes('@')) { showToast('Please enter a valid email address'); return; }
+
+  emailCaptured = true;
+  localStorage.setItem('writheon_email', email);
+  saveState();
+
+  try {
+    await fetch('/api/capture', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, title: scriptTitle, genre: scriptGenre })
+    });
+  } catch(e) { /* silent — don't block analysis */ }
+
+  document.getElementById('emailModal').className = 'modal-overlay';
+
+  if (pendingAnalysis) {
+    pendingAnalysis = false;
+    const text = getInputText();
+    if (text) await executeAnalysis(text);
+  }
+}
+
+function skipEmail() {
+  document.getElementById('emailModal').className = 'modal-overlay';
+  const hadPending = pendingAnalysis;
+  pendingAnalysis = false;
+  if (hadPending) {
+    const text = getInputText();
+    if (text) executeAnalysis(text);
+  }
+}
+
+// ─── SUGGESTIONS TOGGLE (Upgrade 3) ──────────────────────
+function toggleSuggestion(header) {
+  const body = header.nextElementSibling;
+  const icon = header.querySelector('.toggle-icon');
+  body.classList.toggle('open');
+  icon.textContent = body.classList.contains('open') ? '−' : '+';
 }
 
 // ─── UTILS ────────────────────────────────────────────────
@@ -1091,7 +1262,7 @@ function showToast(msg) {
 }
 
 // ─── CURSOR ───────────────────────────────────────────────
-const cur = document.getElementById('cursor');
+const cur  = document.getElementById('cursor');
 const ring = document.getElementById('cursorRing');
 let mx=0, my=0, rx=0, ry=0;
 document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
@@ -1103,17 +1274,17 @@ document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
 })();
 document.querySelectorAll('a,button,textarea').forEach(el => {
   el.addEventListener('mouseenter', () => { cur.style.width='14px'; cur.style.height='14px'; ring.style.width='44px'; ring.style.height='44px'; });
-  el.addEventListener('mouseleave', () => { cur.style.width='8px'; cur.style.height='8px'; ring.style.width='32px'; ring.style.height='32px'; });
+  el.addEventListener('mouseleave', () => { cur.style.width='8px';  cur.style.height='8px';  ring.style.width='32px'; ring.style.height='32px'; });
 });
 
-// ─── UPLOAD & TABS ───────────────────────────────────────
+// ─── UPLOAD & TABS ────────────────────────────────────────
 let uploadedText = '';
-let activeTab = 'upload';
+let activeTab    = 'upload';
 
 function switchTab(tab) {
   activeTab = tab;
   document.getElementById('tabUpload').className = 'input-tab' + (tab === 'upload' ? ' active' : '');
-  document.getElementById('tabPaste').className = 'input-tab' + (tab === 'paste' ? ' active' : '');
+  document.getElementById('tabPaste').className  = 'input-tab' + (tab === 'paste'  ? ' active' : '');
   document.getElementById('uploadZone').className = 'upload-zone' + (tab === 'upload' ? ' active-tab' : '');
   document.getElementById('scriptInput').style.display = tab === 'paste' ? 'block' : 'none';
   updateCharCount();
@@ -1124,13 +1295,8 @@ function getInputText() {
   return document.getElementById('scriptInput').value.trim();
 }
 
-function handleDragOver(e) {
-  e.preventDefault();
-  document.getElementById('uploadZone').classList.add('dragover');
-}
-function handleDragLeave(e) {
-  document.getElementById('uploadZone').classList.remove('dragover');
-}
+function handleDragOver(e)  { e.preventDefault(); document.getElementById('uploadZone').classList.add('dragover'); }
+function handleDragLeave(e) { document.getElementById('uploadZone').classList.remove('dragover'); }
 function handleDrop(e) {
   e.preventDefault();
   document.getElementById('uploadZone').classList.remove('dragover');
@@ -1144,18 +1310,13 @@ function handleFileSelect(e) {
 
 async function processFile(file) {
   const name = file.name;
-  const ext = name.split('.').pop().toLowerCase();
+  const ext  = name.split('.').pop().toLowerCase();
   document.getElementById('uploadPrompt').style.display = 'none';
   document.getElementById('fileInfo').className = 'upload-file-info visible';
   document.getElementById('fileName').textContent = name;
   showToast('Reading file...');
-
   try {
-    if (ext === 'pdf') {
-      uploadedText = await extractPDF(file);
-    } else {
-      uploadedText = await file.text();
-    }
+    uploadedText = ext === 'pdf' ? await extractPDF(file) : await file.text();
     updateCharCount();
     showToast(`Loaded: ${uploadedText.length.toLocaleString()} characters`);
   } catch(e) {
@@ -1165,7 +1326,6 @@ async function processFile(file) {
 }
 
 async function extractPDF(file) {
-  // Load PDF.js from CDN
   if (!window.pdfjsLib) {
     await new Promise((res, rej) => {
       const s = document.createElement('script');
@@ -1176,10 +1336,10 @@ async function extractPDF(file) {
     window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   }
   const arrayBuffer = await file.arrayBuffer();
-  const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  const pdf  = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
   let text = '';
   for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
+    const page    = await pdf.getPage(i);
     const content = await page.getTextContent();
     text += content.items.map(item => item.str).join(' ') + '\n';
   }

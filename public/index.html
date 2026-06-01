@@ -736,6 +736,117 @@ footer {
 .reveal-d3 { transition-delay: .3s; }
 .reveal-d4 { transition-delay: .4s; }
 
+/* ── HERO ALERT STRIP (Upgrade 11) ── */
+.hero-alert-strip {
+  margin-top: 36px;
+  max-width: 640px;
+  position: relative; z-index: 2;
+}
+.hero-alert {
+  display: none;
+  align-items: center; gap: 12px;
+  padding: 14px 20px;
+  border-left: 2px solid var(--border-light);
+  background: var(--surface);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.hero-alert.active { display: flex; opacity: 1; }
+.hero-alert.critical { border-left-color: var(--red); }
+.hero-alert.warning  { border-left-color: var(--amber); }
+.hero-alert.ok       { border-left-color: var(--green); }
+.hero-alert-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 400; letter-spacing: .12em;
+  text-transform: uppercase; flex-shrink: 0;
+}
+.hero-alert.critical .hero-alert-badge { color: var(--red); }
+.hero-alert.warning  .hero-alert-badge { color: var(--amber); }
+.hero-alert.ok       .hero-alert-badge { color: var(--green); }
+.hero-alert-msg {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; font-weight: 300; letter-spacing: .06em;
+  color: var(--text-mid); line-height: 1.5;
+}
+
+/* ── SCORE SOCIAL PROOF (Upgrade 10) ── */
+.section-scores {
+  padding: 160px 56px;
+  border-top: 1px solid var(--border);
+}
+.scores-inner { max-width: 1200px; margin: 0 auto; }
+.scores-header {
+  margin-bottom: 80px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: end;
+}
+.scores-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(40px, 5vw, 64px); letter-spacing: .04em; line-height: 1.0; color: var(--white);
+}
+.scores-title span {
+  display: block; font-family: 'Cormorant Garamond', serif;
+  font-weight: 300; font-style: italic;
+  font-size: .5em; color: var(--gold); letter-spacing: .1em; margin-bottom: 8px;
+}
+.scores-intro { font-size: 20px; font-weight: 300; font-style: italic; line-height: 1.7; color: var(--text-mid); }
+.score-cards-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border);
+}
+.score-card { background: var(--surface); padding: 40px 32px; }
+.score-card-number {
+  font-family: 'Bebas Neue', sans-serif; font-size: 72px;
+  letter-spacing: .02em; line-height: 1; margin-bottom: 6px;
+}
+.score-card-verdict {
+  font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 400;
+  letter-spacing: .14em; text-transform: uppercase; margin-bottom: 20px;
+}
+.score-card-title {
+  font-family: 'Cormorant Garamond', serif; font-size: 20px;
+  font-weight: 300; font-style: italic; color: var(--text); margin-bottom: 10px;
+}
+.score-card-genre {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 300;
+  letter-spacing: .16em; color: var(--gold-dim); text-transform: uppercase;
+  border: 1px solid var(--border-light); padding: 4px 10px; display: inline-block;
+  margin-bottom: 16px;
+}
+.score-card-label {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 300;
+  letter-spacing: .16em; color: var(--text-dim); text-transform: uppercase;
+}
+
+/* ── FOUNDING FORM (Upgrade 9) ── */
+.founding-form { margin-top: 16px; display: none; }
+.founding-form.open { display: block; }
+.founding-email-input {
+  width: 100%; background: var(--deep); border: 1px solid var(--border-light);
+  color: var(--text); font-family: 'DM Mono', monospace;
+  font-size: 13px; font-weight: 300; letter-spacing: .06em;
+  padding: 12px 16px; outline: none; margin-bottom: 10px;
+  transition: border-color .2s;
+}
+.founding-email-input:focus { border-color: var(--gold-dim); }
+.founding-email-input::placeholder { color: var(--text-dim); }
+.btn-founding-submit {
+  width: 100%; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 400;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--black); background: var(--gold); border: none;
+  padding: 14px; cursor: pointer; transition: background .2s;
+}
+.btn-founding-submit:hover { background: var(--white); }
+.founding-form-sub {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 300;
+  letter-spacing: .1em; color: var(--text-dim); text-transform: uppercase;
+  text-align: center; margin-top: 8px;
+}
+.founding-confirm {
+  display: none;
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 300;
+  letter-spacing: .1em; color: var(--gold); text-transform: uppercase;
+  margin-top: 12px; line-height: 1.5;
+}
+
 @media (max-width: 1024px) {
   nav { padding: 20px 28px; }
   .nav-links { display: none; }
@@ -743,10 +854,10 @@ footer {
   .hero-stat-row { left: 28px; right: 28px; }
   .hero-stat { padding: 0 20px 0 0; }
   .section-dashboard, .section-why, .section-thinks, .section-preview,
-  .section-ecosystem, .section-pricing, .section-cta { padding: 80px 28px; }
-  .dash-header, .thinks-header, .eco-header, .why-inner { grid-template-columns: 1fr; gap: 40px; }
+  .section-ecosystem, .section-pricing, .section-scores, .section-cta { padding: 80px 28px; }
+  .dash-header, .thinks-header, .eco-header, .why-inner, .scores-header { grid-template-columns: 1fr; gap: 40px; }
   .thinks-grid, .eco-grid { grid-template-columns: 1fr 1fr; }
-  .pricing-grid { grid-template-columns: 1fr 1fr; }
+  .pricing-grid, .score-cards-grid { grid-template-columns: 1fr 1fr; }
   footer { padding: 40px 28px; flex-direction: column; gap: 24px; text-align: center; }
   .preview-panel.active { grid-template-columns: 1fr; }
   .mockup-body { grid-template-columns: 1fr; }
@@ -788,6 +899,23 @@ footer {
       <a href="/coverage" class="btn-primary">Run Free Coverage →</a>
       <a href="#engine" class="btn-ghost">See the Engine</a>
     </div>
+
+    <!-- UPGRADE 11: Rotating diagnostic alert strip -->
+    <div class="hero-alert-strip" id="heroAlertStrip">
+      <div class="hero-alert critical active" id="heroAlert0">
+        <span class="hero-alert-badge">Critical</span>
+        <span class="hero-alert-msg">Pressure Collapse Detected — Pages 54–78</span>
+      </div>
+      <div class="hero-alert warning" id="heroAlert1">
+        <span class="hero-alert-badge">Warning</span>
+        <span class="hero-alert-msg">Character Imbalance — Antagonist Underdeveloped</span>
+      </div>
+      <div class="hero-alert ok" id="heroAlert2">
+        <span class="hero-alert-badge">Strong</span>
+        <span class="hero-alert-msg">Premise Architecture — High Confidence</span>
+      </div>
+    </div>
+
   </div>
   <div class="hero-stat-row">
     <div class="hero-stat">
@@ -795,16 +923,16 @@ footer {
       <div class="stat-label">Coverage Voice Modes</div>
     </div>
     <div class="hero-stat">
-      <div class="stat-val">4<em>+</em></div>
-      <div class="stat-label">Diagnostic Modes</div>
+      <div class="stat-val">8<em>+</em></div>
+      <div class="stat-label">Diagnostic Systems</div>
     </div>
     <div class="hero-stat">
-      <div class="stat-val">SDE<em>™</em></div>
-      <div class="stat-label">Screenplay Development Engine</div>
+      <div class="stat-val">$75<em>-250</em></div>
+      <div class="stat-label">Cost of one human coverage report</div>
     </div>
     <div class="hero-stat">
-      <div class="stat-val">$0<em>+</em></div>
-      <div class="stat-label">Start Free · No Credit Card</div>
+      <div class="stat-val">$0</div>
+      <div class="stat-label">Cost to start today</div>
     </div>
   </div>
 </section>
@@ -1270,7 +1398,13 @@ footer {
           <li>Early access to all new systems</li>
           <li>Rate locked for life</li>
         </ul>
-        <a href="/coverage" class="btn-tier btn-tier-founding">Claim Founding Access →</a>
+        <button class="btn-tier btn-tier-founding" id="foundingBtn" onclick="toggleFoundingForm()">Claim Founding Access →</button>
+        <div class="founding-form" id="foundingForm">
+          <input type="email" id="foundingEmail" class="founding-email-input" placeholder="your@email.com">
+          <button class="btn-founding-submit" onclick="submitFoundingEmail()">Claim My Founding Access</button>
+          <p class="founding-form-sub">First 250 writers only. Rate locked for life at $15/month.</p>
+        </div>
+        <div class="founding-confirm" id="foundingConfirm"></div>
       </div>
 
       <!-- PRO -->
@@ -1315,6 +1449,47 @@ footer {
     <div class="founding-note reveal">
       <span class="fn-label">Founding Writer Access</span>
       <p class="fn-text">The first 250 writers who commit to WRITHEON's development earn charter pricing — $15/month, locked for life. This is not a promotional rate. It is a recognition that the writers who build with us in the early stages deserve permanent access to what they helped create. Once 250 spots are filled, this tier closes permanently.</p>
+    </div>
+  </div>
+</section>
+
+<!-- UPGRADE 10: WRITHEON SCORE SOCIAL PROOF -->
+<section class="section-scores" id="thescore">
+  <div class="scores-inner">
+    <div class="section-tag" data-n="06">The Score</div>
+    <div class="scores-header">
+      <div class="scores-title reveal">
+        <span>SDE™ Score System</span>
+        What The Score<br>Reveals
+      </div>
+      <p class="scores-intro reveal reveal-d2">Writers are including their Writheon Score in query letters. Agents are starting to ask for it.</p>
+    </div>
+    <div class="score-cards-grid">
+
+      <div class="score-card reveal">
+        <div class="score-card-number" style="color:#4caf7d">84</div>
+        <div class="score-card-verdict" style="color:#4caf7d">PASS</div>
+        <div class="score-card-title">The River Remembers</div>
+        <div class="score-card-genre">Drama</div>
+        <div class="score-card-label">Writheon SDE™</div>
+      </div>
+
+      <div class="score-card reveal reveal-d1">
+        <div class="score-card-number" style="color:#e8a030">61</div>
+        <div class="score-card-verdict" style="color:#e8a030">CONSIDER</div>
+        <div class="score-card-title">Protocol Black</div>
+        <div class="score-card-genre">Thriller</div>
+        <div class="score-card-label">Writheon SDE™</div>
+      </div>
+
+      <div class="score-card reveal reveal-d2">
+        <div class="score-card-number" style="color:#c0392b">43</div>
+        <div class="score-card-verdict" style="color:#c0392b">FAIL</div>
+        <div class="score-card-title">The Waiting Room</div>
+        <div class="score-card-genre">Horror</div>
+        <div class="score-card-label">Writheon SDE™</div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -1377,6 +1552,50 @@ function showGenre(g, el) {
   document.querySelectorAll('.preview-panel').forEach(p=>p.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('panel-'+g).classList.add('active');
+}
+
+// UPGRADE 11: Rotating alert strip
+(function() {
+  const alerts = [
+    document.getElementById('heroAlert0'),
+    document.getElementById('heroAlert1'),
+    document.getElementById('heroAlert2'),
+  ];
+  let idx = 0;
+  let paused = false;
+  const strip = document.getElementById('heroAlertStrip');
+  if (!strip) return;
+  strip.addEventListener('mouseenter', () => paused = true);
+  strip.addEventListener('mouseleave', () => paused = false);
+  setInterval(() => {
+    if (paused) return;
+    alerts[idx].classList.remove('active');
+    idx = (idx + 1) % alerts.length;
+    alerts[idx].classList.add('active');
+  }, 3000);
+})();
+
+// UPGRADE 9: Founding form
+function toggleFoundingForm() {
+  const form = document.getElementById('foundingForm');
+  form.classList.toggle('open');
+}
+
+async function submitFoundingEmail() {
+  const email = document.getElementById('foundingEmail').value.trim();
+  if (!email || !email.includes('@')) return;
+  try {
+    await fetch('/api/capture', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, tier: 'founding' })
+    });
+  } catch(e) {}
+  document.getElementById('foundingForm').classList.remove('open');
+  document.getElementById('foundingBtn').style.display = 'none';
+  const confirm = document.getElementById('foundingConfirm');
+  confirm.style.display = 'block';
+  confirm.textContent = "You’re on the list. We’ll reach out when payments go live.";
 }
 </script>
 </body>
