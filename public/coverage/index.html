@@ -855,7 +855,6 @@ function selectMode(mode, el) {
   const m = MODES[mode];
   document.getElementById('modeInfoName').textContent = m.name;
   document.getElementById('modeInfoDesc').textContent = m.desc;
-  document.getElementById('inputLabel').textContent = m.label;
   document.getElementById('inputHint').textContent = m.hint;
   document.getElementById('scriptInput').value = '';
   document.getElementById('charCount').textContent = '0 characters';
@@ -892,7 +891,7 @@ async function runAnalysis() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-5',
         max_tokens: 1000,
         system: `You are the Writheon Coverage Engine™ — a professional screenplay diagnostic system. You operate as a ${VOICES[currentVoice]} providing coverage in the Writheon Screenplay Development Engine™ framework.
 
