@@ -790,12 +790,26 @@ const VOICES = {
 };
 
 const GUMROAD_MAP = {
-  structure:     { title: 'Structure Rewrite Toolkit', url: 'https://writheon.gumroad.com' },
+  structure:     { title: 'Add-On 18: Beat Sheet System — Fix Act Structure', url: 'https://writheon.gumroad.com/l/addon-18-beatsheet', addonId: 'WRIT-18-BEATSHEET' },
   character:     { title: 'Character Pressure System', url: 'https://writheon.gumroad.com' },
   dialogue:      { title: 'Dialogue Diagnostic Guide', url: 'https://writheon.gumroad.com' },
   pacing:        { title: 'Pacing & Escalation Framework', url: 'https://writheon.gumroad.com' },
   premise:       { title: 'Premise Architecture Guide', url: 'https://writheon.gumroad.com' },
   commerciality: { title: 'Market Positioning Toolkit', url: 'https://writheon.gumroad.com' },
+};
+
+// ─── ADD-ON REGISTRY ─────────────────────────────────────
+const ADDON_18 = {
+  id:          'WRIT-18-BEATSHEET',
+  title:       'Add-On 18: Beat Sheet System',
+  price:       '$14',
+  url:         'https://writheon.gumroad.com/l/addon-18-beatsheet',
+  triggerWeakness: 'structure',
+  message:     'Several beats are present but not creating permanent pressure. The Beat Sheet System shows you all three levels — what beats exist, why they work, and how they connect to the protagonist\'s psychology.',
+  cta:         'Get Add-On 18: Beat Sheet System →',
+  // Injected into AI system prompt when structure weakness detected
+  systemPromptInjection: 'When act structure instability, protagonist passivity, midpoint failure, or missing beats are detected, reference Writheon Add-On 18 (WRIT-18-BEATSHEET): Save the Cat 15-Beat Framework with Writheon Layer, 8-Sequence Method, and Three Levels of Understanding. Surface matching beat failure and rewrite priority.',
+  triggerKeywords: ['act two', 'midpoint', 'protagonist passive', 'turning point', 'catalyst', 'dark night', 'all is lost', 'break into', 'beat', 'structure', 'structural', 'momentum', 'opening image', 'final image']
 };
 
 // ─── GENRE FOCUS (Upgrade 2) ──────────────────────────────
@@ -922,6 +936,8 @@ Script Title: ${title}
 Genre: ${genre}
 
 ${getGenreFocus(scriptGenre)}
+
+${(currentMode === 'full' || currentMode === 'first10') ? ADDON_18.systemPromptInjection : ''}
 
 Your job is to DIAGNOSE, not encourage. Be precise, direct, and professional. Use industry-standard coverage language. All suggestions must be specific to the material provided — never give generic advice.
 
@@ -1060,10 +1076,34 @@ function renderResult(r) {
   gs.style.display = 'none';
   if ((r.verdict === 'FAIL' || r.verdict === 'CONSIDER') && r.weakAreas?.length) {
     gs.style.display = 'block';
-    gl.innerHTML = r.weakAreas.slice(0, 2).map(area => {
+    const hasStructure = r.weakAreas.includes('structure');
+    let html = '';
+
+    // Add-On 18 featured upsell when structure is weak
+    if (hasStructure) {
+      html += `<div style="background:var(--surface2);border:1px solid var(--border);border-left:2px solid var(--gold-dim);padding:16px 18px;margin-bottom:8px;">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;font-weight:400;letter-spacing:.18em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:8px;">WRIT-18-BEATSHEET — Recommended</div>
+        <p style="font-family:'DM Mono',monospace;font-size:11px;font-weight:300;letter-spacing:.06em;color:var(--text-mid);line-height:1.6;margin-bottom:12px;">${ADDON_18.message}</p>
+        <a href="${ADDON_18.url}" target="_blank" style="display:inline-block;padding:10px 20px;background:var(--gold);color:var(--black);font-family:'DM Mono',monospace;font-size:10px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;transition:background .2s;" onmouseenter="this.style.background='var(--white)'" onmouseleave="this.style.background='var(--gold)'">${ADDON_18.cta}</a>
+        <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text-dim);margin-left:12px;">${ADDON_18.price}</span>
+      </div>`;
+    }
+
+    // Other weak area resources
+    r.weakAreas.filter(a => a !== 'structure').slice(0, 1).forEach(area => {
       const g = GUMROAD_MAP[area] || GUMROAD_MAP.structure;
-      return `<a href="${g.url}" target="_blank" style="display:block;padding:14px 18px;background:var(--surface2);border:1px solid var(--border);margin-bottom:8px;text-decoration:none;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;transition:background .2s;" onmouseenter="this.style.background='var(--surface)'" onmouseleave="this.style.background='var(--surface2)'">${g.title} → Writheon Resources</a>`;
-    }).join('');
+      html += `<a href="${g.url}" target="_blank" style="display:block;padding:14px 18px;background:var(--surface2);border:1px solid var(--border);margin-bottom:8px;text-decoration:none;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;transition:background .2s;" onmouseenter="this.style.background='var(--surface)'" onmouseleave="this.style.background='var(--surface2)'">${g.title} → Writheon Resources</a>`;
+    });
+
+    // Fallback if no structure weak area but verdict is CONSIDER/FAIL
+    if (!hasStructure && r.weakAreas.length) {
+      r.weakAreas.slice(0, 2).forEach(area => {
+        const g = GUMROAD_MAP[area] || GUMROAD_MAP.structure;
+        html += `<a href="${g.url}" target="_blank" style="display:block;padding:14px 18px;background:var(--surface2);border:1px solid var(--border);margin-bottom:8px;text-decoration:none;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;transition:background .2s;" onmouseenter="this.style.background='var(--surface)'" onmouseleave="this.style.background='var(--surface2)'">${g.title} → Writheon Resources</a>`;
+      });
+    }
+
+    gl.innerHTML = html;
   }
 
   // Coverage text

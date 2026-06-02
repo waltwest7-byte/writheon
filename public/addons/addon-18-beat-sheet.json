@@ -1,0 +1,150 @@
+{
+  "id": "addon-18-beat-sheet-system",
+  "api_reference_id": "WRIT-18-BEATSHEET",
+  "title": "Writheon Beat Sheet System",
+  "addon": "Add-On 18",
+  "price": "$14",
+  "gumroad_url": "https://writheon.gumroad.com/l/addon-18-beatsheet",
+  "description": "A beat is not a plot point. A beat is a pressure event — something that permanently changes the emotional or physical situation of the protagonist. The Save the Cat 15 beats and the 8-Sequence Method are two maps of the same territory. Together they are more complete than either alone.",
+  "connects_to": ["addon-16-narrative-engine", "addon-13-character-pressure"],
+  "acknowledgments": [
+    "Blake Snyder (1957–2009) — Save the Cat! (2005) — creator of the 15-beat framework",
+    "Frank Daniel (1926–1996) — Columbia/USC/AFI — originator of the sequence approach to screenplay structure",
+    "Paul Gulino — Screenwriting: The Sequence Approach (2004) — formalized the 8-Sequence Method"
+  ],
+  "sde_integration": {
+    "sde_module": "CE-02-Structure",
+    "phase": "Live",
+    "diagnostic_category_tags": ["Act Structure", "Scene Pressure", "Character Pressure", "Pacing"],
+    "coverage_engine_score_fields": ["act_structure", "scene_pressure", "character_pressure", "pacing"],
+    "voice_mode_relevance": ["Dev Executive", "Studio Notes", "Contest Reader", "Brutal Truth", "Streaming Platform", "Manager Notes"],
+    "analysis_trigger_keywords": [
+      "act two collapses",
+      "midpoint weak",
+      "protagonist passive",
+      "no turning point",
+      "missing catalyst",
+      "dark night",
+      "all is lost",
+      "break into two",
+      "beat sheet",
+      "structure",
+      "act structure",
+      "structural instability",
+      "no momentum",
+      "theme unclear",
+      "opening image",
+      "final image"
+    ],
+    "rewrite_priority_mapping": {
+      "passive_protagonist": "Protagonist is pushed into Act Two rather than choosing it. The Break into Two must be a choice the protagonist makes. (Add-On 18 — Beat 06)",
+      "midpoint_not_closing_approach": "Act Two B continues the same approach as Act Two A. The Midpoint must permanently close the original strategy. (Add-On 18 — Beat 09)",
+      "bad_guys_close_in_repetition": "Act Two B repeats the same pressure type rather than escalating. Each beat must close a different exit. (Add-On 18 — Beat 10)",
+      "dark_night_disconnected": "Dark Night is present but doesn't connect to Theme Stated on page 5. They must be the same question — one planted, one answered. (Add-On 18 — Beat 12)",
+      "no_arc_in_images": "Opening Image and Final Image could be swapped without loss. They must be direct, deliberate contrasts — the arc made visible. (Add-On 18 — Beats 01 and 15)",
+      "level_one_only": "All 15 beats are present but feel mechanical. Apply Level Two (structural function) and Level Three (wound connection) to each beat. (Add-On 18 — Three Levels)"
+    },
+    "system_prompt_injection": "When act structure instability, protagonist passivity, midpoint failure, or missing beats are detected, reference Writheon Add-On 18 (WRIT-18-BEATSHEET): Save the Cat 15-Beat Framework with Writheon Layer, 8-Sequence Method, and Three Levels of Understanding. Surface matching beat failure and rewrite priority."
+  },
+  "core_frameworks": [
+    {
+      "name": "The Writheon Beat Doctrine",
+      "items": [
+        "A beat is a pressure event — something that permanently changes the protagonist's situation, psychology, or options",
+        "A beat is not a scene — a scene can contain multiple beats; a beat can happen in a single line",
+        "A beat operates at three levels: external event (what happens), structural function (why it matters), interior (how it connects to the protagonist's wound)",
+        "If nothing has permanently changed by the end of a beat, it is a scene that hasn't yet found its structural function",
+        "Beat sheets are diagnostic tools first — use them to find where pressure has stopped building, then repair the architecture"
+      ]
+    },
+    {
+      "name": "The 15 Save the Cat Beats — Writheon Layer",
+      "items": [
+        "01 Opening Image (p.1) — Sets the emotional baseline the Final Image will transform; the before-snapshot of the protagonist's world",
+        "02 Theme Stated (p.5) — The Moral Engine™ dramatic question spoken before the protagonist understands it; the belief the story will spend 110 pages testing",
+        "03 Set-Up (pp.1–10) — Plants every element that will detonate in Acts 2 and 3; shows the world that cannot continue as it is",
+        "04 Catalyst (p.12) — The irreversible external change; permanently closes the world that existed before it — the door the story can't return through",
+        "05 Debate (pp.12–25) — Reveals the wound through what the protagonist argues against; their distortion speaking; ends in a choice, not a circumstance",
+        "06 Break into Two (p.25) — The protagonist actively chooses their problem; Act Two begins when the protagonist causes it; not something that happens to them",
+        "07 B Story (p.30) — The Mirror Function™; a relationship that carries the theme; models who the protagonist could become if they answer the Dramatic Question correctly",
+        "08 Fun and Games (pp.30–55) — The promise of the premise; exits are closing even during the 'up' phase; Escalation Principle™ active throughout",
+        "09 Midpoint (p.55) — False Victory or False Defeat; the original approach becomes permanently unavailable; Act Two B must be a different film from Act Two A",
+        "10 Bad Guys Close In (pp.55–75) — Each beat closes a different exit; protagonist has measurably fewer options at p.75 than at p.55; not repetition — deepening",
+        "11 All Is Lost (p.75) — Maximum disadvantage; 'whiff of death'; mirror of the Catalyst in its worst possible form",
+        "12 Dark Night of the Soul (pp.75–85) — The wound is seen clearly; the Theme Stated from p.5 finally lands; the answer emerges from memory, object, or another person",
+        "13 Break into Three (p.85) — Protagonist chooses again as the person the story has made them; genuinely different from the person who broke into Two",
+        "14 Finale (pp.85–110) — The Villain Argument™ is answered through action, not stated; five-part structure: Gathering, Executing, High Tower Surprise, Digging Down, New Plan",
+        "15 Final Image (p.110) — Direct contrast to Opening Image; the arc made visible; if Opening and Final Images can be swapped, the arc was not completed"
+      ]
+    },
+    {
+      "name": "The 8-Sequence Method (Frank Daniel / Paul Gulino)",
+      "items": [
+        "Sequence 1 (pp.1–15) — Opening + Hook: Who is this person and what is wrong with their world? STC: Opening Image, Theme Stated, Set-Up (partial)",
+        "Sequence 2 (pp.15–30) — Complication + Break into Two: Catalyst arrives and Debate plays out; ends when protagonist makes the active choice. STC: Set-Up complete, Catalyst, Debate, Break into Two",
+        "Sequence 3 (pp.30–45) — First Attempts + B Story: Initial approach partially succeeds or fails; protagonist doesn't yet know it has limits. STC: B Story, Fun and Games (early)",
+        "Sequence 4 (pp.45–60) — Midpoint Complication: Fun and Games escalate to the Midpoint; first strategy is permanently insufficient. STC: Fun and Games complete, Midpoint",
+        "Sequence 5 (pp.60–75) — New Plan + Escalating Pressure: New approach forms; Bad Guys Close In; sequence ends without a clear answer. STC: Bad Guys Close In (early to mid)",
+        "Sequence 6 (pp.75–85) — Darkest Hour: All Is Lost; Dark Night; maximum disadvantage. STC: All Is Lost, Dark Night of the Soul",
+        "Sequence 7 (pp.85–100) — Confrontation + Climax: Break into Three and core Finale; Villain Argument™ directly engaged. STC: Break into Three, Finale (to climax)",
+        "Sequence 8 (pp.100–110) — Resolution + Final Image: Aftermath; new world established; B Story resolves. STC: Finale (resolution), Final Image"
+      ]
+    },
+    {
+      "name": "Three Levels of Understanding",
+      "items": [
+        "Level One — The Map: understanding what beats exist and approximately when they occur; produces scripts where beats are present but feel mechanical",
+        "Level Two — The Why: understanding what structural pressure each beat creates; each beat does real structural work, not just occupying its assigned page",
+        "Level Three — The Interior: every beat's external event connects to the protagonist's internal psychology; the Catalyst specifically aggravates the protagonist's wound; structure and character become indistinguishable"
+      ]
+    }
+  ],
+  "diagnostic_questions": [
+    "Is every one of the 15 beats present in the script?",
+    "Does the Break into Two result from a choice the protagonist makes — not something that happens to them?",
+    "Does the Midpoint permanently end the original approach, or does Act Two B continue it?",
+    "Does the Catalyst specifically aggravate the protagonist's wound (Level Three)?",
+    "Does the Dark Night connect to the Theme Stated from page 5?",
+    "Does each beat in Bad Guys Close In close a different exit — not repeat the same pressure?",
+    "Is the distance between Opening Image and Final Image the protagonist's full arc made visible?"
+  ],
+  "failure_modes": [
+    "Break into Two — protagonist is pushed into Act Two rather than choosing it; produces a passive protagonist",
+    "Midpoint — original approach continues into Act Two B without being permanently closed",
+    "Bad Guys Close In — same pressure type repeated rather than different exits closed with each beat",
+    "Dark Night — sadness without the Theme Stated landing; protagonist doesn't see their distortion clearly",
+    "Finale — antagonist physically defeated but Villain Argument™ never answered through action",
+    "Opening and Final Images — no deliberate contrast; arc not made visible in a single image",
+    "Beat sheet used as a checklist (Level One only) — beats present but mechanical and inevitable-feeling"
+  ],
+  "prompt_library": [
+    {
+      "id": "BS-01",
+      "name": "Build the Beat Sheet",
+      "prompt": "Beat out this story using the Writheon Beat Sheet System. Story concept/outline: [PASTE CONCEPT OR OUTLINE]. For each of the 15 Save the Cat beats: (1) The external event — what happens, (2) The internal event — how the protagonist's belief, options, or psychology permanently changes, (3) The structural function in Writheon terms — which Narrative Engine™ principle this beat activates, which exit it closes, (4) The page target and scene type. Then map to the 8-Sequence Method — name each sequence's dramatic question and how it resolves. Flag any beat where the external event occurs without the internal event."
+    },
+    {
+      "id": "BS-02",
+      "name": "Beat Sheet Diagnostic",
+      "prompt": "Here is my current beat sheet or story outline: [PASTE]. Analyze it through all three levels of the Writheon Beat Sheet System: LEVEL ONE (the map): Are all 15 beats present? Flag any missing beats. LEVEL TWO (the why): For each beat — does it create permanent structural pressure? Does it close an exit the protagonist previously had? Does the Midpoint permanently end the original approach, or does Act Two B continue it? LEVEL THREE (the interior): For each beat — is there an internal transformation alongside the external event? Does the Catalyst specifically aggravate the protagonist's wound? Does the Dark Night connect to the Theme Stated from page 5? Return a full analysis with specific suggestions for deepening each level."
+    },
+    {
+      "id": "BS-03",
+      "name": "Beat the Premise — Full Architecture",
+      "prompt": "Beat out this premise from scratch using both systems simultaneously: [PASTE PREMISE OR LOGLINE]. First, identify: the Structural Engine™ type (Pursuit/Mystery/Ticking Clock/Relationship/Survival/Corruption/Revenge/Collapse), and the Moral Engine™ profile for the protagonist (belief, wound, distortion, line, dramatic question). Then generate all 15 beats with both external and internal dimensions operating at Level Three — where each beat's external event directly engages the protagonist's wound. Map to the 8-Sequence Method. Describe the Opening Image and Final Image as direct contrasts. Name the Theme Stated line — the exact words a character would say on page 5."
+    }
+  ],
+  "scoring_rubric": {
+    "90_100": "All 15 beats present and operating at Level Three. Break into Two is active. Midpoint permanently closes original approach. Dark Night connects to Theme Stated. Final Image is deliberate contrast to Opening Image.",
+    "75_89": "Most beats present. Break into Two mostly active. Midpoint present but Act Two B partially continues original approach. Level Two operational; Level Three inconsistent.",
+    "60_74": "Several beats missing or misplaced. Break into Two may be passive. Dark Night is sadness without Theme Stated landing. Beat sheet applied at Level One only.",
+    "45_59": "Multiple missing beats. Act Two structure unclear. Midpoint does not close original approach. No identifiable Dark Night or deliberate Final Image contrast.",
+    "0_44": "Beat sheet absent or applied as decoration. Protagonist passive throughout. No structural pressure in most beats."
+  },
+  "upsell_trigger": {
+    "weakness": "structural_gaps",
+    "message": "Several beats are present but not creating permanent pressure. The Beat Sheet System shows you all three levels — what beats exist, why they work, and how they connect to the protagonist's psychology.",
+    "cta": "Get Add-On 18: Beat Sheet System →",
+    "gumroad_url": "https://writheon.gumroad.com/l/addon-18-beatsheet"
+  }
+}
