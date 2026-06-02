@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rewrite Engine™ — WRITHEON</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{--black:#060606;--deep:#0a0a0a;--surface:#0f0f0f;--card:#131313;--card2:#161616;--border:#1c1c1c;--border2:#242424;--text:#ece8e0;--mid:#a8a29a;--dim:#6b6560;--gold:#c8a44a;--gold2:#a8853a;--red:#bf3b2e;--green:#3d9e6a;--amber:#d4892a;--white:#f4f0e8}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--text);font-family:'Cormorant Garamond',Georgia,serif;min-height:100vh;cursor:none;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.02;pointer-events:none;z-index:999}
+
+.cur{position:fixed;width:7px;height:7px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width.15s,height.15s}
+.cur-r{position:fixed;width:28px;height:28px;border:1px solid rgba(200,164,74,.3);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width.25s,height.25s}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:22px 56px;background:rgba(6,6,6,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.2em;color:var(--white);text-decoration:none}
+.logo em{color:var(--gold);font-style:normal}
+.nav-c{display:flex;align-items:center;gap:28px}
+.nav-product{font-family:'DM Mono',monospace;font-size:10px;font-weight:300;letter-spacing:.16em;color:var(--dim);text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.nav-product::before{content:'';width:1px;height:14px;background:var(--border2)}
+.nav-back{font-family:'DM Mono',monospace;font-size:10px;font-weight:300;letter-spacing:.12em;color:var(--dim);text-decoration:none;text-transform:uppercase;transition:color.2s;display:flex;align-items:center;gap:6px}
+.nav-back::before{content:'←'}
+.nav-back:hover{color:var(--text)}
+.nav-badge{font-family:'DM Mono',monospace;font-size:9px;font-weight:400;letter-spacing:.12em;color:var(--gold);border:1px solid rgba(200,164,74,.3);padding:4px 10px;text-transform:uppercase}
+
+/* APP */
+.app{padding-top:80px;min-height:100vh;display:grid;grid-template-rows:auto 1fr}
+
+.app-header{padding:32px 56px 24px;border-bottom:1px solid var(--border);display:flex;align-items:flex-end;justify-content:space-between}
+.ah-left h1{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.06em;color:var(--white);display:flex;align-items:center;gap:16px}
+.ah-left h1 em{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:.52em;color:var(--gold);letter-spacing:.1em}
+.ah-left p{font-family:'DM Mono',monospace;font-size:10px;font-weight:300;letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin-top:6px}
+.ah-right{display:flex;align-items:center;gap:20px}
+.mode-select{font-family:'DM Mono',monospace;font-size:10px;font-weight:300;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;display:flex;gap:1px}
+.ms-opt{padding:8px 16px;background:var(--card);border:1px solid var(--border);cursor:none;transition:all.2s;border:none}
+.ms-opt.active{background:var(--surface);color:var(--text);border-bottom:2px solid var(--gold)}
+.ms-opt:hover{color:var(--mid)}
+
+/* MAIN */
+.app-main{display:grid;grid-template-columns:1fr 1fr;height:calc(100vh - 160px)}
+
+/* INPUT PANEL */
+.panel-in{border-right:1px solid var(--border);display:flex;flex-direction:column}
+.panel-header{padding:20px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ph-label{font-family:'DM Mono',monospace;font-size:10px;font-weight:300;letter-spacing:.18em;color:var(--gold);text-transform:uppercase}
+.ph-hint{font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.1em;color:var(--dim);text-transform:uppercase}
+.panel-body{flex:1;padding:24px 32px;display:flex;flex-direction:column;gap:16px;overflow-y:auto}
+
+/* MODE CARDS */
+.mode-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-bottom:4px}
+.mc{background:var(--card);padding:16px 14px;cursor:none;border:none;text-align:left;transition:background.2s;position:relative}
+.mc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:transparent;transition:background.2s}
+.mc.active,.mc:hover{background:var(--card2)}
+.mc.active::before{background:var(--gold)}
+.mc-name{font-family:'DM Mono',monospace;font-size:10px;font-weight:400;letter-spacing:.1em;color:var(--mid);text-transform:uppercase;transition:color.2s}
+.mc.active .mc-name{color:var(--text)}
+.mc-desc{font-size:13px;font-weight:300;font-style:italic;color:var(--dim);line-height:1.4;margin-top:4px}
+
+/* TEXTAREA */
+textarea{width:100%;flex:1;min-height:320px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;font-weight:300;line-height:1.85;padding:20px;resize:none;outline:none;transition:border-color.2s;letter-spacing:.02em}
+textarea:focus{border-color:var(--border2)}
+textarea::placeholder{color:var(--dim);font-style:italic;font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:300}
+
+.panel-footer{padding:16px 32px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.char-c{font-family:'DM Mono',monospace;font-size:10px;font-weight:300;letter-spacing:.1em;color:var(--dim)}
+
+/* REWRITE FOCUS */
+.focus-row{display:flex;flex-direction:column;gap:8px}
+.focus-label{font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.16em;color:var(--dim);text-transform:uppercase}
+.focus-opts{display:flex;gap:6px;flex-wrap:wrap}
+.focus-opt{font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);border:1px solid var(--border);padding:5px 12px;cursor:none;background:none;transition:all.2s}
+.focus-opt.active,.focus-opt:hover{color:var(--gold);border-color:rgba(200,164,74,.4)}
+
+.run-btn{font-family:'DM Mono',monospace;font-size:12px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--black);background:var(--gold);border:none;padding:13px 32px;cursor:none;position:relative;transition:background.2s,transform.2s}
+.run-btn::after{content:'';position:absolute;bottom:-3px;right:-3px;width:100%;height:100%;border:1px solid var(--gold2);transition:transform.2s}
+.run-btn:hover{background:var(--white);transform:translate(-2px,-2px)}
+.run-btn:hover::after{transform:translate(2px,2px)}
+.run-btn:disabled{background:var(--border);color:var(--dim);cursor:not-allowed;transform:none}
+.run-btn:disabled::after{display:none}
+
+/* OUTPUT PANEL */
+.panel-out{display:flex;flex-direction:column;overflow:hidden}
+
+/* EMPTY STATE */
+.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px;text-align:center}
+.es-icon{font-family:'Bebas Neue',sans-serif;font-size:64px;letter-spacing:.04em;color:var(--border);margin-bottom:20px}
+.es-text{font-size:20px;font-weight:300;font-style:italic;color:var(--dim);margin-bottom:8px}
+.es-sub{font-family:'DM Mono',monospace;font-size:10px;font-weight:300;letter-spacing:.14em;color:var(--border2);text-transform:uppercase}
+
+/* LOADING */
+.loading-state{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;padding:48px;text-align:center}
+.loading-state.active{display:flex}
+.spinner{width:36px;height:36px;border:1px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:24px}
+.loading-text{font-family:'DM Mono',monospace;font-size:11px;font-weight:300;letter-spacing:.18em;color:var(--dim);text-transform:uppercase;margin-bottom:6px}
+.loading-sub{font-size:16px;font-weight:300;font-style:italic;color:var(--dim)}
+
+/* RESULT */
+.result-state{flex:1;display:none;flex-direction:column;overflow:hidden}
+.result-state.active{display:flex}
+
+.result-tabs{display:flex;gap:1px;background:var(--border);flex-shrink:0}
+.rtab{font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:12px 20px;background:var(--card);border:none;cursor:none;transition:all.2s;white-space:nowrap}
+.rtab.active,.rtab:hover{color:var(--text);background:var(--surface)}
+.rtab.active{border-bottom:2px solid var(--gold)}
+
+.result-content{flex:1;overflow-y:auto;padding:28px 32px}
+
+/* REWRITE OUTPUT */
+.rewrite-block{margin-bottom:28px}
+.rb-label{font-family:'DM Mono',monospace;font-size:9px;font-weight:400;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.rb-copy{font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.1em;color:var(--dim);cursor:none;background:none;border:none;transition:color.2s}
+.rb-copy:hover{color:var(--gold)}
+.rb-text{font-family:'DM Mono',monospace;font-size:12px;font-weight:300;line-height:1.85;color:var(--text);letter-spacing:.02em;white-space:pre-wrap}
+
+/* DIFF */
+.diff-block{margin-bottom:8px}
+.diff-add{background:rgba(61,158,106,.08);border-left:2px solid var(--green);padding:8px 12px;font-family:'DM Mono',monospace;font-size:11px;font-weight:300;line-height:1.7;color:var(--text);letter-spacing:.02em;white-space:pre-wrap}
+.diff-rem{background:rgba(191,59,46,.06);border-left:2px solid rgba(191,59,46,.4);padding:8px 12px;font-family:'DM Mono',monospace;font-size:11px;font-weight:300;line-height:1.7;color:var(--dim);text-decoration:line-through;letter-spacing:.02em;white-space:pre-wrap}
+.diff-tag{font-family:'DM Mono',monospace;font-size:8px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;padding:2px 6px;margin-left:8px;border:1px solid}
+.diff-tag-add{color:var(--green);border-color:rgba(61,158,106,.3)}
+.diff-tag-rem{color:var(--red);border-color:rgba(191,59,46,.3)}
+
+/* DIAGNOSTIC */
+.diag-section{margin-bottom:24px}
+.diag-title{font-family:'DM Mono',monospace;font-size:9px;font-weight:400;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.diag-items{display:flex;flex-direction:column;gap:8px}
+.diag-item{padding:12px 16px;background:var(--card);border-left:2px solid var(--border2)}
+.di-cat{font-family:'DM Mono',monospace;font-size:9px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+.di-cat-structure{color:var(--gold)}
+.di-cat-pressure{color:var(--amber)}
+.di-cat-dialogue{color:var(--green)}
+.di-cat-character{color:var(--mid)}
+.di-text{font-size:14px;font-weight:300;font-style:italic;line-height:1.65;color:var(--mid)}
+
+/* SCORE DELTA */
+.score-delta{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;margin-bottom:24px;padding:24px;background:var(--card);border:1px solid var(--border)}
+.sd-before,.sd-after{text-align:center}
+.sd-num{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:.02em;line-height:1}
+.sd-label{font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin-top:4px}
+.sd-arrow{font-family:'DM Mono',monospace;font-size:20px;color:var(--gold)}
+.sd-delta{font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:.1em;color:var(--green);text-align:center;margin-top:8px}
+
+/* ACTIONS */
+.result-actions{padding:16px 32px;border-top:1px solid var(--border);display:flex;gap:12px;flex-shrink:0}
+.btn-sm{font-family:'DM Mono',monospace;font-size:10px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;border:none;padding:10px 18px;cursor:none;transition:all.2s}
+.btn-export{color:var(--black);background:var(--gold)}
+.btn-export:hover{background:var(--white)}
+.btn-copy-all{color:var(--dim);background:var(--card);border:1px solid var(--border)}
+.btn-copy-all:hover{color:var(--text);border-color:var(--mid)}
+.btn-new{color:var(--dim);background:none;border:1px solid var(--border);margin-left:auto}
+.btn-new:hover{color:var(--text);border-color:var(--mid)}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold);padding:12px 18px;z-index:500;font-family:'DM Mono',monospace;font-size:10px;font-weight:300;letter-spacing:.1em;color:var(--mid);text-transform:uppercase;transform:translateY(16px);opacity:0;transition:transform.3s,opacity.3s}
+.toast.show{transform:none;opacity:1}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.fade-in{animation:fadeUp .3s ease forwards}
+
+@media(max-width:900px){
+  .app-main{grid-template-columns:1fr;grid-template-rows:auto auto}
+  .panel-in{border-right:none;border-bottom:1px solid var(--border)}
+  nav{padding:16px 24px}
+  .app-header{padding:20px 24px;flex-direction:column;align-items:flex-start;gap:12px}
+  .mode-cards{grid-template-columns:1fr}
+  .panel-body,.result-content{padding:20px 24px}
+  .panel-footer,.result-actions{padding:14px 24px}
+}
+</style>
+</head>
+<body>
+
+<div class="cur" id="cur"></div>
+<div class="cur-r" id="curR"></div>
+
+<nav>
+  <div style="display:flex;align-items:center;gap:0">
+    <a href="/" class="logo">WRITH<em>E</em>ON</a>
+    <span class="nav-product">Rewrite Engine™</span>
+  </div>
+  <div class="nav-c">
+    <span class="nav-badge" id="tierBadge">Free Tier</span>
+    <a href="/coverage" class="nav-back" style="margin-left:8px">Coverage Engine</a>
+    <a href="/" class="nav-back">Back to Site</a>
+  </div>
+</nav>
+
+<div class="app">
+
+  <div class="app-header">
+    <div class="ah-left">
+      <h1>Rewrite Engine™ <em>Screenplay Development Engine™</em></h1>
+      <p>Paste a scene · Select focus · Receive precision rewrite with diagnostic breakdown</p>
+    </div>
+    <div class="ah-right">
+      <div class="mode-select">
+        <button class="ms-opt active" onclick="setRewriteMode('precision',this)">Precision</button>
+        <button class="ms-opt" onclick="setRewriteMode('pressure',this)">Add Pressure</button>
+        <button class="ms-opt" onclick="setRewriteMode('dialogue',this)">Dialogue</button>
+        <button class="ms-opt" onclick="setRewriteMode('tighten',this)">Tighten</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-main">
+
+    <!-- INPUT -->
+    <div class="panel-in">
+      <div class="panel-header">
+        <span class="ph-label" id="inputLabel">Paste Your Scene</span>
+        <span class="ph-hint" id="inputHint">Any format · Fountain, FDX, plain text</span>
+      </div>
+      <div class="panel-body">
+        <div class="mode-cards">
+          <button class="mc active" data-mode="scene" onclick="selectInputMode('scene',this)">
+            <div class="mc-name">Scene</div>
+            <div class="mc-desc">Single scene or sequence</div>
+          </button>
+          <button class="mc" data-mode="dialogue" onclick="selectInputMode('dialogue',this)">
+            <div class="mc-name">Dialogue</div>
+            <div class="mc-desc">Conversation or exchange</div>
+          </button>
+          <button class="mc" data-mode="act" onclick="selectInputMode('act',this)">
+            <div class="mc-name">Act Sequence</div>
+            <div class="mc-desc">Multi-scene sequence</div>
+          </button>
+        </div>
+
+        <textarea id="sceneInput" placeholder="Paste your scene here.
+
+The Rewrite Engine will analyze structural function, dramatic pressure, character agency, dialogue efficiency, and pacing — then deliver a precision rewrite with a full diagnostic breakdown of every decision made.
+
+Fountain format, Final Draft export, or plain text accepted." spellcheck="false"></textarea>
+
+        <div class="focus-row">
+          <div class="focus-label">Rewrite Focus (select all that apply)</div>
+          <div class="focus-opts">
+            <button class="focus-opt active" onclick="toggleFocus(this)">Structure</button>
+            <button class="focus-opt active" onclick="toggleFocus(this)">Pressure</button>
+            <button class="focus-opt" onclick="toggleFocus(this)">Dialogue</button>
+            <button class="focus-opt" onclick="toggleFocus(this)">Pacing</button>
+            <button class="focus-opt" onclick="toggleFocus(this)">Character Agency</button>
+            <button class="focus-opt" onclick="toggleFocus(this)">Scene Function</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer">
+        <span class="char-c" id="charCount">0 characters</span>
+        <button class="run-btn" id="runBtn" onclick="runRewrite()">Rewrite Scene →</button>
+      </div>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="panel-out">
+      <div class="panel-header">
+        <span class="ph-label">Rewrite Output</span>
+        <span class="ph-hint" id="outputHint">Precision rewrite + diagnostic breakdown</span>
+      </div>
+
+      <!-- EMPTY -->
+      <div class="empty-state" id="emptyState">
+        <div class="es-icon">RE™</div>
+        <div class="es-text">Paste your scene. Run the engine.</div>
+        <div class="es-sub">Rewrite · Diagnose · Improve · Repeat</div>
+      </div>
+
+      <!-- LOADING -->
+      <div class="loading-state" id="loadingState">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadText">Running Rewrite Engine™</div>
+        <div class="loading-sub" id="loadSub">Analyzing structural function...</div>
+      </div>
+
+      <!-- RESULT -->
+      <div class="result-state" id="resultState">
+        <div class="result-tabs">
+          <button class="rtab active" onclick="showTab('rewrite',this)">Rewrite</button>
+          <button class="rtab" onclick="showTab('diff',this)">Diff View</button>
+          <button class="rtab" onclick="showTab('diagnostic',this)">Diagnostic</button>
+          <button class="rtab" onclick="showTab('score',this)">Score Delta</button>
+        </div>
+
+        <!-- REWRITE TAB -->
+        <div class="result-content" id="tab-rewrite">
+          <div class="rewrite-block">
+            <div class="rb-label">
+              Rewritten Scene
+              <button class="rb-copy" onclick="copyText('rewriteOutput')">Copy</button>
+            </div>
+            <div class="rb-text" id="rewriteOutput"></div>
+          </div>
+        </div>
+
+        <!-- DIFF TAB -->
+        <div class="result-content" id="tab-diff" style="display:none">
+          <div class="rewrite-block">
+            <div class="rb-label">Change Breakdown</div>
+            <div id="diffOutput"></div>
+          </div>
+        </div>
+
+        <!-- DIAGNOSTIC TAB -->
+        <div class="result-content" id="tab-diagnostic" style="display:none">
+          <div id="diagOutput"></div>
+        </div>
+
+        <!-- SCORE TAB -->
+        <div class="result-content" id="tab-score" style="display:none">
+          <div id="scoreOutput"></div>
+        </div>
+
+        <div class="result-actions">
+          <button class="btn-sm btn-copy-all" onclick="copyAll()">Copy Rewrite</button>
+          <button class="btn-sm btn-export" onclick="exportPDF()" id="exportBtn">Export PDF</button>
+          <button class="btn-sm btn-new" onclick="resetEngine()">New Scene</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────
+let currentMode = 'scene';
+let rewriteMode = 'precision';
+let currentResult = null;
+let isPro = false;
+let rewriteCount = 0;
+const FREE_LIMIT = 2;
+
+const REWRITE_MODES = {
+  precision: { name: 'Precision Rewrite', desc: 'Full structural, pressure, and dialogue optimization' },
+  pressure: { name: 'Add Pressure', desc: 'Escalate stakes, tension, and protagonist agency' },
+  dialogue: { name: 'Dialogue Rewrite', desc: 'Efficiency, subtext, character voice, authenticity' },
+  tighten: { name: 'Tighten Scene', desc: 'Remove redundancy, sharpen beats, improve momentum' }
+};
+
+const LOAD_LINES = [
+  ['Running Rewrite Engine™', 'Analyzing structural function...'],
+  ['Evaluating Scene Pressure', 'Measuring protagonist agency and stakes...'],
+  ['Diagnosing Dialogue', 'Checking authenticity and efficiency...'],
+  ['Engineering Rewrite', 'Applying precision development frameworks...'],
+  ['Generating Diagnostic', 'Documenting every structural decision...'],
+];
+
+function init() {
+  const stored = localStorage.getItem('writheon_re_state');
+  if (stored) {
+    const s = JSON.parse(stored);
+    rewriteCount = s.count || 0;
+    isPro = s.pro || false;
+  }
+  document.getElementById('sceneInput').addEventListener('input', updateChar);
+  updateTierBadge();
+}
+
+function saveState() {
+  localStorage.setItem('writheon_re_state', JSON.stringify({ count: rewriteCount, pro: isPro }));
+}
+
+function updateTierBadge() {
+  const b = document.getElementById('tierBadge');
+  b.textContent = isPro ? 'Pro — Unlimited' : `${Math.max(0, FREE_LIMIT - rewriteCount)} Free Rewrites`;
+}
+
+// ── MODES ─────────────────────────────────────────────────
+function selectInputMode(mode, el) {
+  currentMode = mode;
+  document.querySelectorAll('.mc').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function setRewriteMode(mode, el) {
+  rewriteMode = mode;
+  document.querySelectorAll('.ms-opt').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function toggleFocus(el) {
+  el.classList.toggle('active');
+}
+
+function getFocusAreas() {
+  return Array.from(document.querySelectorAll('.focus-opt.active')).map(el => el.textContent);
+}
+
+// ── REWRITE ───────────────────────────────────────────────
+async function runRewrite() {
+  const text = document.getElementById('sceneInput').value.trim();
+  if (!text || text.length < 80) { showToast('Paste at least one full scene to rewrite'); return; }
+  if (!isPro && rewriteCount >= FREE_LIMIT) { showUpgrade(); return; }
+
+  setLoading(true);
+  const focus = getFocusAreas();
+
+  const systemPrompt = `You are the Writheon Rewrite Engine™ — a professional screenplay development system. Your function is NOT to generate new screenplay content — it is to take existing scenes and rewrite them with precise structural, pressure, and dialogue improvements.
+
+REWRITE MODE: ${REWRITE_MODES[rewriteMode].name}
+FOCUS AREAS: ${focus.join(', ')}
+
+You MUST respond with ONLY valid JSON — no preamble, no markdown fences:
+{
+  "rewrite": "<the full rewritten scene in proper screenplay format>",
+  "changes": [
+    { "type": "structure|pressure|dialogue|character|pacing", "original": "<original line or beat>", "rewritten": "<new version>", "reason": "<why this change improves the scene>" }
+  ],
+  "diagnostics": [
+    { "category": "Structure|Pressure|Dialogue|Character", "finding": "<diagnostic observation>", "recommendation": "<actionable note>" }
+  ],
+  "scoreBefore": <40-85>,
+  "scoreAfter": <scoreBefore + 8 to 18>,
+  "verdict": "<one sentence professional assessment of the original scene>",
+  "improvement": "<one sentence describing what the rewrite achieves>"
+}
+
+REWRITE PRINCIPLES:
+- Never invent plot points not present in the original
+- Preserve the writer's voice — enhance it, never replace it
+- Every structural change must serve dramatic pressure
+- Dialogue changes must preserve character voice while improving efficiency
+- If the scene is strong, say so — identify what works and make minimal changes`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: `REWRITE THIS SCENE:\n\n${text.substring(0, 3500)}` }]
+      })
+    });
+
+    const data = await res.json();
+    const raw = data.content?.[0]?.text || '';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const result = JSON.parse(clean);
+
+    rewriteCount++;
+    currentResult = { ...result, original: text };
+    saveState();
+    renderResult(result, text);
+
+  } catch (e) {
+    showToast('Rewrite failed — check connection and try again');
+    console.error(e);
+  } finally {
+    setLoading(false);
+  }
+}
+
+// ── RENDER ────────────────────────────────────────────────
+function renderResult(r, original) {
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('resultState').className = 'result-state active fade-in';
+
+  // Rewrite tab
+  document.getElementById('rewriteOutput').textContent = r.rewrite;
+
+  // Diff tab
+  const diffOut = document.getElementById('diffOutput');
+  diffOut.innerHTML = '';
+  if (r.changes && r.changes.length) {
+    r.changes.forEach(c => {
+      diffOut.innerHTML += `
+        <div class="diff-block">
+          <div class="diff-rem">${escHtml(c.original)} <span class="diff-tag diff-tag-rem">Original</span></div>
+          <div class="diff-add">${escHtml(c.rewritten)} <span class="diff-tag diff-tag-add">${c.type}</span></div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;font-weight:300;letter-spacing:.06em;color:var(--dim);padding:8px 12px 12px;font-style:italic">${c.reason}</div>
+        </div>`;
+    });
+  } else {
+    diffOut.innerHTML = '<div style="font-family:\'DM Mono\',monospace;font-size:11px;color:var(--dim);padding:16px;font-style:italic">No significant structural changes detected — scene was largely preserved.</div>';
+  }
+
+  // Diagnostic tab
+  const diagOut = document.getElementById('diagOutput');
+  diagOut.innerHTML = '';
+  if (r.verdict) {
+    diagOut.innerHTML += `<div class="diag-section"><div class="diag-title">Scene Assessment</div><div style="font-size:17px;font-weight:300;font-style:italic;line-height:1.75;color:var(--mid);margin-bottom:8px">${r.verdict}</div><div style="font-family:'DM Mono',monospace;font-size:11px;font-weight:300;letter-spacing:.08em;color:var(--green)">${r.improvement}</div></div>`;
+  }
+  if (r.diagnostics && r.diagnostics.length) {
+    diagOut.innerHTML += `<div class="diag-section"><div class="diag-title">Diagnostic Notes</div><div class="diag-items">${r.diagnostics.map(d => `<div class="diag-item"><div class="di-cat di-cat-${d.category.toLowerCase()}">${d.category}</div><div class="di-text">${d.finding} <strong style="color:var(--text);font-style:normal">${d.recommendation}</strong></div></div>`).join('')}</div></div>`;
+  }
+
+  // Score tab
+  const scoreOut = document.getElementById('scoreOutput');
+  const before = r.scoreBefore || 62;
+  const after = r.scoreAfter || 78;
+  const delta = after - before;
+  const bColor = before >= 75 ? 'var(--green)' : before >= 55 ? 'var(--amber)' : 'var(--red)';
+  const aColor = after >= 75 ? 'var(--green)' : after >= 55 ? 'var(--amber)' : 'var(--red)';
+  scoreOut.innerHTML = `
+    <div class="score-delta">
+      <div class="sd-before"><div class="sd-num" style="color:${bColor}">${before}</div><div class="sd-label">Before</div></div>
+      <div class="sd-arrow">→</div>
+      <div class="sd-after"><div class="sd-num" style="color:${aColor}">${after}</div><div class="sd-label">After Rewrite</div></div>
+    </div>
+    <div class="sd-delta" style="text-align:center;font-family:'DM Mono',monospace;font-size:14px;font-weight:400;letter-spacing:.1em;color:var(--green)">+${delta} points estimated</div>
+    <div style="margin-top:24px;font-family:'DM Mono',monospace;font-size:10px;font-weight:300;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;text-align:center">Score estimates based on structural improvement analysis — not a guarantee of coverage outcome</div>`;
+
+  updateTierBadge();
+}
+
+// ── TABS ──────────────────────────────────────────────────
+function showTab(tab, btn) {
+  ['rewrite','diff','diagnostic','score'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t === tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.rtab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── LOADING ───────────────────────────────────────────────
+function setLoading(on) {
+  document.getElementById('loadingState').className = on ? 'loading-state active' : 'loading-state';
+  document.getElementById('runBtn').disabled = on;
+  if (on) {
+    let i = 0;
+    const iv = setInterval(() => {
+      if (i >= LOAD_LINES.length) { clearInterval(iv); return; }
+      document.getElementById('loadText').textContent = LOAD_LINES[i][0];
+      document.getElementById('loadSub').textContent = LOAD_LINES[i][1];
+      i++;
+    }, 900);
+  }
+}
+
+// ── UTILS ─────────────────────────────────────────────────
+function updateChar() {
+  document.getElementById('charCount').textContent = document.getElementById('sceneInput').value.length.toLocaleString() + ' characters';
+}
+
+function escHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function copyText(id) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.textContent).then(() => showToast('Copied to clipboard'));
+}
+
+function copyAll() {
+  if (!currentResult) return;
+  navigator.clipboard.writeText(currentResult.rewrite).then(() => showToast('Rewrite copied'));
+}
+
+function exportPDF() {
+  if (!isPro) { showUpgrade(); return; }
+  window.print();
+}
+
+function resetEngine() {
+  document.getElementById('sceneInput').value = '';
+  document.getElementById('charCount').textContent = '0 characters';
+  document.getElementById('emptyState').style.display = 'flex';
+  document.getElementById('resultState').className = 'result-state';
+  currentResult = null;
+}
+
+function showUpgrade() {
+  showToast('Upgrade to Pro for unlimited rewrites — visit writheon.com/#pricing');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show';
+  setTimeout(() => t.className = 'toast', 3200);
+}
+
+// ── CURSOR ────────────────────────────────────────────────
+const cur = document.getElementById('cur'), curR = document.getElementById('curR');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+(function a(){cur.style.left=mx+'px';cur.style.top=my+'px';rx+=(mx-rx)*.1;ry+=(my-ry)*.1;curR.style.left=rx+'px';curR.style.top=ry+'px';requestAnimationFrame(a)})();
+document.querySelectorAll('a,button,textarea').forEach(el => {
+  el.addEventListener('mouseenter',()=>{cur.style.width='14px';cur.style.height='14px';curR.style.width='44px';curR.style.height='44px'});
+  el.addEventListener('mouseleave',()=>{cur.style.width='7px';cur.style.height='7px';curR.style.width='28px';curR.style.height='28px'});
+});
+
+init();
+</script>
+</body>
+</html>

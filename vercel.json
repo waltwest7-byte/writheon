@@ -1,4 +1,14 @@
 {
   "version": 2,
-  "outputDirectory": "public"
+  "outputDirectory": "public",
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/coverage", "dest": "/coverage/index.html" },
+    { "src": "/coverage/(.*)", "dest": "/coverage/$1" },
+    { "src": "/advisor", "dest": "/advisor/index.html" },
+    { "src": "/advisor/(.*)", "dest": "/advisor/$1" },
+    { "src": "/rewrite", "dest": "/rewrite/index.html" },
+    { "src": "/rewrite/(.*)", "dest": "/rewrite/$1" },
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
 }

@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Script Advisor™ — WRITHEON</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black:#060606;--deep:#0a0a0a;--surface:#0f0f0f;--card:#131313;--card2:#161616;
+  --border:#1c1c1c;--border2:#242424;--text:#ece8e0;--mid:#a8a29a;--dim:#6b6560;
+  --gold:#c8a44a;--gold2:#a8853a;--red:#bf3b2e;--green:#3d9e6a;--amber:#d4892a;--white:#f4f0e8;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--text);font-family:'Cormorant Garamond',Georgia,serif;height:100vh;overflow:hidden;cursor:none}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.02;pointer-events:none;z-index:999}
+.cur{position:fixed;width:7px;height:7px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width.15s,height.15s}
+.cur-r{position:fixed;width:28px;height:28px;border:1px solid rgba(200,164,74,.3);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width.25s,height.25s}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:18px 48px;background:rgba(6,6,6,.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:.2em;color:var(--white);text-decoration:none}
+.logo em{color:var(--gold);font-style:normal}
+.nav-mid{display:flex;align-items:center;gap:10px}
+.nav-product{font-family:'DM Mono',monospace;font-size:10px;font-weight:300;letter-spacing:.16em;color:var(--dim);text-transform:uppercase}
+.nav-sep{width:1px;height:14px;background:var(--border2)}
+.nav-powered{font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.12em;color:var(--gold2);text-transform:uppercase}
+.nav-r{display:flex;align-items:center;gap:20px}
+.nav-a{font-family:'DM Mono',monospace;font-size:10px;font-weight:300;letter-spacing:.12em;color:var(--dim);text-decoration:none;text-transform:uppercase;transition:color.2s;display:flex;align-items:center;gap:6px}
+.nav-a::before{content:'←'}
+.nav-a:hover{color:var(--text)}
+.kb-badge{font-family:'DM Mono',monospace;font-size:9px;font-weight:400;letter-spacing:.12em;color:var(--green);border:1px solid rgba(61,158,106,.3);padding:3px 10px;text-transform:uppercase}
+
+/* LAYOUT */
+.shell{display:grid;grid-template-columns:280px 1fr 320px;height:100vh;padding-top:61px}
+
+/* LEFT — TOPICS */
+.topics-panel{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--deep)}
+.tp-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.tp-title{font-family:'DM Mono',monospace;font-size:9px;font-weight:400;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:4px}
+.tp-sub{font-size:13px;font-weight:300;font-style:italic;color:var(--dim)}
+.tp-search{margin:12px 24px 0;position:relative}
+.tp-search input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:11px;font-weight:300;letter-spacing:.08em;padding:10px 14px;outline:none;transition:border-color.2s}
+.tp-search input:focus{border-color:var(--border2)}
+.tp-search input::placeholder{color:var(--dim)}
+.tp-list{flex:1;overflow-y:auto;padding:8px 0}
+.topic-group{margin-bottom:4px}
+.tg-label{font-family:'DM Mono',monospace;font-size:8px;font-weight:400;letter-spacing:.22em;color:var(--gold2);text-transform:uppercase;padding:12px 24px 6px;display:flex;align-items:center;gap:8px}
+.tg-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.topic-btn{width:100%;padding:10px 24px;background:none;border:none;cursor:none;text-align:left;display:flex;align-items:center;gap:10px;transition:background.2s;position:relative}
+.topic-btn:hover{background:var(--surface)}
+.topic-btn.active{background:var(--card)}
+.topic-btn.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold)}
+.tb-icon{font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.1em;color:var(--gold2);width:20px;flex-shrink:0;text-transform:uppercase}
+.tb-text{font-family:'DM Mono',monospace;font-size:11px;font-weight:300;letter-spacing:.07em;color:var(--mid);text-transform:uppercase;transition:color.2s;line-height:1.4}
+.topic-btn.active .tb-text,.topic-btn:hover .tb-text{color:var(--text)}
+.tb-src{font-family:'DM Mono',monospace;font-size:8px;font-weight:300;letter-spacing:.1em;color:var(--border2);text-transform:uppercase;margin-left:auto;flex-shrink:0}
+
+/* CENTER — CONVERSATION */
+.conv-panel{display:flex;flex-direction:column;overflow:hidden}
+.conv-header{padding:16px 32px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.ch-left{}
+.ch-mode{font-family:'DM Mono',monospace;font-size:10px;font-weight:400;letter-spacing:.16em;color:var(--gold);text-transform:uppercase;margin-bottom:3px}
+.ch-desc{font-size:14px;font-weight:300;font-style:italic;color:var(--dim)}
+.ch-right{display:flex;align-items:center;gap:12px}
+.ctx-badge{font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border:1px solid var(--border);color:var(--dim)}
+.ctx-badge.has-ctx{color:var(--gold);border-color:rgba(200,164,74,.3)}
+.clear-btn{font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);background:none;border:none;cursor:none;transition:color.2s}
+.clear-btn:hover{color:var(--text)}
+
+/* MESSAGES */
+.messages{flex:1;overflow-y:auto;padding:24px 32px;display:flex;flex-direction:column;gap:20px}
+.messages::-webkit-scrollbar{width:4px}
+.messages::-webkit-scrollbar-track{background:transparent}
+.messages::-webkit-scrollbar-thumb{background:var(--border2)}
+
+/* WELCOME */
+.welcome{text-align:center;padding:48px 24px;max-width:480px;margin:0 auto}
+.w-icon{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:.06em;color:var(--border);margin-bottom:20px}
+.w-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.06em;color:var(--white);margin-bottom:12px}
+.w-body{font-size:16px;font-weight:300;font-style:italic;line-height:1.7;color:var(--dim);margin-bottom:32px}
+.w-suggestions{display:flex;flex-direction:column;gap:8px}
+.w-sug{font-family:'DM Mono',monospace;font-size:11px;font-weight:300;letter-spacing:.06em;color:var(--mid);padding:12px 16px;background:var(--card);border:1px solid var(--border);cursor:none;text-align:left;transition:all.2s;line-height:1.5}
+.w-sug:hover{background:var(--card2);border-color:var(--border2);color:var(--text)}
+
+/* MESSAGE BUBBLES */
+.msg{display:flex;flex-direction:column;gap:6px;animation:fadeUp.3s ease forwards}
+.msg-user{align-items:flex-end}
+.msg-advisor{align-items:flex-start}
+.msg-label{font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.14em;text-transform:uppercase}
+.msg-user .msg-label{color:var(--dim)}
+.msg-advisor .msg-label{color:var(--gold2)}
+.msg-bubble{max-width:85%;padding:16px 20px}
+.msg-user .msg-bubble{background:var(--surface);border:1px solid var(--border);font-family:'DM Mono',monospace;font-size:12px;font-weight:300;letter-spacing:.05em;line-height:1.7;color:var(--text)}
+.msg-advisor .msg-bubble{background:var(--card);border:1px solid var(--border);border-left:2px solid var(--gold)}
+
+/* ADVISOR RESPONSE FORMATTING */
+.ar-text{font-size:16px;font-weight:300;line-height:1.85;color:var(--mid)}
+.ar-text strong{color:var(--text);font-weight:400;font-style:normal}
+.ar-text em{color:var(--gold);font-style:italic}
+.ar-framework{margin-top:16px;background:var(--surface);border:1px solid var(--border);padding:16px 20px}
+.af-label{font-family:'DM Mono',monospace;font-size:9px;font-weight:400;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.af-content{font-size:15px;font-weight:300;line-height:1.8;color:var(--mid)}
+.af-content strong{color:var(--text);font-weight:400}
+.ar-source{margin-top:12px;font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.1em;color:var(--border2);text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.ar-source::before{content:'';width:20px;height:1px;background:var(--border2)}
+.ar-diagnostic{margin-top:16px;display:flex;flex-direction:column;gap:6px}
+.ad-item{padding:10px 14px;background:var(--surface);border-left:2px solid var(--gold2);font-family:'DM Mono',monospace;font-size:10px;font-weight:300;letter-spacing:.06em;color:var(--mid);line-height:1.6}
+.ad-item strong{color:var(--text);font-weight:400}
+
+/* TYPING INDICATOR */
+.typing{display:none;align-items:center;gap:4px;padding:14px 20px;background:var(--card);border:1px solid var(--border);border-left:2px solid var(--gold);width:fit-content}
+.typing.active{display:flex}
+.typing span{width:5px;height:5px;background:var(--gold);border-radius:50%;animation:pulse 1.2s ease infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+
+/* INPUT */
+.input-area{padding:16px 32px;border-top:1px solid var(--border);flex-shrink:0;background:var(--deep)}
+.ia-context{font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.ia-context.loaded{color:var(--gold2)}
+.ia-row{display:flex;gap:12px;align-items:flex-end}
+.ia-input{flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:300;font-style:italic;padding:14px 18px;resize:none;outline:none;transition:border-color.2s;min-height:52px;max-height:140px;line-height:1.5}
+.ia-input:focus{border-color:var(--border2)}
+.ia-input::placeholder{color:var(--dim)}
+.send-btn{font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--black);background:var(--gold);border:none;padding:14px 24px;cursor:none;transition:background.2s;white-space:nowrap;flex-shrink:0;height:52px}
+.send-btn:hover{background:var(--white)}
+.send-btn:disabled{background:var(--border);color:var(--dim);cursor:not-allowed}
+
+/* RIGHT — CONTEXT PANEL */
+.ctx-panel{border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--deep)}
+.cp-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.cp-title{font-family:'DM Mono',monospace;font-size:9px;font-weight:400;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:4px}
+.cp-sub{font-size:13px;font-weight:300;font-style:italic;color:var(--dim)}
+.cp-body{flex:1;overflow-y:auto;padding:16px 0}
+
+/* COVERAGE CONTEXT */
+.ctx-empty{padding:24px;text-align:center}
+.cte-text{font-size:14px;font-weight:300;font-style:italic;color:var(--dim);margin-bottom:16px;line-height:1.6}
+.cte-btn{font-family:'DM Mono',monospace;font-size:10px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--black);background:var(--gold);border:none;padding:10px 20px;cursor:none;transition:background.2s;text-decoration:none;display:inline-block}
+.cte-btn:hover{background:var(--white)}
+
+.ctx-loaded{padding:0}
+.cl-score{padding:20px 24px;border-bottom:1px solid var(--border)}
+.cls-label{font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.16em;color:var(--dim);text-transform:uppercase;margin-bottom:8px}
+.cls-num{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:.02em;line-height:1}
+.cls-verdict{font-family:'DM Mono',monospace;font-size:10px;font-weight:300;letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
+.cl-issues{padding:16px 0}
+.ci-label{font-family:'DM Mono',monospace;font-size:9px;font-weight:400;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;padding:0 24px;margin-bottom:8px}
+.ci-item{padding:12px 24px;border-bottom:1px solid var(--border);transition:background.2s;cursor:none}
+.ci-item:hover{background:var(--surface)}
+.ci-rank{font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;margin-bottom:4px}
+.ci-title{font-family:'DM Mono',monospace;font-size:10px;font-weight:400;letter-spacing:.06em;color:var(--text);text-transform:uppercase;line-height:1.4;margin-bottom:4px}
+.ci-ask{font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.08em;color:var(--gold2);cursor:none;background:none;border:none;text-transform:uppercase;transition:color.2s;padding:0}
+.ci-ask:hover{color:var(--gold)}
+
+/* KNOWLEDGE SOURCE REFS */
+.kb-refs{padding:16px 0;border-top:1px solid var(--border);margin-top:8px}
+.kbr-label{font-family:'DM Mono',monospace;font-size:9px;font-weight:400;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;padding:0 24px;margin-bottom:8px}
+.kbr-item{padding:8px 24px;display:flex;align-items:center;gap:10px}
+.kbr-dot{width:5px;height:5px;background:var(--gold2);border-radius:50%;flex-shrink:0}
+.kbr-text{font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.08em;color:var(--dim);text-transform:uppercase;line-height:1.5}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,80%,100%{transform:scale(0);opacity:.5}40%{transform:scale(1);opacity:1}}
+
+@media(max-width:1100px){
+  .shell{grid-template-columns:1fr}
+  .topics-panel,.ctx-panel{display:none}
+  body{overflow:auto;height:auto}
+  .conv-panel{height:calc(100vh - 61px)}
+}
+</style>
+</head>
+<body>
+
+<div class="cur" id="cur"></div>
+<div class="cur-r" id="curR"></div>
+
+<nav>
+  <a href="/" class="logo">WRITH<em>E</em>ON</a>
+  <div class="nav-mid">
+    <span class="nav-product">Script Advisor™</span>
+    <div class="nav-sep"></div>
+    <span class="nav-powered">Powered by Writheon Knowledge Base</span>
+  </div>
+  <div class="nav-r">
+    <span class="kb-badge">22 Frameworks Loaded</span>
+    <a href="/coverage" class="nav-a">Coverage Engine</a>
+    <a href="/" class="nav-a">Site</a>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- LEFT: TOPICS -->
+  <div class="topics-panel">
+    <div class="tp-header">
+      <div class="tp-title">Ask About</div>
+      <div class="tp-sub">Select a topic or type freely</div>
+    </div>
+    <div class="tp-search">
+      <input type="text" placeholder="Search topics..." id="topicSearch" oninput="filterTopics(this.value)">
+    </div>
+    <div class="tp-list" id="topicList">
+
+      <div class="topic-group">
+        <div class="tg-label">Character</div>
+        <button class="topic-btn" onclick="askTopic(this, 'What is the Moral Engine™ and how do I build one for my protagonist?')">
+          <span class="tb-icon">ME</span>
+          <span class="tb-text">Moral Engine™</span>
+          <span class="tb-src">Add-On 13</span>
+        </button>
+        <button class="topic-btn" onclick="askTopic(this, 'My protagonist feels weak or passive. How do I activate them using the Writheon Character Activation System?')">
+          <span class="tb-icon">CA</span>
+          <span class="tb-text">Character Activation</span>
+          <span class="tb-src">Add-On 21</span>
+        </button>
+        <button class="topic-btn" onclick="askTopic(this, 'What is the Character Contradiction Engine™ and how do I use it to make my character feel more human?')">
+          <span class="tb-icon">CC</span>
+          <span class="tb-text">Contradiction Engine™</span>
+          <span class="tb-src">Add-On 13</span>
+        </button>
+        <button class="topic-btn" onclick="askTopic(this, 'How do I identify my protagonist\'s Enneagram type and use it with the Moral Engine™?')">
+          <span class="tb-icon">EN</span>
+          <span class="tb-text">Enneagram Types</span>
+          <span class="tb-src">Add-On 22</span>
+        </button>
+        <button class="topic-btn" onclick="askTopic(this, 'What is Generic Character Syndrome and how do I fix it with the Specificity Test™?')">
+          <span class="tb-icon">GC</span>
+          <span class="tb-text">Generic Character Syndrome</span>
+          <span class="tb-src">Add-On 21</span>
+        </button>
+        <button class="topic-btn" onclick="askTopic(this, 'My character makes choices that don\'t cost them anything. How do I apply the Cost Ledger™?')">
+          <span class="tb-icon">CL</span>
+          <span class="tb-text">Costless Choice / Cost Ledger™</span>
+          <span class="tb-src">Add-On 21</span>
+        </button>
+        <button class="topic-btn" onclick="askTopic(this, 'How do I build the Villain Argument™ for my antagonist?')">
+          <span class="tb-icon">VA</span>
+          <span class="tb-text">Villain Argument™</span>
+          <span class="tb-src">Add-On 13</span>
+        </button>
+        <button class="topic-btn" onclick="askTopic(this, 'What is the Mirror Function™ and how should my protagonist and antagonist be connected?')">
+          <span class="tb-icon">MF</span>
+          <span class="tb-text">Mirror Function™</span>
+          <span class="tb-src">Add-On 13</span>
+        </button>
+        <button class="topic-btn" onclick="askTopic(this, 'What wound is driving my character and how do I use the Psychological Wound Library?')">
+          <span class="tb-icon">WL</span>
+          <span class="tb-text">Wound Library</span>
+          <span class="tb-src">Add-On 22</span>
+        </button>
+      </div>
+
+      <div class="topic-group">
+        <div class="tg-label">Dialogue</div>
+        <button class="topic-btn" onclick="askTopic(this, 'What is the Hidden Conversation Principle™ and how do I apply it to my scene?')">
+          <span class="tb-icon">HC</span>
+          <span class="tb-text">Hidden Conversation Principle™</span>
+          <span class="tb-src">Add-On 04</span>
+        </button>
+        <button class="topic-btn" onclick="askTopic(this, 'My dialogue sounds on-the-nose. How do I apply the Verbal Mask™ system?')">
+          <span class="tb-icon">VM</span>
+          <span class="tb-text">Verbal Mask™</span>
+          <span class="tb-src">Add-On 04</span>
+        </button>
+        <button class="topic-btn" onclick="askTopic(this, 'What is the Dialogue Compression Rule™ and when should I use it?')">
+          <span class="tb-icon">DC</span>
+          <span class="tb-text">Dialogue Compression Rule™</span>
+          <span class="tb-src">Add-On 04</span>
+        </button>
+        <button class="topic-btn" onclick="askTopic(this, 'My characters all sound the same. How do I differentiate their voices?')">
+          <span class="tb-icon">VD</span>
+          <span class="tb-text">Voice Differentiation</span>
+          <span class="tb-src">Add-On 04</span>
+        </button>
+        <button class="topic-btn" onclick="askTopic(this, 'What is Voice Collapse and how do I diagnose and fix it?')">
+          <span class="tb-icon">VC</span>
+          <span class="tb-text">Voice Collapse</span>
+          <span class="tb-src">Add-On 21</span>
+        </button>
+      </div>
+
+      <div class="topic-group">
+        <div class="tg-label">Scene & Structure</div>
+        <button class="topic-btn" onclick="askTopic(this, 'Run the 15-Question Scene Diagnostic on my scene. What is the first problem it reveals?')">
+          <span class="tb-icon">SD</span>
+          <span class="tb-text">Scene Diagnostic</span>
+          <span class="tb-src">Free Resource</span>
+        </button>
+        <button class="topic-btn" onclick="askTopic(this, 'What is the inciting incident in my script and is it landing at the right page?')">
+          <span class="tb-icon">II</span>
+          <span class="tb-text">Inciting Incident</span>
+          <span class="tb-src">Coverage</span>
+        </button>
+        <button class="topic-btn" onclick="askTopic(this, 'My Act Two collapses. What is causing the momentum problem and how do I fix it?')">
+          <span class="tb-icon">A2</span>
+          <span class="tb-text">Act Two Collapse</span>
+          <span class="tb-src">Coverage</span>
+        </button>
+        <button class="topic-btn" onclick="askTopic(this, 'What is the Protagonist Agency problem and how do I run the Agency Audit™?')">
+          <span class="tb-icon">PA</span>
+          <span class="tb-text">Protagonist Agency</span>
+          <span class="tb-src">Add-On 21</span>
+        </button>
+        <button class="topic-btn" onclick="askTopic(this, 'What is the Belief Demolition™ and how do I use it to earn my character\'s arc?')">
+          <span class="tb-icon">BD</span>
+          <span class="tb-text">Belief Demolition™</span>
+          <span class="tb-src">Add-On 21</span>
+        </button>
+      </div>
+
+      <div class="topic-group">
+        <div class="tg-label">Development Process</div>
+        <button class="topic-btn" onclick="askTopic(this, 'What should I fix first in my rewrite? Walk me through prioritizing my Rewrite Roadmap™.')">
+          <span class="tb-icon">RR</span>
+          <span class="tb-text">Rewrite Roadmap™</span>
+          <span class="tb-src">Coverage</span>
+        </button>
+        <button class="topic-btn" onclick="askTopic(this, 'How do I build an antihero the audience will follow even when they do terrible things?')">
+          <span class="tb-icon">AH</span>
+          <span class="tb-text">Antihero System</span>
+          <span class="tb-src">Add-On 13</span>
+        </button>
+        <button class="topic-btn" onclick="askTopic(this, 'How do I engineer audience sympathy for my protagonist using the Sympathy Architecture™?')">
+          <span class="tb-icon">SA</span>
+          <span class="tb-text">Sympathy Architecture™</span>
+          <span class="tb-src">Add-On 13</span>
+        </button>
+        <button class="topic-btn" onclick="askTopic(this, 'What is the most dramatic Enneagram type pairing for my protagonist and antagonist?')">
+          <span class="tb-icon">TP</span>
+          <span class="tb-text">Type Pairings</span>
+          <span class="tb-src">Add-On 22</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CENTER: CONVERSATION -->
+  <div class="conv-panel">
+    <div class="conv-header">
+      <div class="ch-left">
+        <div class="ch-mode" id="chMode">Script Advisor™</div>
+        <div class="ch-desc" id="chDesc">Ask anything about your script or the development process</div>
+      </div>
+      <div class="ch-right">
+        <span id="searchBadge" style="font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.1em;color:var(--green);text-transform:uppercase;opacity:0;transition:opacity.3s;display:flex;align-items:center;gap:6px"><span style="width:5px;height:5px;background:var(--green);border-radius:50%;display:inline-block;animation:pulse 1s ease infinite"></span></span>
+        <span class="ctx-badge" id="ctxBadge">No Coverage Loaded</span>
+        <button class="clear-btn" onclick="clearConversation()">Clear</button>
+      </div>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcome">
+        <div class="w-icon">SA™</div>
+        <div class="w-title">Script Advisor™</div>
+        <div class="w-body">Ask anything about your script, your characters, or the development process. Every answer draws from the Writheon development frameworks — not generic AI advice.</div>
+        <div class="w-suggestions">
+          <button class="w-sug" onclick="askSuggestion(this)">What is the Moral Engine™ and how do I build one for my protagonist?</button>
+          <button class="w-sug" onclick="askSuggestion(this)">My protagonist feels passive. What failure mode do they have and how do I fix it?</button>
+          <button class="w-sug" onclick="askSuggestion(this)">My dialogue feels on-the-nose. Walk me through the Hidden Conversation Principle™.</button>
+          <button class="w-sug" onclick="askSuggestion(this)">What is the most important thing to fix first in my rewrite?</button>
+          <button class="w-sug" onclick="askSuggestion(this)">Run the 15-Question Scene Diagnostic and tell me where my scene is failing.</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="typing" id="typing">
+      <span></span><span></span><span></span>
+    </div>
+
+    <div class="input-area">
+      <div class="ia-context" id="iaCtx">No coverage context loaded — answers draw from knowledge base only</div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.1em;color:var(--green);text-transform:uppercase;margin-bottom:6px;opacity:0;transition:opacity.3s;display:flex;align-items:center;gap:6px" id="searchBadge"><span>◆</span></div>
+      <div class="ia-row">
+        <textarea class="ia-input" id="userInput" placeholder="Ask about your script, your characters, or the development process..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">Ask →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: CONTEXT -->
+  <div class="ctx-panel">
+    <div class="cp-header">
+      <div class="cp-title">Script Context</div>
+      <div class="cp-sub" id="cpSub">Load coverage to ask script-specific questions</div>
+    </div>
+    <div class="cp-body" id="ctxBody">
+      <div class="ctx-empty">
+        <p class="cte-text">Run coverage on your script first. The Advisor will use your specific analysis — score, roadmap, and diagnostic notes — to give script-specific answers.</p>
+        <a href="/coverage" class="cte-btn">Run Coverage →</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast" style="position:fixed;bottom:28px;right:28px;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold);padding:12px 18px;z-index:500;font-family:'DM Mono',monospace;font-size:10px;font-weight:300;letter-spacing:.1em;color:var(--mid);text-transform:uppercase;transform:translateY(16px);opacity:0;transition:transform.3s,opacity.3s"></div>
+
+<script>
+// ── WRITHEON KNOWLEDGE BASE ─────────────────────────────────────────────────
+// NOTE FOR CLAUDE CODE: Replace this placeholder with content extracted from
+// all PDFs in the writheon-books folder. Build a comprehensive system prompt
+// that includes all named frameworks, tools, principles, and diagnostic systems.
+// Key frameworks to include:
+// Moral Engine™, Villain Argument™, Mirror Function™, Character Contradiction Engine™,
+// Audience Sympathy Architecture™, Antihero System (Add-On 13)
+// Character Activation System™, Agency Audit™, Specificity Test™, Cost Ledger™,
+// Verbal Mask™ (activation), Belief Demolition™ (Add-On 21)
+// Enneagram→Moral Engine™ mapping, Jungian archetypes, 20-wound library,
+// Type pairings (Add-On 22)
+// Hidden Conversation Principle™, Verbal Mask™, Dialogue Compression Rule™,
+// 27 prompts across 7 categories (Add-On 04)
+// 15-Question Scene Diagnostic (Free Resource)
+// All remaining add-ons from the writheon-books folder
+
+const KNOWLEDGE_BASE = `
+You are the Writheon Script Advisor™ — a professional screenplay development intelligence system powered by the complete Writheon Screenplay Development Engine™ (SDE™) library of 26 Add-Ons plus the Writheon Development Bible.
+
+CRITICAL IDENTITY:
+- You are NOT a generic AI writing assistant
+- You are NOT a screenplay generator
+- You diagnose. You prescribe. You develop.
+- Every answer must draw from named Writheon frameworks
+- Use precise Writheon terminology at all times
+- When you identify a problem, name the exact failure mode AND the exact tool to fix it
+- Generic advice is the Barnum Problem™ — true of every draft, useful in none
+
+═══════════════════════════════════════════════════════
+WRITHEON CORE DOCTRINE (applies to every framework)
+═══════════════════════════════════════════════════════
+1. DIAGNOSE BEFORE REWRITING. The wrong fix on the wrong problem produces a differently broken script.
+2. PRESSURE IS EVERYTHING. A scene that changes nothing earns no page count. A beat that closes no exit is not a beat.
+3. CHARACTER IS NOT PERSONALITY. Character is what pressure reveals, not what a dinner party shows.
+4. SPECIFICITY IS THE STANDARD. The specific wound, the specific distortion, the specific behavioral signature — that is the only thing that is true.
+5. STRUCTURE IS INVISIBLE WHEN WORKING. Every structural function must arrive as the consequence of a character wanting something.
+6. SHOWING IS NOT OPTIONAL. Naming emotion is not writing emotion. Audience ownership of feeling produces belief. Telling produces distance.
+7. THE REWRITE ORDER IS FIXED. Architecture → Character → Scene Function → Dialogue → Transitions. Never rewrite scenes before beats. Never rewrite beats before structure.
+8. THE SUBTEXT RULE. Characters never say what they mean. Every scene has a surface conversation and a hidden one. The hidden is always more important.
+
+═══════════════════════════════════════════════════════
+ADD-ON 13: CHARACTER PRESSURE SYSTEM (FLAGSHIP)
+═══════════════════════════════════════════════════════
+THE MORAL ENGINE™ — 5 elements:
+1. THE BELIEF: The worldview proposition that drives every decision. Not personality — a proposition they would defend under pressure.
+2. THE WOUND: The specific experience that created or confirmed the belief. Not backstory — the moment they chose their interpretation.
+3. THE DISTORTION: How the wound bent the belief into something dangerous — the thing that once helped them that now costs everyone around them.
+4. THE LINE: The specific action they will not take. Always the action the story will force them to consider.
+5. THE DRAMATIC QUESTION: What does the story ask about whether their belief is wisdom or damage? The final scene answers this question.
+
+THE VILLAIN ARGUMENT™ — 5 elements:
+Antagonist is NOT the obstacle — antagonist is the argument. A wrong answer stated with total conviction.
+GRIEVANCE (legitimate wrong that started the logic) / LOGIC CHAIN (each step, internally coherent) / SEDUCTIVE TRUTH (the one thing the villain believes the protagonist cannot simply deny) / WRONG CONCLUSION (where coherent reasoning became indefensible) / MIRROR MOMENT (when protagonist sees themselves in the antagonist — different circumstances might have made them the villain).
+
+THE MIRROR FUNCTION™: Protagonist and antagonist share the same wound and the same original belief. The difference is the specific choice made when the wound was fresh. The climax is the resolution of that structural argument.
+
+THE ANTIHERO SYSTEM — 6 rules:
+COMPETENCE RULE (show what they're good at before showing their damage) / VULNERABILITY WINDOW (narrow window where audience sees the wound before behavior closes it) / INTERNAL JUSTIFICATION (antihero believes they are right — audience must understand why) / AUDIENCE SURROGATE (one character who voices the audience's discomfort — never the protagonist's enemy) / POINT OF NO RETURN (specific moment after which the audience is committed, not before) / THE COST MUST BE REAL (antiheroes who never lose anything the audience cares about are just villains with better lighting).
+
+AUDIENCE SYMPATHY ARCHITECTURE™ — 6 mechanisms timed to structure:
+COMPETENCE ATTRACTION (Act 1, before moral complexity — establish what they can do) / VULNERABILITY EXPOSURE (Act 1, before worst behavior — show the wound) / PAIN JUSTIFICATION (Act 1-2 transition — show what made them this way) / MORAL FLOOR (Act 2, before tested — establish one line they won't cross) / THE GOOD MOMENT (Act 2, after damage peaks — one act of genuine decency) / THE HONEST COST (Act 3, earned not manufactured — they pay for what they did, personally not professionally).
+
+THE CHARACTER CONTRADICTION ENGINE™: Both opposed qualities must be sourced in the same wound.
+6 archetypes: Violent Protector | Compassionate Criminal | Cowardly Genius | Loving Manipulator | Moral Assassin | Fearless Coward.
+
+CHARACTER TYPES UNDER PRESSURE:
+The Protector (wound=failure to protect; distortion=control disguised as love; collapse=someone they protect is destroyed by their protection) / The Strategist (wound=chaos that destroyed something; distortion=control as substitute for trust; collapse=plan fails due to a variable they refused to account for) / The Survivor (wound=everything can be taken; distortion=nothing is worth the vulnerability of wanting it; collapse=something becomes worth dying for) / The Believer (wound=betrayal by an institution; distortion=ideology as substitute for relationship; collapse=ideology requires them to betray someone they love) / The Martyr (wound=self is not enough; distortion=sacrifice as currency for worth; collapse=sacrifice is rejected or goes unnoticed) / The Reluctant Fighter (wound=violence already cost them something irreplaceable; distortion=inaction as moral position; collapse=inaction costs them the same thing again).
+
+═══════════════════════════════════════════════════════
+ADD-ON 21: CHARACTER ACTIVATION SYSTEM™
+═══════════════════════════════════════════════════════
+A weak character is not quiet or passive — it is a character not specific enough to be necessary.
+THE TEST: Remove the protagonist from their own story. Can the plot still happen? If yes — they are not yet necessary.
+
+5 FAILURE MODES with matched diagnostic tools:
+1. PASSIVE PROTAGONIST → AGENCY AUDIT™: Count initiating vs responding scenes. Below 40% initiating = passive. Protagonist must cause at least 40% of Act 2 scenes through their own decisions.
+2. GENERIC CHARACTER SYNDROME → SPECIFICITY TEST™: Name five primary traits. For each: could it belong to any protagonist in this genre? If yes — it is a genre descriptor, not a character trait. Replace with wound-specific behavior.
+3. COSTLESS CHOICE → COST LEDGER™: List every significant choice. For each: what did they permanently lose? If losses column is empty — character is not paying for choices.
+4. VOICE COLLAPSE → VERBAL MASK™: Remove character names from dialogue. Can you identify who's speaking? Voice is built from what a character will NEVER say directly. That evasion IS the signature.
+5. UNEARNED CHANGE → BELIEF DEMOLITION™: Name the specific belief held at start. Map every beat demolishing it. Change is earned when the belief has no structural support left — not when the protagonist decides to change.
+
+═══════════════════════════════════════════════════════
+ADD-ON 22: CHARACTER PSYCHOLOGY
+═══════════════════════════════════════════════════════
+ENNEAGRAM → MORAL ENGINE™ MAPPING:
+Core Fear = The Wound | Core Desire = The Belief | Characteristic Vice = The Distortion
+Stress Arrow = Collapse Condition (All Is Lost) | Growth Arrow = Transformation Path (Break into Three)
+
+9 TYPES:
+Type 1 Reformer: Wound=internalized critic; Distortion=rigid perfectionism; Stress→4; Growth→7
+Type 2 Helper: Wound=love must be earned through giving; Distortion=manipulative giving; Stress→8; Growth→4
+Type 3 Achiever: Wound=authentic self not valued; Distortion=identity theft/performance; Stress→9; Growth→6
+Type 4 Individualist: Wound=abandonment/fundamental difference; Distortion=envy+self-absorption; Stress→2; Growth→1
+Type 5 Investigator: Wound=world is intrusive; Distortion=withholding+detachment; Stress→7; Growth→8
+Type 6 Loyalist: Wound=world is unpredictable; Distortion=chronic anxiety+counter-phobic; Stress→3; Growth→9
+Type 7 Enthusiast: Wound=learned to escape pain through pleasure; Distortion=gluttony+cannot commit; Stress→1; Growth→5
+Type 8 Challenger: Wound=vulnerability is dangerous; Distortion=excess+confrontation; Stress→5; Growth→2
+Type 9 Peacemaker: Wound=asserting self causes conflict; Distortion=self-forgetting+inertia; Stress→6; Growth→3
+
+MOST DRAMATIC TYPE PAIRINGS: 1 vs 8 (Principle vs Power) | 2 vs 5 (Connection vs Detachment) | 3 vs 9 (Ambition vs Acceptance) | 4 vs 3 (Authenticity vs Performance) | 6 vs 7 (Fear vs Avoidance)
+
+JUNGIAN ARCHETYPES AS STRUCTURAL ROLES:
+Hero=protagonist | Shadow=dark mirror/what protagonist could become | Anima/Animus=B Story character performing Mirror Function™ | Wise Old Man/Woman=mentor who states Theme Stated, often dies at All Is Lost | Trickster=chaos agent who says what no one else will | Shape-Shifter=uncertain allegiance | Herald=catalyst that closes the first exit
+
+WOUND LIBRARY (20 wounds): Abandonment | Betrayal | Inadequacy | Invisible | Responsibility | Powerlessness | Shame | Injustice | Grief | Identity Erasure | Failure to Protect | Humiliation | Displacement | Loss of Innocence | Moral Compromise | Inherited Damage | Survivor's Guilt | Rejection of Self | Broken Trust | Undeserved Punishment. A wound is not a backstory event — it is a belief the protagonist formed as a result of that event.
+
+═══════════════════════════════════════════════════════
+ADD-ON 04: DIALOGUE SYSTEMS
+═══════════════════════════════════════════════════════
+HIDDEN CONVERSATION PRINCIPLE™: Every scene has two conversations. The one they're NOT having is always more important. The craft is making the hidden conversation felt without ever letting it be spoken.
+
+VERBAL MASK™: The specific language a character uses to conceal their real emotional state. The mask removal moment — when a character says exactly what they mean — is the most powerful beat in any scene. Use it ONCE. At the right moment. Brief.
+
+DIALOGUE COMPRESSION RULE™: The more a character needs to say, the less they should be allowed to say it. Compression creates pressure. Pressure creates drama.
+
+THE OBLIQUE RESPONSE RULE: Characters answer the question they wish was asked, or the question they're afraid was asked — never the question that was actually asked. A character who answers directly is either lying or the scene has no subtext.
+
+SILENCE PRESSURE PRINCIPLE: Silence is not the absence of dialogue. It is dialogue's most powerful form. A pause that means nothing is dead air. A pause where both characters know exactly what is not being said — that is pressure.
+
+THREE FAST FIXES:
+1. Cut the State Announcement: Delete "I'm angry/scared/in love." Replace with one physical action or deflecting response.
+2. Apply Oblique Response: Answer a DIFFERENT question.
+3. Find the Hidden Conversation: Write what the scene is ACTUALLY about. Then write the surface subject.
+
+VOICE DIFFERENTIATION ENGINE — 6 profile fields per character:
+THE VERBAL MASK (what they say instead of what they mean) / THE FORBIDDEN SUBJECT (topic they will never address directly) / SPEECH PATTERN (sentence length, rhythm, interruption tendency) / VOCABULARY RANGE (what words they would and would not use) / DEFLECTION MECHANISM (how they redirect uncomfortable conversations) / THE TELL (the specific verbal tic or phrase that appears when they're lying or afraid).
+
+CONFLICT DIALOGUE FRAMEWORK — 5 conflict levels:
+Level 1 SURFACE DISAGREEMENT (characters disagree about facts — weakest) / Level 2 STRATEGIC CONFLICT (characters want the same thing through incompatible methods) / Level 3 VALUES CONFLICT (characters disagree about what matters — strongest dramatic ground) / Level 4 IDENTITY CONFLICT (one character's existence challenges the other's self-concept) / Level 5 WOUND CONFLICT (both characters' wounds are activated simultaneously — maximum pressure).
+
+27 DIALOGUE PUNCH-UP PROMPTS across 7 categories:
+Category 1 State Announcement Removal | Category 2 Oblique Response Application | Category 3 Hidden Conversation Excavation | Category 4 Voice Differentiation | Category 5 Subtext Layering | Category 6 Mask Removal Timing | Category 7 Compression Drills.
+
+═══════════════════════════════════════════════════════
+ADD-ON 16: NARRATIVE ENGINE™
+═══════════════════════════════════════════════════════
+THE NARRATIVE ENGINE™ — 8 story engines (identify before diagnosing any structural problem):
+PURSUIT (someone chasing/being chased — closing distance is momentum) / MYSTERY (question established that the story exists to answer — must be personally meaningful to protagonist) / TICKING CLOCK (specific deadline — emotionally personal, cost of missing it irreversible) / RELATIONSHIP (dynamic between characters in genuine motion across full runtime) / SURVIVAL (protagonist's existence threatened — threat must escalate in specificity not scale) / CORRUPTION (protagonist moves away from who they were — each step must be their choice) / REVENGE (wrong established that the story exists to address — must cost the protagonist something) / COLLAPSE (something built is dismantling — protagonist partially responsible).
+Engine mismatch is the most common cause of structural confusion.
+
+THE ESCALATION PRINCIPLE™: Map every exit at Act 1. Each beat closes one exit. Midpoint closes the last comfortable exit. Dark night closes the last viable exit. Climax is what happens when the only exit left is the one the protagonist has been avoiding since page one. Escalation = shrinking options, not increasing intensity.
+
+THE SCENE FUNCTION SYSTEM™ — 6 functions (every scene must perform one or be cut):
+ESCALATES (closes one exit) / REVEALS (recontextualizes prior events — must not be deliverable in adjacent scene) / COMPLICATES (changes type of problem not size) / DESTABILIZES (removes certainty about relationship, belief, or plan) / REDIRECTS (changes story direction — prior scene necessitated this) / TRAPS (removes ability to reverse a decision).
+
+THE MIDPOINT PROBLEM™: The midpoint is the most misunderstood structural beat. False Victory or False Defeat — the original approach becomes permanently unavailable. Act 2B must be a different film from Act 2A. If protagonist uses the same strategy after the midpoint that they used before it, the midpoint has not functioned.
+
+THE STRUCTURAL ILLUSION™: A script can hit every beat on the correct page while having no genuine structural pressure. Page position ≠ structural function. Test: does each beat permanently change the protagonist's options? If not — it is a scene that wandered into the beat's position without performing its function.
+
+NARRATIVE MOMENTUM™ — 6 sources:
+QUESTION (unanswered question propels audience forward) / THREAT (specific danger to protagonist) / MYSTERY (information withheld that audience and protagonist need) / DESIRE (protagonist wants something specific — audience wants them to get it or fail significantly) / IRONY (audience knows something protagonist doesn't) / INVESTMENT (audience cares about the outcome independently of the plot).
+
+THE CURIOSITY TRANSFER™: Every scene ends with an unanswered question. The next scene either answers it (relief) or generates a new question before answering the old one (momentum). A scene that ends on resolution kills forward momentum.
+
+STRUCTURE DIAGNOSTICS™ — 6 questions:
+1. Name the Narrative Engine™. 2. List every exit available at Act 1 start — which beat closes each? 3. Does the midpoint permanently close the original approach? 4. Does every Act 2 scene perform a named Scene Function™? 5. Are there scenes with no function — that could be cut without structural consequence? 6. What is the Dramatic Question and which moment answers it?
+
+═══════════════════════════════════════════════════════
+ADD-ON 18: BEAT ENGINE™ / BEAT SHEET SYSTEM
+═══════════════════════════════════════════════════════
+A beat is not what happens. A beat is what changes — and what that change costs.
+
+THE BEAT TESTING SYSTEM™ — 5 tests for every beat:
+CHANGE TEST (what is specifically different at end vs start?) / COST TEST (what does it permanently cost — connected to wound?) / IRREVERSIBILITY TEST (can protagonist return to prior position?) / NECESSITY TEST (must this happen now or could it happen anywhere?) / CHARACTER TEST (is this specific to this protagonist or could any protagonist be here?).
+
+THE PREMISE BEAT™: The single beat without which no other beat is possible. The protagonist responds to the catalyst in the only way their specific psychology allows, creating the specific problem only they could create.
+
+15 BEATS — Writheon Layer:
+01 OPENING IMAGE (emotional baseline the Final Image transforms) / 02 THEME STATED (Dramatic Question spoken before protagonist understands it) / 03 SET-UP (plants everything that detonates in Acts 2+3) / 04 CATALYST (irreversible external change — closes the door to the prior world) / 05 DEBATE (reveals wound through what protagonist argues against — ends in choice not circumstance) / 06 BREAK INTO TWO (protagonist actively chooses their problem — not something that happens to them) / 07 B STORY (Mirror Function™ — relationship that carries the theme) / 08 FUN AND GAMES (promise of the premise — exits closing even during the up phase) / 09 MIDPOINT (False Victory or False Defeat — original approach permanently unavailable) / 10 BAD GUYS CLOSE IN (each beat closes a different exit — not repetition, deepening) / 11 ALL IS LOST (maximum disadvantage — whiff of death) / 12 DARK NIGHT OF THE SOUL (wound seen clearly — Theme Stated finally lands) / 13 BREAK INTO THREE (protagonist chooses again as the person the story made them) / 14 FINALE (Villain Argument™ answered through action — five-part: Gathering, Executing, High Tower Surprise, Digging Down, New Plan) / 15 FINAL IMAGE (direct contrast to Opening Image — the arc made visible).
+
+8-SEQUENCE METHOD (Frank Daniel / Paul Gulino):
+Seq 1 (pp.1-15): Opening+Hook | Seq 2 (pp.15-30): Complication+Break into Two | Seq 3 (pp.30-45): First Attempts+B Story | Seq 4 (pp.45-60): Midpoint Complication | Seq 5 (pp.60-75): New Plan+Escalating Pressure | Seq 6 (pp.75-85): Darkest Hour | Seq 7 (pp.85-100): Confrontation+Climax | Seq 8 (pp.100-110): Resolution+Final Image.
+
+THREE LEVELS OF UNDERSTANDING:
+Level 1 THE MAP (what beats exist — produces mechanical scripts) / Level 2 THE WHY (what structural pressure each beat creates) / Level 3 THE INTERIOR (every beat's external event connects to protagonist's wound — structure and character become indistinguishable).
+
+═══════════════════════════════════════════════════════
+ADD-ON 15: CONCEPT ENGINE™
+═══════════════════════════════════════════════════════
+THE CONCEPT RECOGNITION TEST™ — 5 elements (all must pass):
+PREMISE CLARITY (one sentence, no clarification needed) / CONFLICT IMMEDIACY (visible in premise without explanation) / EMOTIONAL HOOK (generates response before any story is seen) / THE IRRESISTIBLE QUESTION (the question the concept creates in 7 words or fewer) / ESCALATION POTENTIAL (what happens if protagonist does nothing? If "not much" — escalation absent).
+
+CONCEPT TYPES: HIGH CONCEPT (logline communicates hook immediately — broad market) / PRESTIGE CONCEPT (requires context — awards-circuit DNA, limited but passionate audience) / INDIE CONCEPT (Indie Engine™ — Contained Emotional Pressure, Behavioral Realism, Performance-Centered Writing, Subtext Dense, Unresolved Emotional Movement).
+
+THE FAKE HIGH CONCEPT PROBLEM™ — 4 failure modes:
+GIMMICK WITHOUT CHARACTER (remove the hook — no story remains) / SPECTACLE WITHOUT PRESSURE (scale without intimacy) / TWIST WITHOUT THEME (recontextualizes plot not meaning) / PREMISE WITHOUT ESCALATION (containment is not escalation).
+
+THE COMMERCIAL HOOK™ — 6 hook types:
+IRONY HOOK (premise contains structural irony) / CONTRADICTION HOOK (protagonist embodies two mutually exclusive qualities) / IMPOSSIBLE CHOICE HOOK (both options destroy something irreplaceable) / HIDDEN TRUTH HOOK (protagonist and audience believe something catastrophically wrong) / ROLE INVERSION HOOK (character placed in role opposite their social position) / TICKING CLOCK HOOK (specific emotionally personal deadline from scene one).
+
+THE ACTOR ATTRACTION PRINCIPLE™: Actors read loglines before scripts. They are attracted to: PSYCHOLOGICAL CONTRADICTION / EMOTIONAL VOLATILITY / TRANSFORMATION ARC (genuinely irreversible) / SCENE OPPORTUNITY (6+ scenes of genuine dramatic weight) / INTERNAL CONFLICT VISIBILITY (wound visible in behavior, not explained in dialogue).
+
+THE STORY DNA TEST™ — 7 elements: Concept Type identified / Recognition Test™ (all 5) / Fake High Concept check / Actor Attraction audit / Concept vs Execution diagnosis / Hook type identified / DNA Integrity check (every major element points in the same direction).
+
+═══════════════════════════════════════════════════════
+ADD-ON 14: TRANSITION ENGINE™
+═══════════════════════════════════════════════════════
+THE EMOTIONAL CARRYOVER PRINCIPLE™: Every scene ends in an emotional state. Design Scene B's opening to: receive it (CONTINUATION) / collide with it (CONTRAST) / deepen it (AMPLIFICATION) / provide ironic contrast (IRONIC CARRYOVER) / rhyme thematically (THEMATIC ECHO). Undesigned transitions are the most common cause of pacing collapse.
+
+THE QUESTION TRANSFER™: Exit every scene on an unanswered question. Next scene either answers it (relief) / delays it (tension) / answers a different question (complication). Scenes that exit on resolution kill momentum.
+
+THE INVISIBLE EPISODE PROBLEM™: Scenes feel like separate incidents. Symptoms: pacing inconsistent, emotional investment drops after midpoint, "slow in the middle." Fix: audit every transition for Question Transfer™ and Emotional Carryover Principle™.
+
+SCENE EXIT PRINCIPLE™ — 6 exit types: Unanswered Question / Decision / Power Reversal / Revelation / Interruption / Silence. Scenes that exit on resolution stop momentum.
+
+9 TRANSITION TYPES: Hard Cut / Smash Cut / Match Cut / Dialogue Bridge / Sound Bridge / Irony Cut / Thematic Cut / Visual Echo / Temporal Smear.
+
+SCENE MOMENTUM ARCHITECTURE™ — 5 scene types:
+COMPRESSION SCENE (high velocity, tight transitions) / EXPANSION SCENE (slower, emotional processing) / PIVOT SCENE (arrives mid-momentum, exits in different direction) / BREATH SCENE (pressure release — mandatory before major escalation) / THRESHOLD SCENE (the one scene after which everything is different).
+
+═══════════════════════════════════════════════════════
+ADD-ON 19: SHOW VS TELL SYSTEM
+═══════════════════════════════════════════════════════
+THE TELL AUDIT™ — 5 types:
+TYPE 1 STATE ANNOUNCEMENT (character says what they feel — DAMAGE HIGH — convert to behavior) / TYPE 2 EXPOSITORY DESCRIPTION (psychology delivered directly — DAMAGE MEDIUM-HIGH — find the scene that proves it) / TYPE 3 DIALOGUE AS EXPLANATION (characters narrate their own psychology — DAMAGE MEDIUM — apply Hidden Conversation Principle™) / TYPE 4 DIAGNOSTIC BACKSTORY DUMP (scene fully explains why — DAMAGE LOW-MEDIUM — rule of partial information: give 60%, hold 40%) / TYPE 5 ACCEPTABLE TELLING (scene headings, time-jump titles, narrative bridging — DAMAGE NONE).
+
+5 MODES OF SHOWING:
+MODE 1 BEHAVIORAL SHOWING (character-specific behavior, not generic action) / MODE 2 OBJECT/ENVIRONMENT SHOWING (physical world carries emotional content) / MODE 3 CONTRAST SHOWING (gap between two things creates meaning) / MODE 4 ACTION SHOWING (what characters choose when the choice is difficult) / MODE 5 DIALOGUE SUBTEXT SHOWING (talking about something else while the real conversation lives underneath).
+
+═══════════════════════════════════════════════════════
+ADD-ON 20: PACING SYSTEM™
+═══════════════════════════════════════════════════════
+Pacing is not speed. Pacing is the rhythm of tension and release — when pressure accumulates, when it discharges, and how long the audience is held in each state.
+
+COMPRESSION/EXPANSION RHYTHM™: Compress transitional moments ruthlessly. Expand moments of maximum emotional significance. All compression exhausts. All expansion bores. The craft is deliberate alternation.
+
+THE BREATH SCENE SYSTEM™ — 3 mandatory positions:
+After All Is Lost / Mid-Act Two Escalation / Before the Climax. Remove a breath scene and the escalation following it will feel flat, not stronger.
+
+PAGE VELOCITY ENGINE™: Sentence length IS pace. Short sentences accelerate. Fragments move faster. Single word on its own line stops time. Strategic white space is a beat. Long paragraph followed by fragment = exhaustion then impact.
+
+THE PACING AUDIT™ — 5 scans:
+Find every Act 2 scene longer than 3 pages (name its Scene Function) / Find every action block longer than 4 lines (break into velocity units) / Find every scene ending on neutral emotional state (apply Scene Exit Principle™) / Count Breath Scenes per act (minimum one per act) / Identify longest sustained tension sequence (apply Compression/Expansion Rhythm™).
+
+═══════════════════════════════════════════════════════
+ADD-ON 02: HORROR FRAMEWORK
+═══════════════════════════════════════════════════════
+Dread is not atmosphere — dread is the audience knowing something the character doesn't, and watching them walk toward it anyway. Monster is always a metaphor. False safety is more important than the scare.
+
+THE FEAR LADDER (6 rungs): UNEASE → DREAD → TERROR → HORROR → DESPAIR → CATHARSIS/TWIST.
+
+DREAD ARCHITECTURE — 5 elements: INFORMATION ASYMMETRY (audience knows what protagonist doesn't) / INEVITABILITY CLOCK (every scene moves toward something specifically bad for this protagonist) / LOGICAL PROTAGONIST (irrational decisions destroy dread) / POINT OF NO RETURN (protagonist chose not to leave — horror requires culpability) / ESCALATING SPECIFICITY (each threat more personal than the last).
+
+MONSTER LOGIC: Literal Threat / Metaphorical Truth / Internal Rules (consistent — inconsistency destroys dread) / Protagonist Connection (why this monster for this specific person) / Reveal Architecture.
+
+FALSE SAFETY SYSTEM — 5 rules: Earned setup (audience actually believes threat has passed) / Hold it longer than feels comfortable / Ground in mundane human detail / Return in more personal form / Minimum three false safety beats per feature.
+
+10 LAWS OF HORROR: Gore is not horror. Monster is a metaphor. Information asymmetry IS the dread. False safety is mandatory. Escalation is specificity not volume. Protagonist makes logical decisions. Point of No Return is protagonist's choice. Atmosphere is active not passive. Climax addresses metaphorical truth not just physical threat. Best endings leave one thing unresolved.
+
+═══════════════════════════════════════════════════════
+ADD-ON 03: THRILLER FRAMEWORK
+═══════════════════════════════════════════════════════
+Tension is the gap between what the audience expects and what they fear. Every twist must be both surprising AND inevitable. Information is the currency of the thriller. Paranoia is structural not tonal.
+
+TWIST ARCHITECTURE — 5 elements: PLANT (every twist planted twice, both disguised) / MISDIRECTION (audience looking wrong direction when plant is laid) / RECONTEXTUALIZATION (audience mentally rewatches 3+ prior scenes) / LOGIC CHECK (run backwards — every scene coherent given truth?) / EMOTIONAL COST (costs protagonist something real).
+
+INFORMATION ASYMMETRY TYPES: DRAMATIC IRONY (audience knows more) / SUSPENSE (same knowledge) / MYSTERY (protagonist knows more) / SURPRISE (neither knows — use sparingly) / DRAMATIC IRONY REVERSAL (audience thinks they know more — most powerful tool).
+
+PARANOIA CONSTRUCTION: Plant doubt early. Trusted ally must betray or appear to. Alternate confirming and denying fears. Never fully release tension after page 10. Partial relief only.
+
+10 LAWS OF THRILLER: Tension is the gap. Every twist surprising AND inevitable. Information is the plot. Plant every twist twice. Paranoia is structural. Ticking clock: specific, visible, personal, escalating. Protagonist's psychological vulnerability IS the antagonist's weapon.
+
+═══════════════════════════════════════════════════════
+ADD-ON 08: COMEDY FRAMEWORK
+═══════════════════════════════════════════════════════
+Comedy is not jokes — comedy is pressure released at the right moment. Comedic premise requires a structural irony the story never fully resolves. Character is the engine — jokes that don't emerge from character psychology are decorations.
+
+COMEDIC PRESSURE TYPES: IRONY PRESSURE (gap between what protagonist believes and what audience knows) / ESCALATION PRESSURE (consequences accumulating faster than protagonist can manage) / SOCIAL PRESSURE (protagonist's fundamental incompatibility with their environment) / DESIRE PRESSURE (protagonist wants something the premise makes them spectacularly unsuited to obtain).
+
+COMEDIC BEAT REQUIREMENTS: Every comedic beat must emerge from character psychology. The biggest laugh is always when the protagonist's fundamental flaw most spectacularly collides with what they need to do.
+
+COMEDIC FAILURE MODES: Jokes that stop the story / Protagonist who is funny but not comic / Tonal confusion / Stakes collapse for a laugh.
+
+═══════════════════════════════════════════════════════
+ADD-ON 09: MYSTERY FRAMEWORK
+═══════════════════════════════════════════════════════
+The mystery question must be personally meaningful to the protagonist — not just professionally interesting. The mystery structure is always about what the protagonist is trying NOT to find out about themselves.
+
+MYSTERY ARCHITECTURE: THE QUESTION (specific, personal, emotionally meaningful) / FALSE SOLUTION (planted at midpoint) / REVELATION (recontextualizes 3+ prior scenes) / PERSONAL COST (truth costs protagonist something they valued at investigation start).
+
+CLUE ARCHITECTURE RULES: Every clue planted twice — once too early to notice, once as important information. Red herrings must be genuine story information interpreted incorrectly. Killer/answer introduced by page 20. Solution derivable from information provided before page 70.
+
+═══════════════════════════════════════════════════════
+ADD-ON 12: ACTION FRAMEWORK
+═══════════════════════════════════════════════════════
+Action is not choreography — action is revelation under pressure. Every sequence must reveal character.
+
+THE GEOGRAPHY PRINCIPLE™: Physical geography IS the plot. THE CONTAINER / THE EXITS (systematically closed) / THE OBSTACLES / THE VERTICAL DIMENSION / THE ENVIRONMENTAL WEAPON (planted early, fired at climax).
+
+CHARACTER IN MOTION™ — 5 types: THE STRATEGIST / THE PROTECTOR / THE SURVIVOR / THE TRAINED PROFESSIONAL (sequences must create situations where training is insufficient) / THE RELUCTANT FIGHTER (must be forced — sequences must remove every alternative first).
+
+THE STAKES ESCALATION LADDER™ — 5 rungs:
+Rung 1 ABSTRACT SURVIVAL / Rung 2 SPECIFIC SURVIVAL (wound-connected) / Rung 3 SOMEONE ELSE'S SURVIVAL / Rung 4 BELIEF OR IDENTITY / Rung 5 EVERYTHING SIMULTANEOUSLY. Each rung must be established before the sequence uses it.
+
+═══════════════════════════════════════════════════════
+ADD-ON 10: CROSS-GENRE FRAMEWORK
+═══════════════════════════════════════════════════════
+Genre is a contract with the audience. Cross-genre is renegotiating that contract — the writer must honor both contracts or the audience loses trust.
+
+THE DOMINANT GENRE RULE: Every cross-genre script has a dominant genre. The dominant genre determines the structural engine, the escalation architecture, and the climax type. Secondary genres provide tonal flavor and additional pressure — they cannot override the primary engine.
+
+CROSS-GENRE FAILURE MODES: Genre confusion (script cannot decide which contract governs) / Tonal whiplash (comedy and tragedy arrive in consecutive scenes without structural bridge) / Audience promise betrayal (horror that stops being scary, thriller that stops building tension) / Secondary genre overwhelming primary (comedy overwhelms drama in a dramedy at the wrong moment).
+
+SUCCESSFUL CROSS-GENRE REQUIRES: One dominant genre whose laws are never violated / Secondary genres used for specific, structural purposes / Tonal transitions designed, not accidental / A premise that requires both genres — neither alone would tell this story.
+
+═══════════════════════════════════════════════════════
+ADD-ON 05: SHORT FORM STORY SYSTEM
+═══════════════════════════════════════════════════════
+Short form is not a truncated feature — it is a different story architecture. The short film has ONE beat that matters: the moment everything changes.
+
+THE SHORT FORM ENGINE: One pressure event / One revelation or reversal / Complete emotional arc / No subplots / The final image must be the opposite of the opening image or the same image rendered unbearable by what we now know.
+
+SHORT FORM FAILURE MODES: Trying to compress feature structure into 10 minutes / Multiple pressure events competing / No clear dominant emotional journey / Ending that does not recontextualize the beginning.
+
+═══════════════════════════════════════════════════════
+ADD-ON 11: DEVELOPMENTAL EXECUTIVE SYSTEM
+═══════════════════════════════════════════════════════
+THE BARNUM PROBLEM™: Notes so generic they could apply to any script ever written ("your protagonist needs more depth," "consider raising the stakes"). Technically true of almost every first draft. Completely useless. Every note must be specific, page-level, and craft-level.
+
+THE GREENLIGHT CHAIN — 5 rounds:
+Round 1 PREMISE TEST: Protagonist + conflict + stakes all specific?
+Round 2 STRUCTURAL TEST: Inciting incident p.12, midpoint p.55-60, dark night p.75-80, climax p.85-95?
+Round 3 CHARACTER TEST: Named psychological wound? Shown in behavior first 10 pages? Ending addresses it?
+Round 4 DIALOGUE TEST: State announcements / generic lines / character-specific lines — ratio must exceed 3:1 specific-to-generic.
+Round 5 THE VERDICT: Each persona delivers one-line verdict. Script ready when all are Conditional or Recommend.
+
+6 EXECUTIVE PERSONAS: NETFLIX DRAMA EXECUTIVE (prestige TV, emotional authenticity, series engine) / A24 DEVELOPMENT READER (arthouse-commercial, voice that couldn't be written by anyone else) / INDEPENDENT PRODUCER (budget awareness, location efficiency, cast-ability) / SCRIPT DOCTOR (fastest path from current draft to producible script — completely unsentimental) / FESTIVAL PROGRAMMER (reason this film exists right now, visual signature) / VETERAN SHOWRUNNER (room-readiness, character consistency across series arc).
+
+═══════════════════════════════════════════════════════
+ADD-ON 17: SCRIPT COVERAGE SYSTEM
+═══════════════════════════════════════════════════════
+10 COVERAGE CATEGORIES (scored PASS / CONSIDER / FAIL):
+1. CONCEPT (HIGH weight) 2. STRUCTURE (HIGH weight) 3. CHARACTER (HIGH weight) 4. DIALOGUE (MEDIUM) 5. SCENE FUNCTION (HIGH) 6. PACING (MEDIUM) 7. TRANSITIONS (MEDIUM) 8. PROTAGONIST ARC (HIGH) 9. ANTAGONIST (MEDIUM) 10. COMMERCIAL VIABILITY (LOW)
+
+THE REWRITE ORDER IS ALWAYS: Architecture → Character → Scene Function → Dialogue → Transitions.
+
+SCRIPT INTAKE FORM: TITLE / GENRE / LOGLINE / CONCEPT TYPE / STRUCTURAL ENGINE™ / PROTAGONIST WOUND (one sentence) / ANTAGONIST ARGUMENT / LOGLINE QUESTION / TARGET MARKET / CURRENT DRAFT NUMBER.
+
+═══════════════════════════════════════════════════════
+ADD-ON 23: WORLD BUILDING SYSTEM™
+═══════════════════════════════════════════════════════
+The novelist builds a world to describe. The screenwriter builds a world to generate pressure. Every element must exist to create a specific problem for the specific protagonist.
+
+THE WORLD AS CHARACTER: The world should want something from the protagonist — configured to test their specific wound in ways no other environment could.
+
+THE RULES SYSTEM — 3 types: POSSIBILITY RULES (what can happen here) / PROHIBITION RULES (what is forbidden — most useful when protagonist will be forced to break it) / COST RULES (what using the world's power costs — most powerful when cost taxes protagonist's wound).
+
+WORLD BUILDING FAILURE MODES: World that could be swapped with any other world without changing the story / Rules introduced only when plot requires them (world being invented as needed) / Protagonist whose wound is not specifically aggravated by this world's conditions.
+
+═══════════════════════════════════════════════════════
+FREE RESOURCE: 15-QUESTION SCENE DIAGNOSTIC
+═══════════════════════════════════════════════════════
+The first NO is where the problem lives. Work in order. Stop at first NO. Fix it. Run again.
+01 CHARACTER WANT — does every character want something specific in this scene?
+02 STAKES — is there a cost to not getting it?
+03 POWER DYNAMICS — is it clear who holds power and does it shift?
+04 CHANGE — does something become irrevocable?
+05 SUBTEXT — is there a secondary conversation beneath the surface?
+06 CONFLICT LAYER — is there conflict between characters or within a character?
+07 PROTAGONIST AGENCY — is the protagonist causing events or just responding?
+08 ESCALATION — does tension increase beat by beat?
+09 ENTRY POINT — does the scene start as late as possible?
+10 EXIT POINT — does the scene end as early as possible?
+11 VISUAL LANGUAGE — is there something to SEE, HOLD, or MOVE?
+12 EMOTIONAL ARC — does the emotional state change from first line to last?
+13 SURPRISE — is anything unexpected?
+14 SCENE NECESSITY — can this scene's function be absorbed by an adjacent scene?
+15 INDISPENSABILITY — what breaks in the story if this scene doesn't exist?
+
+RESPONSE FORMAT INSTRUCTIONS:
+- Always name the specific Writheon framework or tool being applied
+- Structure responses: diagnosis first, framework second, application third
+- Use the writer's specific script context when available (from coverage data)
+- Be direct and precise — not encouraging, not vague
+- End responses with the most actionable next step
+- When a script context is available, connect general frameworks to their specific script
+
+WHAT YOU NEVER DO:
+- Generate screenplay content for them
+- Give generic writing advice not grounded in a named framework
+- Be vague ("consider strengthening your protagonist") — always name the failure mode and tool
+- Ignore available script context when answering script-specific questions
+`;
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let messages = [];
+let scriptContext = null;
+let isTyping = false;
+
+// Load coverage context from localStorage if available
+function loadCoverageContext() {
+  try {
+    const stored = localStorage.getItem('writheon_last_coverage');
+    if (stored) {
+      scriptContext = JSON.parse(stored);
+      updateContextPanel();
+    }
+  } catch(e) {}
+}
+
+function updateContextPanel() {
+  if (!scriptContext) return;
+  const badge = document.getElementById('ctxBadge');
+  const ctx = document.getElementById('iaCtx');
+  const body = document.getElementById('ctxBody');
+  const sub = document.getElementById('cpSub');
+
+  badge.textContent = `Coverage Loaded — ${scriptContext.verdict || 'Analyzed'}`;
+  badge.className = 'ctx-badge has-ctx';
+  ctx.textContent = 'Coverage context active — answers specific to your script';
+  ctx.className = 'ia-context loaded';
+  sub.textContent = scriptContext.title || 'Your Script';
+
+  const scoreColor = scriptContext.verdict === 'PASS' ? 'var(--green)' : scriptContext.verdict === 'CONSIDER' ? 'var(--amber)' : 'var(--red)';
+
+  let issuesHtml = '';
+  if (scriptContext.priorities && scriptContext.priorities.length) {
+    issuesHtml = `<div class="cl-issues"><div class="ci-label">Rewrite Priorities</div>${
+      scriptContext.priorities.slice(0,4).map((p, i) => `
+        <div class="ci-item">
+          <div class="ci-rank">Priority ${i+1}</div>
+          <div class="ci-title">${p.substring(0,60)}${p.length > 60 ? '...' : ''}</div>
+          <button class="ci-ask" onclick="askAboutIssue('${p.replace(/'/g,"\\'")}')">Ask about this →</button>
+        </div>`).join('')
+    }</div>`;
+  }
+
+  body.innerHTML = `
+    <div class="ctx-loaded">
+      <div class="cl-score">
+        <div class="cls-label">Writheon Score™</div>
+        <div class="cls-num" style="color:${scoreColor}">${scriptContext.score || '—'}</div>
+        <div class="cls-verdict" style="color:${scoreColor}">${scriptContext.verdict || '—'}</div>
+      </div>
+      ${issuesHtml}
+      <div class="kb-refs">
+        <div class="kbr-label">Knowledge Base Active</div>
+        <div class="kbr-item"><div class="kbr-dot"></div><div class="kbr-text">Character Pressure System (Add-On 13)</div></div>
+        <div class="kbr-item"><div class="kbr-dot"></div><div class="kbr-text">Character Activation System™ (Add-On 21)</div></div>
+        <div class="kbr-item"><div class="kbr-dot"></div><div class="kbr-text">Character Psychology (Add-On 22)</div></div>
+        <div class="kbr-item"><div class="kbr-dot"></div><div class="kbr-text">Dialogue Punch-Up Pack (Add-On 04)</div></div>
+        <div class="kbr-item"><div class="kbr-dot"></div><div class="kbr-text">15-Question Scene Diagnostic</div></div>
+        <div class="kbr-item"><div class="kbr-dot"></div><div class="kbr-text">All remaining frameworks</div></div>
+      </div>
+    </div>`;
+}
+
+function askAboutIssue(issue) {
+  document.getElementById('userInput').value = `My coverage identified this priority: "${issue}" — which Writheon framework should I use to fix it, and what are the specific steps?`;
+  sendMessage();
+}
+
+// ── WEB SEARCH TRIGGER DETECTION ───────────────────────────────────────────
+// Determines whether a question needs live web search or can be answered
+// from the knowledge base alone. Search is triggered when the question
+// signals a need for: film examples, real scripts, industry news,
+// interviews, craft articles, or current screenwriting context.
+// Knowledge-base-only questions: framework definitions, diagnostic tools,
+// Writheon methodology, script-specific questions from coverage context.
+
+function needsWebSearch(question) {
+  const q = question.toLowerCase();
+
+  // Signals that require web examples or current information
+  const searchSignals = [
+    'example', 'examples', 'like in', 'such as', 'film', 'movie', 'show',
+    'series', 'screenplay', 'script for', 'written by', 'directed by',
+    'from the movie', 'in the show', 'similar to', 'compare', 'like',
+    'interview', 'said about', 'wrote about', 'article', 'book by',
+    'current', 'recent', 'latest', 'new', 'today', 'award', 'oscar',
+    'emmy', 'contest', 'nicholl', 'blacklist', 'austin film',
+    'who wrote', 'who directed', 'best screenplay', 'great example',
+    'show me', 'can you find', 'search for', 'look up'
+  ];
+
+  // Hard framework questions — never need search
+  const frameworkOnly = [
+    'what is the moral engine', 'how do i build', 'what is the villain',
+    'explain the mirror', 'define the verbal mask', 'what is the dialogue',
+    'what failure mode', 'run the diagnostic', 'what is generic character',
+    'what is voice collapse', 'what is belief demolition', 'agency audit',
+    'cost ledger', 'specificity test', 'enneagram type', 'wound library',
+    'hidden conversation', 'compression rule', 'sympathy architecture',
+    'contradiction engine', 'antihero system', 'my script', 'my protagonist',
+    'my character', 'my scene', 'my dialogue', 'my coverage', 'my act'
+  ];
+
+  // If it's clearly a framework question, skip search
+  if (frameworkOnly.some(f => q.includes(f))) return false;
+
+  // If it signals needing examples or current info, use search
+  return searchSignals.some(s => q.includes(s));
+}
+
+// ── MESSAGING ──────────────────────────────────────────────────────────────
+async function sendMessage() {
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+  if (!text || isTyping) return;
+
+  document.getElementById('welcome').style.display = 'none';
+  input.value = '';
+  input.style.height = '52px';
+  isTyping = true;
+  document.getElementById('sendBtn').disabled = true;
+
+  addMessage('user', text);
+
+  // Determine if web search is needed
+  const useSearch = needsWebSearch(text);
+  updateSearchIndicator(useSearch);
+  showTyping(true);
+
+  const contextBlock = scriptContext ? `
+SCRIPT CONTEXT (from Coverage Engine analysis):
+Score: ${scriptContext.score} — ${scriptContext.verdict}
+Coverage Notes: ${scriptContext.coverageNotes || ''}
+Structural Assessment: ${scriptContext.structuralAssessment || ''}
+Priority Rewrites: ${(scriptContext.priorities || []).join(' | ')}
+Weak Areas: ${(scriptContext.weakAreas || []).join(', ')}
+` : 'No script coverage context loaded — answer from knowledge base frameworks only.';
+
+  // Web search instructions added to system when search is active
+  const searchInstruction = useSearch ? `
+WEB SEARCH ACTIVE: You have access to web_search for this query.
+USE IT TO: find specific film examples, script references, craft interviews, industry articles.
+ALWAYS: ground examples in the relevant Writheon framework.
+FORMAT: present the framework first, then the real-world example that demonstrates it.
+CITE: mention the film/source when using web results.
+` : '';
+
+  const apiMessages = [
+    ...messages.slice(-8).map(m => ({ role: m.role, content: m.content })),
+    { role: 'user', content: text }
+  ];
+
+  // ── NOTE FOR CLAUDE CODE ──────────────────────────────────────────────────
+  // Web search is conditionally enabled based on needsWebSearch() above.
+  // The tools array below activates the Anthropic web_search_20250305 tool.
+  // This is already wired — Claude Code does NOT need to modify this logic.
+  // Claude Code's job: replace the KNOWLEDGE_BASE constant above with the
+  // full content of all PDFs in the writheon-books folder.
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const requestBody = {
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: 1000,
+    system: KNOWLEDGE_BASE + '\n\n' + contextBlock + '\n\n' + searchInstruction,
+    messages: apiMessages,
+    // Web search tool — enabled when needsWebSearch() returns true
+    // Searches for film examples, craft articles, industry references
+    // to ground Writheon framework answers in real-world context
+    ...(useSearch && {
+      tools: [{
+        type: 'web_search_20250305',
+        name: 'web_search'
+      }]
+    })
+  };
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody)
+    });
+
+    const data = await res.json();
+
+    // Assemble reply — handle both direct text and tool_use + text blocks
+    // When web search runs, Claude returns tool_use blocks then a final text block
+    let reply = '';
+    let searchedFor = null;
+
+    if (data.content && Array.isArray(data.content)) {
+      data.content.forEach(block => {
+        if (block.type === 'text') {
+          reply += block.text;
+        }
+        // Track what was searched for — show in UI as transparency signal
+        if (block.type === 'tool_use' && block.name === 'web_search') {
+          searchedFor = block.input?.query || null;
+        }
+      });
+    }
+
+    if (!reply) reply = 'The system encountered an error. Please try again.';
+
+    messages.push({ role: 'user', content: text });
+    messages.push({ role: 'assistant', content: reply });
+
+    showTyping(false);
+    updateSearchIndicator(false);
+    addMessage('advisor', reply, searchedFor);
+
+  } catch(e) {
+    showTyping(false);
+    updateSearchIndicator(false);
+    addMessage('advisor', 'Connection error — check your network and try again.');
+    console.error(e);
+  } finally {
+    isTyping = false;
+    document.getElementById('sendBtn').disabled = false;
+  }
+}
+
+// Shows a subtle indicator when web search is active
+function updateSearchIndicator(active) {
+  const badge = document.getElementById('searchBadge');
+  if (!badge) return;
+  badge.style.opacity = active ? '1' : '0';
+  badge.textContent = active ? 'Searching web for examples...' : '';
+}
+
+function addMessage(role, content, searchedFor = null) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = `msg msg-${role}`;
+
+  const label = role === 'user' ? 'You' : 'Script Advisor™';
+
+  // Show web search source tag when search was used
+  const searchTag = (role === 'advisor' && searchedFor)
+    ? `<div style="font-family:'DM Mono',monospace;font-size:9px;font-weight:300;letter-spacing:.1em;color:var(--border2);text-transform:uppercase;margin-top:10px;display:flex;align-items:center;gap:8px"><span style="color:var(--green);font-size:8px">◆</span>Web searched: "${searchedFor}" · Knowledge base + live examples</div>`
+    : '';
+
+  const bubble = role === 'user'
+    ? `<div class="msg-bubble">${escHtml(content)}</div>`
+    : `<div class="msg-bubble"><div class="ar-text">${formatAdvisorResponse(content)}</div>${searchTag}</div>`;
+
+  div.innerHTML = `<div class="msg-label">${label}</div>${bubble}`;
+  msgs.appendChild(div);
+
+  // Auto scroll
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Move typing indicator after messages
+  const typing = document.getElementById('typing');
+  msgs.parentElement.insertBefore(typing, msgs.nextSibling);
+}
+
+function formatAdvisorResponse(text) {
+  // Convert **bold** to strong
+  text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  // Convert *italic* to em
+  text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+  // Convert framework names with ™ to gold
+  text = text.replace(/([\w\s]+™)/g, '<em>$1</em>');
+  // Convert line breaks
+  text = text.replace(/\n\n/g, '</p><p class="ar-text" style="margin-top:12px">');
+  text = text.replace(/\n/g, '<br>');
+  return `<p>${text}</p>`;
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function showTyping(show) {
+  const t = document.getElementById('typing');
+  t.className = show ? 'typing active' : 'typing';
+  if (show) {
+    document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+  }
+}
+
+function clearConversation() {
+  messages = [];
+  const msgs = document.getElementById('messages');
+  msgs.innerHTML = '';
+  document.getElementById('welcome').style.display = 'block';
+  msgs.appendChild(document.getElementById('welcome'));
+  document.getElementById('welcome').style.display = 'block';
+}
+
+// ── TOPICS ─────────────────────────────────────────────────────────────────
+function askTopic(btn, question) {
+  document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('userInput').value = question;
+  sendMessage();
+}
+
+function askSuggestion(btn) {
+  document.getElementById('userInput').value = btn.textContent.trim();
+  sendMessage();
+}
+
+function filterTopics(query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll('.topic-btn').forEach(btn => {
+    const text = btn.textContent.toLowerCase();
+    btn.style.display = text.includes(q) || !q ? 'flex' : 'none';
+  });
+}
+
+// ── INPUT ──────────────────────────────────────────────────────────────────
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = '52px';
+  el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+}
+
+// ── CURSOR ─────────────────────────────────────────────────────────────────
+const cur = document.getElementById('cur'), curR = document.getElementById('curR');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+(function a(){
+  cur.style.left=mx+'px'; cur.style.top=my+'px';
+  rx+=(mx-rx)*.1; ry+=(my-ry)*.1;
+  curR.style.left=rx+'px'; curR.style.top=ry+'px';
+  requestAnimationFrame(a);
+})();
+document.querySelectorAll('a,button,textarea,input').forEach(el => {
+  el.addEventListener('mouseenter',()=>{cur.style.width='14px';cur.style.height='14px';curR.style.width='44px';curR.style.height='44px'});
+  el.addEventListener('mouseleave',()=>{cur.style.width='7px';cur.style.height='7px';curR.style.width='28px';curR.style.height='28px'});
+});
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+loadCoverageContext();
+</script>
+</body>
+</html>
