@@ -943,8 +943,8 @@ async function executeAnalysis(text) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
-        max_tokens: 1500,
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: currentMode === 'full' ? 4096 : 1800,
         system: `You are the Writheon Coverage Engine™ — a professional screenplay diagnostic system. You operate as a ${VOICES[currentVoice]} providing coverage within the Writheon Screenplay Development Engine™ framework.
 
 Script Title: ${title}
