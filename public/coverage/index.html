@@ -1181,12 +1181,26 @@ writheon.com/coverage`;
 function showUpgradeModal() { document.getElementById('upgradeModal').className = 'modal-overlay active'; }
 function closeModal()       { document.getElementById('upgradeModal').className = 'modal-overlay'; }
 
+const VALID_CODES = {
+  pro:      'WRITHEON-PRO-2026',
+  beta:     'WRITHEON-BETA-2026',
+  founding: 'WRITHEON-FOUNDING-2026',
+  admin:    'WRITHEON-GMOE-ADMIN'
+};
+
 function verifyCode() {
   const code = document.getElementById('unlockCode').value.trim().toUpperCase();
-  if (code.startsWith('WR-') && code.length >= 8) {
+  const tier = Object.keys(VALID_CODES).find(k => VALID_CODES[k] === code);
+  if (tier) {
     isPro = true; saveState();
     closeModal(); unlockPro();
-    showToast('Pro access unlocked — welcome to Writheon.');
+    const messages = {
+      pro:      'Pro access unlocked — welcome to Writheon.',
+      beta:     'Beta access unlocked — thank you for building with us.',
+      founding: 'Founding access unlocked — rate locked for life.',
+      admin:    'Admin access unlocked.'
+    };
+    showToast(messages[tier]);
   } else {
     showToast('Invalid code — check your email or upgrade via Stripe');
   }
