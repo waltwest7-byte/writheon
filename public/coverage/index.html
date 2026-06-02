@@ -943,40 +943,12 @@ async function executeAnalysis(text) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        // System prompt is built server-side from the Writheon knowledge base (api/kb.js)
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: currentMode === 'full' ? 4096 : 1800,
-        system: `You are the Writheon Coverage Engine™ — a professional screenplay diagnostic system. You operate as a ${VOICES[currentVoice]} providing coverage within the Writheon Screenplay Development Engine™ framework.
-
-Script Title: ${title}
-Genre: ${genre}
-
-${getGenreFocus(scriptGenre)}
-
-${(currentMode === 'full' || currentMode === 'first10') ? ADDON_18.systemPromptInjection : ''}
-
-Your job is to DIAGNOSE, not encourage. Be precise, direct, and professional. Use industry-standard coverage language. All suggestions must be specific to the material provided — never give generic advice.
-
-You MUST respond with ONLY valid JSON in this exact structure — no preamble, no markdown, no code block:
-{
-  "verdict": "PASS" | "CONSIDER" | "FAIL",
-  "score": "A" | "B+" | "B" | "C+" | "C" | "D",
-  "scores": {
-    "premise": <0-100>,
-    "structure": <0-100>,
-    "character": <0-100>,
-    "dialogue": <0-100>,
-    "pacing": <0-100>,
-    "commerciality": <0-100>
-  },
-  "coverageNotes": "<2-3 sentences of overall assessment in the voice of ${VOICES[currentVoice]}>",
-  "structuralAssessment": "<2-3 sentences on structure, architecture, and narrative pressure>",
-  "priorities": ["<specific rewrite priority 1>", "<specific rewrite priority 2>", "<specific rewrite priority 3>"],
-  "weakAreas": ["structure" | "character" | "dialogue" | "pacing" | "premise" | "commerciality"],
-  "suggestions": {
-    "<weakArea1>": ["<specific script-based fix 1>", "<specific script-based fix 2>"],
-    "<weakArea2>": ["<specific script-based fix 1>", "<specific script-based fix 2>"]
-  }
-}`,
+        mode:  currentMode,
+        genre: scriptGenre || '',
+        voice: currentVoice,
+        title: title,
         messages: [{ role: 'user', content: prompt }]
       })
     });

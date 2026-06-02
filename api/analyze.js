@@ -1,3 +1,5 @@
+const { buildSystemPrompt } = require('./kb');
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -7,8 +9,7 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    // Vercel usually auto-parses JSON bodies, but explicitly handle the
-    // stream case so req.body is always populated regardless of runtime version
+    // Explicit body parsing — Vercel auto-parses JSON but this is a safe fallback
     let body = req.body;
     if (!body || typeof body !== 'object') {
       const raw = await new Promise((resolve, reject) => {
@@ -22,9 +23,18 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    if (!body.model || !body.messages) {
-      return res.status(400).json({ error: 'Missing required fields: model, messages' });
+    const { messages, mode, genre, voice, title, model, max_tokens } = body;
+
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: 'Missing required field: messages' });
     }
+
+    // Build the full Writheon knowledge-base system prompt server-side
+    const system = buildSystemPrompt({ mode, genre, voice, title });
+
+    // Select model and token budget based on analysis mode
+    const selectedModel = model || 'claude-haiku-4-5-20251001';
+    const selectedTokens = mode === 'full' ? 4096 : (max_tokens || 1800);
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -33,13 +43,18 @@ module.exports = async function handler(req, res) {
         'x-api-key': process.env.ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify({
+        model: selectedModel,
+        max_tokens: selectedTokens,
+        system,
+        messages
+      })
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('[writheon:analyze] Anthropic error', response.status, JSON.stringify(data));
+      console.error('[writheon:analyze] Anthropic error', response.status, JSON.stringify(data).substring(0, 300));
     }
 
     return res.status(response.status).json(data);
