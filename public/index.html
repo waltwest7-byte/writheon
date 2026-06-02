@@ -1599,21 +1599,27 @@ function toggleFoundingForm() {
   form.classList.toggle('open');
 }
 
+const STRIPE_FOUNDING_LINK = ‘REPLACE_WITH_FOUNDING_15_MONTH_LINK’;
+
 async function submitFoundingEmail() {
-  const email = document.getElementById('foundingEmail').value.trim();
-  if (!email || !email.includes('@')) return;
+  const email = document.getElementById(‘foundingEmail’).value.trim();
+  if (!email || !email.includes(‘@’)) return;
   try {
-    await fetch('/api/capture', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, tier: 'founding' })
+    await fetch(‘/api/capture’, {
+      method: ‘POST’,
+      headers: { ‘Content-Type’: ‘application/json’ },
+      body: JSON.stringify({ email, tier: ‘founding’ })
     });
   } catch(e) {}
-  document.getElementById('foundingForm').classList.remove('open');
-  document.getElementById('foundingBtn').style.display = 'none';
-  const confirm = document.getElementById('foundingConfirm');
-  confirm.style.display = 'block';
+  document.getElementById(‘foundingForm’).classList.remove(‘open’);
+  document.getElementById(‘foundingBtn’).style.display = ‘none’;
+  const confirm = document.getElementById(‘foundingConfirm’);
+  confirm.style.display = ‘block’;
   confirm.textContent = "You’re on the list. We’ll reach out when payments go live.";
+  // Forward to Stripe when the link is live
+  if (STRIPE_FOUNDING_LINK && !STRIPE_FOUNDING_LINK.startsWith(‘REPLACE’)) {
+    window.open(STRIPE_FOUNDING_LINK, ‘_blank’);
+  }
 }
 </script>
 </body>

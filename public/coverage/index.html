@@ -723,6 +723,9 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
     <a href="https://STRIPE_PAYMENT_LINK_HERE" target="_blank" class="btn-stripe">
       Upgrade to Pro — $19/mo →
     </a>
+    <a id="foundingStripeBtn" href="REPLACE_WITH_FOUNDING_15_MONTH_LINK" target="_blank" class="btn-stripe" style="margin-top:8px;background:transparent;border:1px solid var(--gold-dim);color:var(--gold);">
+      Claim Founding Access — $15/mo →
+    </a>
     <div class="modal-or">Already purchased?</div>
     <input type="text" class="modal-input" id="unlockCode" placeholder="Enter unlock code" />
     <div class="modal-actions">
@@ -751,7 +754,8 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
 
 <script>
 // ─── CONSTANTS ────────────────────────────────────────────
-const STRIPE_PAYMENT_LINK = 'https://STRIPE_PAYMENT_LINK_HERE';
+const STRIPE_PAYMENT_LINK   = 'https://STRIPE_PAYMENT_LINK_HERE';
+const STRIPE_FOUNDING_LINK  = 'REPLACE_WITH_FOUNDING_15_MONTH_LINK';
 const FREE_LIMIT = 3;
 const FULL_SCRIPT_FREE = true;
 
