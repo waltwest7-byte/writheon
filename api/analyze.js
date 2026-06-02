@@ -1,4 +1,6 @@
 const { buildSystemPrompt } = require('./kb');
+const { checkRateLimit } = require('./lib/rateLimit');
+const { supabaseInsert } = require('./lib/supabase');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -8,32 +10,28 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
+  // Rate limiting
+  const rl = await checkRateLimit(req, 'analyze');
+  if (!rl.allowed) {
+    return res.status(429).json({ error: 'Too many requests. Please wait 15 minutes.' });
+  }
+
   try {
-    // Explicit body parsing — Vercel auto-parses JSON but this is a safe fallback
     let body = req.body;
     if (!body || typeof body !== 'object') {
       const raw = await new Promise((resolve, reject) => {
-        let data = '';
-        req.on('data', chunk => { data += chunk; });
-        req.on('end', () => resolve(data));
-        req.on('error', reject);
+        let d = ''; req.on('data', c => d += c); req.on('end', () => resolve(d)); req.on('error', reject);
       });
       try { body = JSON.parse(raw); } catch (e) {
-        return res.status(400).json({ error: 'Invalid JSON body', detail: e.message });
+        return res.status(400).json({ error: 'Invalid JSON body' });
       }
     }
 
     const { messages, mode, genre, voice, title, model, max_tokens } = body;
+    if (!messages) return res.status(400).json({ error: 'Missing: messages' });
 
-    if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({ error: 'Missing required field: messages' });
-    }
-
-    // Build the full Writheon knowledge-base system prompt server-side
     const system = buildSystemPrompt({ mode, genre, voice, title });
-
-    // Select model and token budget based on analysis mode
-    const selectedModel = model || 'claude-haiku-4-5-20251001';
+    const selectedModel  = model || 'claude-haiku-4-5-20251001';
     const selectedTokens = mode === 'full' ? 4096 : (max_tokens || 1800);
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -43,24 +41,40 @@ module.exports = async function handler(req, res) {
         'x-api-key': process.env.ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify({
-        model: selectedModel,
-        max_tokens: selectedTokens,
-        system,
-        messages
-      })
+      body: JSON.stringify({ model: selectedModel, max_tokens: selectedTokens, system, messages })
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('[writheon:analyze] Anthropic error', response.status, JSON.stringify(data).substring(0, 300));
+      console.error('[analyze] Anthropic error', response.status, JSON.stringify(data).substring(0, 200));
+    }
+
+    // Async: save analysis to Supabase (non-blocking)
+    if (response.ok && data.content?.[0]?.text) {
+      try {
+        const raw = data.content[0].text.replace(/```json|```/gi, '').trim();
+        const jm = raw.match(/\{[\s\S]*\}/);
+        if (jm) {
+          const result = JSON.parse(jm[0]);
+          supabaseInsert('analyses', {
+            title: title || null, genre: genre || null,
+            mode: mode || null, voice: voice || null,
+            verdict: result.verdict, score: result.score,
+            writheon_score: result._writheonScore || null,
+            scores: result.scores || null,
+            coverage_notes: result.coverageNotes || null,
+            structural_assessment: result.structuralAssessment || null,
+            priorities: result.priorities || null,
+            weak_areas: result.weakAreas || null
+          }).catch(() => {});
+        }
+      } catch (_) {}
     }
 
     return res.status(response.status).json(data);
-
   } catch (err) {
-    console.error('[writheon:analyze] Handler error:', err.message);
+    console.error('[analyze] error:', err.message);
     return res.status(500).json({ error: 'Proxy error', detail: err.message });
   }
 };

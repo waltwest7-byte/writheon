@@ -430,21 +430,26 @@ REWRITE PRINCIPLES:
 - If the scene is strong, say so — identify what works and make minimal changes`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/api/rewrite', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
         system: systemPrompt,
         messages: [{ role: 'user', content: `REWRITE THIS SCENE:\n\n${text.substring(0, 3500)}` }]
       })
     });
 
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `API error ${res.status}`);
+    }
     const data = await res.json();
     const raw = data.content?.[0]?.text || '';
-    const clean = raw.replace(/```json|```/g, '').trim();
-    const result = JSON.parse(clean);
+    if (!raw) throw new Error('Empty response');
+    const stripped = raw.replace(/```json|```/gi, '').trim();
+    const jsonMatch = stripped.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No JSON in response');
+    const result = JSON.parse(jsonMatch[0]);
 
     rewriteCount++;
     currentResult = { ...result, original: text };
@@ -556,7 +561,6 @@ function copyAll() {
 }
 
 function exportPDF() {
-  if (!isPro) { showUpgrade(); return; }
   window.print();
 }
 
