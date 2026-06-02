@@ -947,20 +947,15 @@ CITE: mention the film/source when using web results.
   // full content of all PDFs in the writheon-books folder.
   // ─────────────────────────────────────────────────────────────────────────
 
+  // web_search_20250305 is only supported by claude-3-5 models.
+  // Use claude-haiku-4-5-20251001 for KB-only queries (faster, cheaper).
+  // Use claude-haiku-4-5-20251001 for all queries — web search disabled until
+  // a supported model is confirmed. The 26-Add-On KB covers framework questions.
   const requestBody = {
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 1000,
-    system: KNOWLEDGE_BASE + '\n\n' + contextBlock + '\n\n' + searchInstruction,
-    messages: apiMessages,
-    // Web search tool — enabled when needsWebSearch() returns true
-    // Searches for film examples, craft articles, industry references
-    // to ground Writheon framework answers in real-world context
-    ...(useSearch && {
-      tools: [{
-        type: 'web_search_20250305',
-        name: 'web_search'
-      }]
-    })
+    system: KNOWLEDGE_BASE + '\n\n' + contextBlock,
+    messages: apiMessages
   };
 
   try {
@@ -972,24 +967,35 @@ CITE: mention the film/source when using web results.
 
     const data = await res.json();
 
-    // Assemble reply — handle both direct text and tool_use + text blocks
-    // When web search runs, Claude returns tool_use blocks then a final text block
+    // Handle Anthropic API errors (400, 401, 500, etc.)
+    if (!res.ok || data.type === 'error') {
+      const errMsg = data.error?.message || `API error ${res.status}`;
+      console.error('[Writheon Advisor]', errMsg);
+      showTyping(false);
+      updateSearchIndicator(false);
+      addMessage('advisor', 'The analysis engine returned an error. Please try again in a moment.');
+      isTyping = false;
+      document.getElementById('sendBtn').disabled = false;
+      return;
+    }
+
+    // Assemble reply from content blocks
     let reply = '';
     let searchedFor = null;
 
     if (data.content && Array.isArray(data.content)) {
       data.content.forEach(block => {
-        if (block.type === 'text') {
-          reply += block.text;
-        }
-        // Track what was searched for — show in UI as transparency signal
+        if (block.type === 'text') reply += block.text;
         if (block.type === 'tool_use' && block.name === 'web_search') {
-          searchedFor = block.input?.query || null;
+          searchedFor = block.input && block.input.query ? block.input.query : null;
         }
       });
     }
 
-    if (!reply) reply = 'The system encountered an error. Please try again.';
+    if (!reply) {
+      console.error('[Writheon Advisor] Empty reply. Full response:', JSON.stringify(data).substring(0, 400));
+      reply = 'The system returned an empty response. Please try again.';
+    }
 
     messages.push({ role: 'user', content: text });
     messages.push({ role: 'assistant', content: reply });
@@ -999,10 +1005,10 @@ CITE: mention the film/source when using web results.
     addMessage('advisor', reply, searchedFor);
 
   } catch(e) {
+    console.error('[Writheon Advisor] Fetch error:', e);
     showTyping(false);
     updateSearchIndicator(false);
-    addMessage('advisor', 'Connection error — check your network and try again.');
-    console.error(e);
+    addMessage('advisor', 'Connection error — please check your network and try again.');
   } finally {
     isTyping = false;
     document.getElementById('sendBtn').disabled = false;
