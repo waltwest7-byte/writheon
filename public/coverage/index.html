@@ -411,11 +411,16 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
     text-align: center; width: 100%; white-space: nowrap;
   }
   nav, .sidebar, .input-area, .mode-info-bar, .history-panel,
-  .modal-overlay, .upgrade-gate, .run-btn, .char-count { display: none !important; }
+  .modal-overlay, .upgrade-gate, .run-btn, .char-count,
+  .result-actions, .writheon-score-block .btn-copy-score { display: none !important; }
   .app-shell { display: block; padding-top: 0; }
   .app-header { position: static; padding: 20px; }
   .main-panel { padding: 20px; }
-  .result-card { border: none; }
+  /* Force result card visible regardless of .visible class */
+  .result-card { display: block !important; border: none; }
+  .writheon-score-block { background: none; border-bottom: 1px solid #1e1e1e; }
+  body { background: white; color: black; }
+  .result-text, .priority-item, .result-section-title { color: black !important; }
 }
 
 /* ANIMATIONS */
@@ -721,7 +726,7 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
     <h3>Unlock Pro Access</h3>
     <p>Unlimited analyses. All six voice modes. PDF export. Cross-device history.</p>
     <a href="https://STRIPE_PAYMENT_LINK_HERE" target="_blank" class="btn-stripe">
-      Upgrade to Pro — $19/mo →
+      Upgrade to Pro — $29/month →
     </a>
     <a id="foundingStripeBtn" href="https://buy.stripe.com/fZu9ATh2s8Fv7lW8th7bW01" target="_blank" class="btn-stripe" style="margin-top:8px;background:transparent;border:1px solid var(--gold-dim);color:var(--gold);">
       Claim Founding Access — $15/mo →
@@ -874,11 +879,21 @@ function selectMode(mode, el) {
 
 function selectVoice(voice, el) {
   const locked = ['studio','contest','brutal','streaming','manager'];
-  if (locked.includes(voice) && !isPro) { showUpgradeModal(); return; }
+  if (locked.includes(voice) && !isPro) {
+    showUpgradeModal();
+    return;
+  }
   currentVoice = voice;
   document.querySelectorAll('.voice-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('voiceIndicator').textContent = VOICES[voice];
+}
+
+// Debug helper — call writheonReset() in browser console to clear all stored state
+function writheonReset() {
+  localStorage.removeItem('writheon_state');
+  localStorage.removeItem('writheon_email');
+  location.reload();
 }
 
 // ─── ANALYSIS ─────────────────────────────────────────────
@@ -966,10 +981,20 @@ You MUST respond with ONLY valid JSON in this exact structure — no preamble, n
       })
     });
 
+    if (!res.ok) {
+      const errBody = await res.text().catch(() => '');
+      throw new Error(`API ${res.status}: ${errBody.substring(0, 200)}`);
+    }
     const data = await res.json();
     const raw = data.content?.[0]?.text || '';
-    const clean = raw.replace(/```json|```/g, '').trim();
-    const result = JSON.parse(clean);
+    if (!raw) throw new Error('Empty response from API');
+
+    // Strip markdown fences if present, then extract the JSON object
+    // regardless of any preamble or trailing text the model may have added
+    const stripped = raw.replace(/```json|```/gi, '').trim();
+    const jsonMatch = stripped.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No JSON object found in response: ' + stripped.substring(0, 200));
+    const result = JSON.parse(jsonMatch[0]);
 
     // Track usage
     if (currentMode === 'first10') {
@@ -990,17 +1015,35 @@ You MUST respond with ONLY valid JSON in this exact structure — no preamble, n
 
     currentResult = result;
     history.unshift({
-      mode: MODES[currentMode].name, voice: VOICES[currentVoice],
-      verdict: result.verdict, score: result.score,
-      preview: text.substring(0, 60) + '...', timestamp: Date.now()
+      // Display metadata
+      modeKey:  currentMode,
+      modeName: MODES[currentMode].name,
+      voiceKey: currentVoice,
+      voiceName: VOICES[currentVoice],
+      verdict:  result.verdict,
+      score:    result.score,
+      writheonScore: result._writheonScore,
+      title:    title,
+      genre:    genre,
+      preview:  text.substring(0, 60) + '...',
+      timestamp: Date.now(),
+      // Full result stored for click-to-reload
+      result:   result
     });
     if (history.length > 10) history.pop();
     saveState();
     renderResult(result);
 
   } catch(e) {
-    showToast('Analysis failed — check connection and try again');
-    console.error(e);
+    console.error('[Writheon] Analysis error:', e);
+    const msg = e.message || '';
+    if (msg.includes('API 4')) {
+      showToast('API error — check your Anthropic API key in Vercel settings');
+    } else if (msg.includes('No JSON')) {
+      showToast('Unexpected response format — retrying may help');
+    } else {
+      showToast('Analysis failed — check connection and try again');
+    }
   } finally {
     setLoading(false);
   }
@@ -1145,10 +1188,43 @@ function renderHistory() {
   const panel = document.getElementById('historyPanel');
   const list  = document.getElementById('historyList');
   panel.style.display = 'block';
-  list.innerHTML = history.map(h => {
+  list.innerHTML = history.map((h, i) => {
     const cls = h.verdict === 'PASS' ? 'score-pass' : h.verdict === 'CONSIDER' ? 'score-consider' : 'score-fail';
-    return `<div class="history-item"><div class="history-meta"><span class="history-mode">${h.mode}</span><span class="history-preview">${h.preview}</span></div><span class="history-score ${cls}">${h.score}</span></div>`;
+    const titleStr = h.title && h.title !== 'Untitled' ? h.title : '';
+    const genreStr = h.genre && h.genre !== 'Unspecified' ? ` · ${h.genre}` : '';
+    const meta     = titleStr ? `<span class="history-mode">${titleStr}${genreStr}</span><span class="history-preview">${h.modeName || h.mode}</span>` :
+                                `<span class="history-mode">${h.modeName || h.mode}</span><span class="history-preview">${h.preview}</span>`;
+    const scoreDisplay = h.writheonScore ? `<span class="history-score ${cls}" style="font-size:14px;">${h.writheonScore}<span style="font-size:10px;opacity:.5">/100</span></span>` :
+                                           `<span class="history-score ${cls}">${h.score}</span>`;
+    return `<div class="history-item" onclick="reloadHistoryItem(${i})" style="cursor:pointer;" title="Click to reload this analysis">
+      <div class="history-meta">${meta}</div>
+      ${scoreDisplay}
+    </div>`;
   }).join('');
+}
+
+function reloadHistoryItem(index) {
+  const h = history[index];
+  if (!h || !h.result) { showToast('Full result not available for this entry'); return; }
+  // Restore analysis context
+  currentResult = h.result;
+  if (h.modeKey)  currentMode  = h.modeKey;
+  if (h.voiceKey) currentVoice = h.voiceKey;
+  // Update sidebar UI to match
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === currentMode);
+  });
+  document.querySelectorAll('.voice-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.voice === currentVoice);
+  });
+  if (h.modeKey) {
+    document.getElementById('modeInfoName').textContent = MODES[h.modeKey]?.name || h.modeName;
+    document.getElementById('modeInfoDesc').textContent = MODES[h.modeKey]?.desc || '';
+  }
+  document.getElementById('voiceIndicator').textContent = VOICES[currentVoice] || h.voiceName;
+  renderResult(h.result);
+  document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  showToast('Analysis reloaded');
 }
 
 // ─── USAGE UI ─────────────────────────────────────────────
