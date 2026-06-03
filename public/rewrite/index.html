@@ -186,8 +186,9 @@ textarea::placeholder{color:var(--dim);font-style:italic;font-family:'Cormorant 
   </div>
   <div class="nav-c">
     <span class="nav-badge" id="tierBadge">Free Tier</span>
-    <a href="/coverage" class="nav-back" style="margin-left:8px">Coverage Engine</a>
-    <a href="/" class="nav-back">Back to Site</a>
+    <a href="/coverage" class="nav-back">Coverage</a>
+    <a href="/advisor" class="nav-back">Advisor</a>
+    <a href="/" class="nav-back">Home</a>
   </div>
 </nav>
 
@@ -323,6 +324,22 @@ Fountain format, Final Draft export, or plain text accepted." spellcheck="false"
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- Upgrade Modal -->
+<div id="upgradeModal" style="display:none;position:fixed;inset:0;background:rgba(6,6,6,.92);z-index:200;align-items:center;justify-content:center;display:none">
+  <div style="background:var(--card);border:1px solid var(--border2);padding:48px;max-width:440px;width:90%;position:relative">
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold)"></div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.06em;color:var(--white);margin-bottom:8px">Unlock Pro Access</div>
+    <p style="font-size:16px;font-weight:300;font-style:italic;color:var(--dim);margin-bottom:24px;line-height:1.6">Unlimited rewrites. All modes. PDF export.</p>
+    <a href="https://buy.stripe.com/fZu9ATh2s8Fv7lW8th7bW01" target="_blank" style="display:block;width:100%;font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--black);background:var(--gold);border:none;padding:14px;text-decoration:none;text-align:center;margin-bottom:20px;transition:background .2s" onmouseenter="this.style.background='var(--white)'" onmouseleave="this.style.background='var(--gold)'">Claim Founding Access — $15/mo →</a>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);text-align:center;margin-bottom:16px;display:flex;align-items:center;gap:10px"><span style="flex:1;height:1px;background:var(--border)"></span>Already purchased?<span style="flex:1;height:1px;background:var(--border)"></span></div>
+    <input id="unlockCode" type="text" placeholder="Enter unlock code" style="width:100%;background:#0a0a0a;border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:12px 16px;outline:none;margin-bottom:12px;letter-spacing:.06em">
+    <div style="display:flex;gap:10px">
+      <button onclick="closeUpgrade()" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);background:none;border:1px solid var(--border);padding:11px 20px;cursor:none;flex:1;transition:all .2s">Cancel</button>
+      <button onclick="verifyCode()" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--black);background:var(--gold);border:none;padding:11px 20px;cursor:none;flex:2;transition:background .2s">Unlock →</button>
+    </div>
   </div>
 </div>
 
@@ -573,7 +590,26 @@ function resetEngine() {
 }
 
 function showUpgrade() {
-  showToast('Upgrade to Pro for unlimited rewrites — visit writheon.com/#pricing');
+  document.getElementById('upgradeModal').style.display = 'flex';
+}
+function closeUpgrade() {
+  document.getElementById('upgradeModal').style.display = 'none';
+}
+
+const VALID_CODES = {
+  pro: 'WRITHEON-PRO-2026', beta: 'WRITHEON-BETA-2026',
+  founding: 'WRITHEON-FOUNDING-2026', admin: 'WRITHEON-GMOE-ADMIN'
+};
+function verifyCode() {
+  const code = document.getElementById('unlockCode').value.trim().toUpperCase();
+  const tier = Object.keys(VALID_CODES).find(k => VALID_CODES[k] === code);
+  if (tier) {
+    isPro = true; saveState(); closeUpgrade();
+    document.getElementById('tierBadge').textContent = 'Pro';
+    showToast('Pro access unlocked.');
+  } else {
+    showToast('Invalid code — check your email');
+  }
 }
 
 function showToast(msg) {
