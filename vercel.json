@@ -2,6 +2,7 @@
   "version": 2,
   "outputDirectory": "public",
   "routes": [
+    { "src": "/api/stripe-webhook", "dest": "/api/stripe-webhook" },
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/coverage", "dest": "/coverage/index.html" },
     { "src": "/coverage/(.*)", "dest": "/coverage/$1" },
