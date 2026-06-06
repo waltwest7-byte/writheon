@@ -675,6 +675,7 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
             <button class="btn-small btn-copy" onclick="copyResult()">Copy</button>
             <button class="btn-small btn-share" onclick="shareResult()">Share</button>
             <button class="btn-small btn-export" id="exportBtn" onclick="exportPDF()">Export PDF</button>
+            <button class="btn-small btn-export" id="notionBtn" onclick="exportNotion()" style="display:none;background:var(--surface2);border:1px solid var(--border-light);color:var(--gold);">Notion Export</button>
           </div>
         </div>
 
@@ -708,6 +709,20 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
             <div id="gumroadLinks"></div>
           </div>
 
+          <!-- Act breakdown sections (Full Coverage mode only) -->
+          <div class="result-section" id="actBreakdownSection" style="display:none">
+            <div class="result-section-title">Act One — Opening Architecture</div>
+            <div class="result-text" id="act1Notes"></div>
+          </div>
+          <div class="result-section" id="act2Section" style="display:none">
+            <div class="result-section-title">Act Two — Pressure System</div>
+            <div class="result-text" id="act2Notes"></div>
+          </div>
+          <div class="result-section" id="act3Section" style="display:none">
+            <div class="result-section-title">Act Three — Resolution Architecture</div>
+            <div class="result-text" id="act3Notes"></div>
+          </div>
+
           <div class="result-section">
             <div class="result-section-title">Coverage Notes</div>
             <div class="result-text" id="coverageNotes"></div>
@@ -716,6 +731,16 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
           <div class="result-section">
             <div class="result-section-title">Structural Assessment</div>
             <div class="result-text" id="structuralAssessment"></div>
+          </div>
+
+          <div class="result-section" id="charDiagSection" style="display:none">
+            <div class="result-section-title">Character Diagnosis</div>
+            <div class="result-text" id="characterDiagnosis"></div>
+          </div>
+
+          <div class="result-section" id="dialogDiagSection" style="display:none">
+            <div class="result-section-title">Dialogue Diagnosis</div>
+            <div class="result-text" id="dialogueDiagnosis"></div>
           </div>
 
           <!-- Priority Rewrites / Locked Panel -->
@@ -757,10 +782,10 @@ textarea::placeholder { color: var(--text-dim); font-style: italic; font-family:
     <h3>Unlock Pro Access</h3>
     <p>Unlimited analyses. All six voice modes. PDF export. Cross-device history.</p>
     <a href="https://buy.stripe.com/fZu9ATh2s8Fv7lW8th7bW01" target="_blank" class="btn-stripe">
-      Upgrade to Pro — $29/month →
+      Upgrade to Pro — $19/month →
     </a>
     <a id="foundingStripeBtn" href="https://buy.stripe.com/fZu9ATh2s8Fv7lW8th7bW01" target="_blank" class="btn-stripe" style="margin-top:8px;background:transparent;border:1px solid var(--gold-dim);color:var(--gold);">
-      Claim Founding Access — $15/mo →
+      Claim Founding Access — $15/month →
     </a>
     <div class="modal-or">Already purchased?</div>
     <input type="text" class="modal-input" id="unlockCode" placeholder="Enter unlock code" />
@@ -794,6 +819,12 @@ const STRIPE_PAYMENT_LINK   = 'https://buy.stripe.com/fZu9ATh2s8Fv7lW8th7bW01';
 const STRIPE_FOUNDING_LINK  = 'https://buy.stripe.com/fZu9ATh2s8Fv7lW8th7bW01';
 const FREE_LIMIT = 3;
 const FULL_SCRIPT_FREE = true;
+const VALID_CODES = {
+  pro:      'WRITHEON-PRO-2026',
+  beta:     'WRITHEON-BETA-2026',
+  founding: 'WRITHEON-FOUNDING-2026',
+  admin:    'WRITHEON-GMOE-ADMIN'
+};
 
 // ─── STATE ────────────────────────────────────────────────
 let currentMode = 'first10';
@@ -958,8 +989,181 @@ async function runAnalysis() {
   await executeAnalysis(text);
 }
 
+// ─── SINGLE API CALL ─────────────────────────────────────
+async function callAnalyzeAPI(prompt, mode) {
+  const res = await fetch('/api/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      mode,
+      genre: scriptGenre || '',
+      voice: currentVoice,
+      title: scriptTitle || 'Untitled',
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  if (!res.ok) {
+    const errBody = await res.text().catch(() => '');
+    throw new Error(`API ${res.status}: ${errBody.substring(0, 200)}`);
+  }
+  const data = await res.json();
+  const raw = data.content?.[0]?.text || '';
+  if (!raw) throw new Error('Empty response from API');
+  return raw;
+}
+
+// ─── 3-ACT FULL COVERAGE ─────────────────────────────────
+async function executeFullCoverageAnalysis(text, title, genre) {
+  // Split text into act portions by word count (25% / 50% / 25%)
+  const words = text.split(/\s+/);
+  const act1End = Math.floor(words.length * 0.27);
+  const act2End = Math.floor(words.length * 0.77);
+  const act1Text = words.slice(0, act1End).join(' ');
+  const act2Text = words.slice(act1End, act2End).join(' ');
+  const act3Text = words.slice(act2End).join(' ');
+
+  // Act 1 analysis
+  setLoadingStep('Act One: Opening Architecture', 'Analyzing pages 1–30 — wound, catalyst, break into two...');
+  const act1Prompt = `ACT ONE ANALYSIS — "${title}" (${genre})
+
+You are performing Act One diagnostic coverage using the complete Writheon knowledge base.
+Analyze ONLY the Act One material below. Assess all five Act One jobs:
+1. WOUND ESTABLISHMENT — is the protagonist's wound visible through behavior before page 10? Name the specific belief and how it manifests.
+2. WORLD INSTALLATION — identify three world elements planted. What does each detonate later?
+3. CATALYST QUALITY — does the Catalyst arrive from outside? Is it irreversible? Does it specifically contact the wound?
+4. DEBATE REVELATION — does the Debate reveal the wound through behavior rather than explanation?
+5. BREAK INTO TWO — is it a decision the protagonist makes, or a circumstance forcing them?
+
+Apply the Moral Engine™, Character Activation System™, and Escalation Principle™. Name every framework applied. Minimum 300 words of diagnostic prose.
+
+ACT ONE MATERIAL:
+${act1Text.substring(0, 12000)}`;
+
+  const act1Analysis = await callAnalyzeAPI(act1Prompt, 'act1');
+
+  // Act 2 analysis
+  setLoadingStep('Act Two: Pressure System', 'Analyzing pages 31–90 — escalation, midpoint, all is lost...');
+  const act2Prompt = `ACT TWO ANALYSIS — "${title}" (${genre})
+
+You are performing Act Two diagnostic coverage using the complete Writheon knowledge base.
+Analyze ONLY the Act Two material below. Assess:
+1. AGENCY AUDIT — does the protagonist cause ≥40% of Act Two scenes through their own decisions?
+2. ESCALATION PRINCIPLE — are exits closing sequentially, or is intensity merely increasing without structural escalation?
+3. MIDPOINT — is it a False Victory or False Defeat that permanently closes the protagonist's original approach? Does Act 2B feel structurally different from Act 2A?
+4. VILLAIN ARGUMENT — name the Grievance, Logic Chain, Seductive Truth, Wrong Conclusion, and Mirror Moment.
+5. MIRROR FUNCTION — do protagonist and antagonist share the same wound? What different choice separates them?
+6. ALL IS LOST — is it the mirror of the Catalyst at maximum severity? Does it close the last viable exit?
+7. DARK NIGHT — does the protagonist genuinely confront their distortion, or stall?
+
+Apply the Scene Function System™ and Beat Engine™. Name every framework applied. Minimum 300 words.
+
+ACT TWO MATERIAL:
+${act2Text.substring(0, 18000)}`;
+
+  const act2Analysis = await callAnalyzeAPI(act2Prompt, 'act2');
+
+  // Act 3 analysis
+  setLoadingStep('Act Three: Resolution Architecture', 'Analyzing pages 91–120 — climax, transformation, final image...');
+  const act3Prompt = `ACT THREE ANALYSIS — "${title}" (${genre})
+
+You are performing Act Three diagnostic coverage using the complete Writheon knowledge base.
+Analyze ONLY the Act Three material below. Assess:
+1. BREAK INTO THREE — does it emerge from the Dark Night answer? Does the protagonist have a new belief?
+2. CLIMAX CONSTRUCTION — does the climax resolve the Villain Argument, not just defeat the antagonist physically?
+3. BELIEF DEMOLITION — is the specific belief the protagonist held at the start demonstrably false by the end? Map the change.
+4. FINAL IMAGE — is it the direct transformation of the Opening Image? Could they be swapped without anyone noticing?
+5. EARNED CHANGE — is the transformation consistent with the wound's specific demolition? Or does it feel imposed by plot?
+6. CATHARSIS — does the resolution close the Moral Engine™ question opened in Act One?
+
+Apply the Narrative Engine™ and Character Activation System™. Name every framework applied. Minimum 300 words.
+
+ACT THREE MATERIAL:
+${act3Text.substring(0, 12000)}`;
+
+  const act3Analysis = await callAnalyzeAPI(act3Prompt, 'act3');
+
+  // Synthesis call — combine all three analyses into final JSON report
+  setLoadingStep('Synthesis', 'Building comprehensive coverage report — all 22 Writheon frameworks applied...');
+  const synthesisPrompt = `FULL COVERAGE SYNTHESIS — "${title}" (${genre})
+
+You have received three separate act analyses of a complete screenplay. Synthesize them into one comprehensive Writheon coverage report.
+
+ACT ONE ANALYSIS:
+${act1Analysis}
+
+ACT TWO ANALYSIS:
+${act2Analysis}
+
+ACT THREE ANALYSIS:
+${act3Analysis}
+
+Based on all three analyses, produce a complete JSON coverage report. The JSON must include ALL of these fields exactly:
+
+{
+  "verdict": "PASS" | "CONSIDER" | "FAIL",
+  "score": "A" | "B+" | "B" | "B-" | "C+" | "C" | "C-" | "D" | "F",
+  "scores": {
+    "structure": 0-100,
+    "character": 0-100,
+    "dialogue": 0-100,
+    "pacing": 0-100,
+    "premise": 0-100,
+    "marketability": 0-100,
+    "emotionalImpact": 0-100,
+    "seriesPotential": 0-100
+  },
+  "executiveSummary": "One paragraph, Development Executive voice, 80-120 words. Must cite at least two specific Writheon frameworks.",
+  "act1Analysis": "Full Act One diagnostic prose from the analysis above — paste verbatim or summarize the key diagnostic findings in 200+ words.",
+  "act2Analysis": "Full Act Two diagnostic prose — 200+ words with specific Writheon framework citations.",
+  "act3Analysis": "Full Act Three diagnostic prose — 200+ words with specific framework citations.",
+  "coverageNotes": "Comprehensive overall coverage — 300+ words citing Moral Engine™, Narrative Engine™, Scene Function System™, and at least 3 other named Writheon frameworks.",
+  "structuralAssessment": "100+ word architectural assessment naming the specific structural failure mode (from Act One or Two failure modes) if present.",
+  "characterDiagnosis": "100+ word Character Activation System™ diagnosis — name which of the five failure modes is present: Passive Protagonist / Generic Character Syndrome / Costless Choice / Voice Collapse / Unearned Change.",
+  "dialogueDiagnosis": "80+ word dialogue assessment using Hidden Conversation Principle™, Verbal Mask™, and Dialogue Compression Rule.",
+  "priorities": [
+    {
+      "rank": 1,
+      "problem": "Specific problem in Writheon framework language",
+      "framework": "Name of the specific Writheon tool that identifies this",
+      "severity": "CRITICAL" | "HIGH" | "MEDIUM",
+      "estimatedGain": "+8 points" (realistic score improvement),
+      "fix": "Exact prescribed fix using the named Writheon tool"
+    }
+  ],
+  "weakAreas": ["structure", "character", "dialogue", "pacing", "premise", "marketability"],
+  "suggestions": {
+    "structure": ["specific actionable suggestion citing a Writheon tool"],
+    "character": ["specific actionable suggestion"],
+    "dialogue": ["specific actionable suggestion"]
+  }
+}
+
+SCORING RULES:
+- Scores must be justified by specific framework observations — never assigned arbitrarily
+- PASS = overall Writheon Score 70+. CONSIDER = 50-69. FAIL = below 50
+- Letter grade: A=90+, B+=80-89, B=70-79, B-=65-69, C+=60-64, C=55-59, C-=50-54, D=40-49, F=below 40
+- priorities: exactly 5-7 items, ordered by structural priority (fix architecture before dialogue)
+- weakAreas: only include dimensions scoring below 65
+
+Return ONLY the JSON object. No preamble, no explanation, no markdown fences.`;
+
+  const synthesisRaw = await callAnalyzeAPI(synthesisPrompt, 'synthesis');
+  const stripped = synthesisRaw.replace(/```json|```/gi, '').trim();
+  const jsonMatch = stripped.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error('No JSON in synthesis response: ' + stripped.substring(0, 200));
+  const result = JSON.parse(jsonMatch[0]);
+
+  // Attach act analyses for Notion export and result rendering
+  result.act1Analysis = result.act1Analysis || act1Analysis;
+  result.act2Analysis = result.act2Analysis || act2Analysis;
+  result.act3Analysis = result.act3Analysis || act3Analysis;
+  result._isFullCoverage = true;
+
+  return result;
+}
+
+// ─── EXECUTE ANALYSIS ─────────────────────────────────────
 async function executeAnalysis(text) {
-  // Capture free-full state BEFORE updating fullScriptUsed
   const isFirstFreeFull = (currentMode === 'full' && !isPro && !fullScriptUsed);
 
   setLoading(true);
@@ -967,58 +1171,39 @@ async function executeAnalysis(text) {
 
   const title = scriptTitle || 'Untitled';
   const genre = scriptGenre || 'Unspecified';
-  const prompt = buildPrompt(text);
 
   try {
-    const res = await fetch('/api/analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        // System prompt is built server-side from the Writheon knowledge base (api/kb.js)
-        model: 'claude-haiku-4-5-20251001',
-        mode:  currentMode,
-        genre: scriptGenre || '',
-        voice: currentVoice,
-        title: title,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
+    let result;
 
-    if (!res.ok) {
-      const errBody = await res.text().catch(() => '');
-      throw new Error(`API ${res.status}: ${errBody.substring(0, 200)}`);
+    if (currentMode === 'full') {
+      // 3-Act analysis + synthesis
+      result = await executeFullCoverageAnalysis(text, title, genre);
+      if (isFirstFreeFull) fullScriptUsed = true;
+    } else {
+      // Single-call analysis for quick modes
+      const prompt = buildPrompt(text);
+      const raw = await callAnalyzeAPI(prompt, currentMode);
+      const stripped = raw.replace(/```json|```/gi, '').trim();
+      const jsonMatch = stripped.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('No JSON object found in response: ' + stripped.substring(0, 200));
+      result = JSON.parse(jsonMatch[0]);
+
+      // Track quick-mode usage
+      if (currentMode === 'first10') first10Count++;
+      else if (currentMode === 'concept' || currentMode === 'scene') analysisCount++;
     }
-    const data = await res.json();
-    const raw = data.content?.[0]?.text || '';
-    if (!raw) throw new Error('Empty response from API');
 
-    // Strip markdown fences if present, then extract the JSON object
-    // regardless of any preamble or trailing text the model may have added
-    const stripped = raw.replace(/```json|```/gi, '').trim();
-    const jsonMatch = stripped.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('No JSON object found in response: ' + stripped.substring(0, 200));
-    const result = JSON.parse(jsonMatch[0]);
-
-    // Track usage
-    if (currentMode === 'first10') {
-      first10Count++;
-    } else if (currentMode === 'concept' || currentMode === 'scene') {
-      analysisCount++;
-    }
-    if (isFirstFreeFull) fullScriptUsed = true;
-
-    // Attach metadata for rendering
     result._title          = title;
     result._genre          = genre;
     result._isFirstFreeFull = isFirstFreeFull;
 
-    // Compute composite score
-    const vals = Object.values(result.scores);
-    result._writheonScore = Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+    // Compute composite Writheon Score
+    const scores = result.scores || {};
+    const vals = Object.values(scores).filter(v => typeof v === 'number');
+    result._writheonScore = vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : null;
 
     currentResult = result;
     history.unshift({
-      // Display metadata
       modeKey:  currentMode,
       modeName: MODES[currentMode].name,
       voiceKey: currentVoice,
@@ -1026,12 +1211,10 @@ async function executeAnalysis(text) {
       verdict:  result.verdict,
       score:    result.score,
       writheonScore: result._writheonScore,
-      title:    title,
-      genre:    genre,
+      title, genre,
       preview:  text.substring(0, 60) + '...',
       timestamp: Date.now(),
-      // Full result stored for click-to-reload
-      result:   result
+      result
     });
     if (history.length > 10) history.pop();
     saveState();
@@ -1040,10 +1223,12 @@ async function executeAnalysis(text) {
   } catch(e) {
     console.error('[Writheon] Analysis error:', e);
     const msg = e.message || '';
-    if (msg.includes('API 4')) {
-      showToast('API error — check your Anthropic API key in Vercel settings');
+    if (msg.includes('API 4') || msg.includes('401')) {
+      showToast('API key error — add ANTHROPIC_API_KEY to Vercel environment variables');
+    } else if (msg.includes('429')) {
+      showToast('Rate limit reached — please wait 15 minutes');
     } else if (msg.includes('No JSON')) {
-      showToast('Unexpected response format — retrying may help');
+      showToast('Unexpected response format — try again');
     } else {
       showToast('Analysis failed — check connection and try again');
     }
@@ -1052,15 +1237,69 @@ async function executeAnalysis(text) {
   }
 }
 
-// ─── BUILD PROMPT (Upgrades 1+2) ──────────────────────────
+// ─── BUILD PROMPT (quick modes) ───────────────────────────
 function buildPrompt(text) {
-  const modeInstructions = {
-    first10: 'Analyze the FIRST 10 PAGES of this screenplay. Assess: opening image, premise establishment, protagonist introduction, world-building efficiency, hook strength, and whether these pages compel a reader to continue.',
-    concept: 'Analyze this SCREENPLAY CONCEPT or LOGLINE. Assess: premise originality, marketability, genre clarity, concept execution potential, and whether the central conflict is strong enough to sustain a feature.',
-    scene:   'Analyze this INDIVIDUAL SCENE. Assess: scene function, dramatic pressure, dialogue authenticity, character action/reaction, and how effectively it advances story or character.',
-    full:    'Provide FULL PROFESSIONAL COVERAGE of this complete screenplay. Assess comprehensively: three-act structure, character arcs, dialogue craft, pacing, theme, premise execution, and commercial viability.'
+  const genreFocus = getGenreFocus(scriptGenre);
+  const prompts = {
+    first10: `Analyze the FIRST 10 PAGES of this screenplay using the Writheon knowledge base.
+
+${genreFocus}
+
+Assess using these Writheon frameworks:
+1. OPENING IMAGE — is it a thesis statement containing the protagonist's wound in visual form?
+2. WOUND ESTABLISHMENT — is the protagonist's wound visible through behavior before page 10?
+3. THEME STATED — does a character plant the Moral Engine™ dramatic question by page 5?
+4. CATALYST QUALITY — does the inciting incident specifically contact the protagonist's wound?
+5. HOOK STRENGTH — does page 10 create an Irresistible Question the audience must see answered?
+
+Name every Writheon framework applied. Every observation must be specific, not generic.
+
+Return JSON exactly: {"verdict":"PASS"|"CONSIDER"|"FAIL","score":"A"|"B+"|"B"|"B-"|"C+"|"C"|"C-"|"D"|"F","scores":{"structure":0-100,"character":0-100,"dialogue":0-100,"pacing":0-100,"premise":0-100,"marketability":0-100,"emotionalImpact":0-100,"seriesPotential":0-100},"coverageNotes":"200+ words citing specific Writheon frameworks","structuralAssessment":"100+ words","priorities":[{"rank":1,"problem":"...","framework":"...","severity":"CRITICAL|HIGH|MEDIUM","estimatedGain":"...","fix":"..."}],"weakAreas":["structure","character"],"suggestions":{"structure":["..."]}}
+
+SCRIPT MATERIAL:
+${text.substring(0, 6000)}`,
+
+    concept: `Analyze this SCREENPLAY CONCEPT or LOGLINE using the Writheon Concept Recognition Test™.
+
+${genreFocus}
+
+Assess all five Concept Recognition Test™ elements:
+1. PREMISE CLARITY — is the dramatic question unmistakable?
+2. CONFLICT IMMEDIACY — does conflict feel present, not eventual?
+3. EMOTIONAL HOOK — what is the emotional experience the concept promises?
+4. IRRESISTIBLE QUESTION — state the question the concept creates in 7 words or fewer.
+5. ESCALATION POTENTIAL — if the protagonist does nothing, what happens? If 'not much' — escalation is absent.
+
+Also apply Narrative Engine™ — name which of the 8 engines (Pursuit/Mystery/Ticking Clock/Relationship/Survival/Corruption/Revenge/Collapse) this concept runs on. If unclear, that is itself a diagnosis.
+
+Return JSON exactly: {"verdict":"PASS"|"CONSIDER"|"FAIL","score":"A"|"B+"|"B"|"B-"|"C+"|"C"|"C-"|"D"|"F","scores":{"structure":0-100,"character":0-100,"dialogue":0-100,"pacing":0-100,"premise":0-100,"marketability":0-100,"emotionalImpact":0-100,"seriesPotential":0-100},"coverageNotes":"200+ words citing Concept Recognition Test™ and Narrative Engine™","structuralAssessment":"80+ words","priorities":[{"rank":1,"problem":"...","framework":"...","severity":"CRITICAL|HIGH|MEDIUM","estimatedGain":"...","fix":"..."}],"weakAreas":["premise"],"suggestions":{"premise":["..."]}}
+
+CONCEPT MATERIAL:
+${text.substring(0, 4000)}`,
+
+    scene: `Analyze this INDIVIDUAL SCENE using the Writheon Scene Function System™ and Beat Engine™.
+
+Run the Scene Function System™ — identify which function this scene performs:
+ESCALATES (closes one exit) / REVEALS (recontextualizes prior events) / COMPLICATES (changes type of problem) / DESTABILIZES (removes certainty) / REDIRECTS (changes story direction) / TRAPS (removes ability to reverse a decision)
+
+If the scene performs NONE of these functions — that is the diagnosis.
+
+Then run all five Beat Engine™ tests:
+1. CHANGE TEST — what is specifically different at the end vs. the start?
+2. COST TEST — what does it permanently cost the protagonist, connected to their wound?
+3. IRREVERSIBILITY TEST — can the protagonist return to their prior position?
+4. NECESSITY TEST — must this happen NOW, or could it happen anywhere?
+5. CHARACTER TEST — is this specific to THIS protagonist, or could any protagonist be here?
+
+Apply Hidden Conversation Principle™ — identify the surface conversation and the hidden one.
+Apply Verbal Mask™ — does any character say exactly what they mean? If so, is that the right moment?
+
+Return JSON exactly: {"verdict":"PASS"|"CONSIDER"|"FAIL","score":"A"|"B+"|"B"|"B-"|"C+"|"C"|"C-"|"D"|"F","scores":{"structure":0-100,"character":0-100,"dialogue":0-100,"pacing":0-100,"premise":0-100,"marketability":0-100,"emotionalImpact":0-100,"seriesPotential":0-100},"coverageNotes":"200+ words with specific Scene Function, Beat Engine, Hidden Conversation citations","structuralAssessment":"80+ words","priorities":[{"rank":1,"problem":"...","framework":"...","severity":"CRITICAL|HIGH|MEDIUM","estimatedGain":"...","fix":"..."}],"weakAreas":["structure"],"suggestions":{"structure":["..."]}}
+
+SCENE MATERIAL:
+${text.substring(0, 5000)}`
   };
-  return `${modeInstructions[currentMode]}\n\nSCRIPT MATERIAL:\n${text.substring(0, 4000)}`;
+  return prompts[currentMode] || prompts.first10;
 }
 
 // ─── RENDER RESULT ────────────────────────────────────────
@@ -1071,32 +1310,68 @@ function renderResult(r) {
 
   // Verdict + score letter
   const scoreEl = document.getElementById('resultScore');
-  scoreEl.textContent = r.score;
+  scoreEl.textContent = r.score || '—';
   scoreEl.className = 'result-score ' + (r.verdict === 'PASS' ? 'score-pass' : r.verdict === 'CONSIDER' ? 'score-consider' : 'score-fail');
-  document.getElementById('resultVerdict').textContent = r.verdict;
+  document.getElementById('resultVerdict').textContent = r.verdict || '—';
   document.getElementById('resultVoiceTag').textContent = `Voice: ${VOICES[currentVoice]} · ${MODES[currentMode].name}`;
 
-  // Writheon Score (Upgrade 4)
-  document.getElementById('writheonScoreNumber').textContent = r._writheonScore;
-  document.getElementById('writheonScoreSub').textContent = `${r._title} · ${r._genre}`;
+  // Writheon Score
+  document.getElementById('writheonScoreNumber').textContent = r._writheonScore || '—';
+  document.getElementById('writheonScoreSub').textContent = `${r._title || 'Untitled'} · ${r._genre || ''}`;
 
-  // Score bars
+  // Score bars — supports both 6-dimension (quick) and 8-dimension (full) schemas
   const grid = document.getElementById('scoresGrid');
   grid.innerHTML = '';
-  const scoreLabels = { premise: 'Premise', structure: 'Structure', character: 'Character', dialogue: 'Dialogue', pacing: 'Pacing', commerciality: 'Commerciality' };
-  Object.entries(r.scores).forEach(([key, val]) => {
+  const scoreLabels = {
+    premise: 'Premise', structure: 'Structure', character: 'Character',
+    dialogue: 'Dialogue', pacing: 'Pacing', commerciality: 'Commerciality',
+    marketability: 'Marketability', emotionalImpact: 'Emotional Impact', seriesPotential: 'Series Potential'
+  };
+  const scores = r.scores || {};
+  Object.entries(scores).forEach(([key, val]) => {
+    if (typeof val !== 'number') return;
     const cls = val >= 70 ? 'fill-high' : val >= 45 ? 'fill-mid' : 'fill-low';
-    grid.innerHTML += `<div class="score-item"><div class="score-item-label"><span>${scoreLabels[key]}</span><span>${val}%</span></div><div class="score-bar"><div class="score-bar-fill ${cls}" style="width:0%" data-width="${val}%"></div></div></div>`;
+    grid.innerHTML += `<div class="score-item"><div class="score-item-label"><span>${scoreLabels[key] || key}</span><span>${val}</span></div><div class="score-bar"><div class="score-bar-fill ${cls}" style="width:0%" data-width="${val}%"></div></div></div>`;
   });
   setTimeout(() => { document.querySelectorAll('.score-bar-fill').forEach(el => { el.style.width = el.dataset.width; }); }, 100);
 
-  // Suggestions (Upgrade 3) — hide for free full coverage
+  // Act breakdowns — show only for Full Coverage
+  const actSections = ['actBreakdownSection', 'act2Section', 'act3Section'];
+  actSections.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  if (r._isFullCoverage && !r._isFirstFreeFull) {
+    if (r.act1Analysis) {
+      document.getElementById('actBreakdownSection').style.display = 'block';
+      document.getElementById('act1Notes').innerHTML = r.act1Analysis.replace(/\n/g, '<br>');
+    }
+    if (r.act2Analysis) {
+      document.getElementById('act2Section').style.display = 'block';
+      document.getElementById('act2Notes').innerHTML = r.act2Analysis.replace(/\n/g, '<br>');
+    }
+    if (r.act3Analysis) {
+      document.getElementById('act3Section').style.display = 'block';
+      document.getElementById('act3Notes').innerHTML = r.act3Analysis.replace(/\n/g, '<br>');
+    }
+  }
+
+  // Character & Dialogue diagnosis (Full Coverage)
+  const charSection = document.getElementById('charDiagSection');
+  const dialogSection = document.getElementById('dialogDiagSection');
+  if (charSection) charSection.style.display = 'none';
+  if (dialogSection) dialogSection.style.display = 'none';
+  if (r.characterDiagnosis && !r._isFirstFreeFull) {
+    if (charSection) { charSection.style.display = 'block'; document.getElementById('characterDiagnosis').innerHTML = r.characterDiagnosis.replace(/\n/g, '<br>'); }
+  }
+  if (r.dialogueDiagnosis && !r._isFirstFreeFull) {
+    if (dialogSection) { dialogSection.style.display = 'block'; document.getElementById('dialogueDiagnosis').innerHTML = r.dialogueDiagnosis.replace(/\n/g, '<br>'); }
+  }
+
+  // Suggestions
   const sugSection = document.getElementById('suggestionsSection');
   const sugContent = document.getElementById('suggestionsContent');
   sugSection.style.display = 'none';
   sugContent.innerHTML = '';
   if (!r._isFirstFreeFull && (r.verdict === 'FAIL' || r.verdict === 'CONSIDER') && r.suggestions) {
-    const areaLabels = { structure: 'Structure', character: 'Character', dialogue: 'Dialogue', pacing: 'Pacing', premise: 'Premise', commerciality: 'Commerciality' };
+    const areaLabels = { structure: 'Structure', character: 'Character', dialogue: 'Dialogue', pacing: 'Pacing', premise: 'Premise', commerciality: 'Commerciality', marketability: 'Marketability' };
     const entries = Object.entries(r.suggestions).filter(([, s]) => s && s.length);
     if (entries.length) {
       sugSection.style.display = 'block';
@@ -1109,14 +1384,14 @@ function renderResult(r) {
             <span class="toggle-icon">+</span>
           </div>
           <div class="suggestion-body">
-            ${sugs.map(s => `<div class="suggestion-item">${s}</div>`).join('')}
+            ${(Array.isArray(sugs) ? sugs : [sugs]).map(s => `<div class="suggestion-item">${s}</div>`).join('')}
           </div>`;
         sugContent.appendChild(div);
       });
     }
   }
 
-  // Gumroad upsell (below suggestions per spec)
+  // Gumroad upsell
   const gs = document.getElementById('gumroadSection');
   const gl = document.getElementById('gumroadLinks');
   gs.style.display = 'none';
@@ -1124,8 +1399,6 @@ function renderResult(r) {
     gs.style.display = 'block';
     const hasStructure = r.weakAreas.includes('structure');
     let html = '';
-
-    // Add-On 18 featured upsell when structure is weak
     if (hasStructure) {
       html += `<div style="background:var(--surface2);border:1px solid var(--border);border-left:2px solid var(--gold-dim);padding:16px 18px;margin-bottom:8px;">
         <div style="font-family:'DM Mono',monospace;font-size:9px;font-weight:400;letter-spacing:.18em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:8px;">WRIT-18-BEATSHEET — Recommended</div>
@@ -1134,29 +1407,18 @@ function renderResult(r) {
         <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text-dim);margin-left:12px;">${ADDON_18.price}</span>
       </div>`;
     }
-
-    // Other weak area resources
-    r.weakAreas.filter(a => a !== 'structure').slice(0, 1).forEach(area => {
+    r.weakAreas.filter(a => a !== 'structure').slice(0, 2).forEach(area => {
       const g = GUMROAD_MAP[area] || GUMROAD_MAP.structure;
-      html += `<a href="${g.url}" target="_blank" style="display:block;padding:14px 18px;background:var(--surface2);border:1px solid var(--border);margin-bottom:8px;text-decoration:none;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;transition:background .2s;" onmouseenter="this.style.background='var(--surface)'" onmouseleave="this.style.background='var(--surface2)'">${g.title} → Writheon Resources</a>`;
+      if (g) html += `<a href="${g.url}" target="_blank" style="display:block;padding:14px 18px;background:var(--surface2);border:1px solid var(--border);margin-bottom:8px;text-decoration:none;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;transition:background .2s;" onmouseenter="this.style.background='var(--surface)'" onmouseleave="this.style.background='var(--surface2)'">${g.title} → Writheon Resources</a>`;
     });
-
-    // Fallback if no structure weak area but verdict is CONSIDER/FAIL
-    if (!hasStructure && r.weakAreas.length) {
-      r.weakAreas.slice(0, 2).forEach(area => {
-        const g = GUMROAD_MAP[area] || GUMROAD_MAP.structure;
-        html += `<a href="${g.url}" target="_blank" style="display:block;padding:14px 18px;background:var(--surface2);border:1px solid var(--border);margin-bottom:8px;text-decoration:none;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;transition:background .2s;" onmouseenter="this.style.background='var(--surface)'" onmouseleave="this.style.background='var(--surface2)'">${g.title} → Writheon Resources</a>`;
-      });
-    }
-
     gl.innerHTML = html;
   }
 
-  // Coverage text
-  document.getElementById('coverageNotes').innerHTML = r.coverageNotes;
-  document.getElementById('structuralAssessment').innerHTML = r.structuralAssessment;
+  // Coverage text + structural assessment
+  document.getElementById('coverageNotes').innerHTML = (r.coverageNotes || '').replace(/\n/g, '<br>');
+  document.getElementById('structuralAssessment').innerHTML = (r.structuralAssessment || '').replace(/\n/g, '<br>');
 
-  // Priority rewrites / locked panel (Upgrade 8)
+  // Priority rewrites — new object format {rank, problem, framework, severity, estimatedGain, fix}
   const pl = document.getElementById('priorityList');
   const locked = document.getElementById('lockedPanel');
   if (r._isFirstFreeFull) {
@@ -1165,12 +1427,26 @@ function renderResult(r) {
   } else {
     pl.style.display = '';
     locked.style.display = 'none';
-    pl.innerHTML = r.priorities.map(p => `<li class="priority-item">${p}</li>`).join('');
+    const priorities = r.priorities || [];
+    pl.innerHTML = priorities.map(p => {
+      if (typeof p === 'object' && p !== null) {
+        const sevColor = p.severity === 'CRITICAL' ? 'var(--red)' : p.severity === 'HIGH' ? 'var(--amber)' : 'var(--gold-dim)';
+        return `<li class="priority-item">
+          <span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;color:${sevColor};text-transform:uppercase;">${p.severity || 'HIGH'} · ${p.estimatedGain || ''}</span><br>
+          <strong style="color:var(--text)">${p.problem || ''}</strong><br>
+          <span style="color:var(--gold-dim);font-size:.9em">${p.framework || ''}</span><br>
+          ${p.fix || ''}
+        </li>`;
+      }
+      return `<li class="priority-item">${p}</li>`;
+    }).join('');
   }
 
-  // Export always enabled (Upgrade 7 — watermark handles free tier)
-  document.getElementById('exportBtn').style.opacity = '1';
+  // Show Notion export button for Pro users
+  const notionBtn = document.getElementById('notionBtn');
+  if (notionBtn) notionBtn.style.display = isPro ? 'inline-block' : 'none';
 
+  document.getElementById('exportBtn').style.opacity = '1';
   updateUsageUI();
   renderHistory();
 }
@@ -1243,25 +1519,52 @@ function updateUsageUI() {
 }
 
 // ─── LOADING ──────────────────────────────────────────────
-const loadingLines = [
-  ['Running Coverage Engine™', 'Applying narrative diagnostic frameworks...'],
-  ['Assessing Structure', 'Evaluating act architecture and pressure points...'],
-  ['Analyzing Character', 'Measuring protagonist pressure and arc integrity...'],
-  ['Evaluating Dialogue', 'Checking authenticity and scene function...'],
-  ['Generating Coverage', 'Formulating professional diagnostic notes...'],
-];
-
 function setLoading(on) {
   document.getElementById('loadingState').className = on ? 'loading-state active' : 'loading-state';
   document.getElementById('runBtn').disabled = on;
   if (on) {
-    let i = 0;
-    const iv = setInterval(() => {
-      if (i >= loadingLines.length) { clearInterval(iv); return; }
-      document.getElementById('loadingText').textContent = loadingLines[i][0];
-      document.getElementById('loadingSub').textContent  = loadingLines[i][1];
-      i++;
-    }, 900);
+    document.getElementById('loadingText').textContent = 'Running Coverage Engine™';
+    document.getElementById('loadingSub').textContent  = 'Applying Writheon diagnostic frameworks...';
+  }
+}
+
+function setLoadingStep(step, detail) {
+  document.getElementById('loadingText').textContent = step;
+  document.getElementById('loadingSub').textContent  = detail || '';
+}
+
+// ─── NOTION EXPORT ─────────────────────────────────────────
+async function exportNotion() {
+  if (!currentResult) { showToast('Run an analysis first'); return; }
+  if (!isPro) { showUpgradeModal(); return; }
+
+  // Get stored unlock code
+  const unlockCode = localStorage.getItem('writheon_unlock_code') || '';
+
+  showToast('Creating Notion page...');
+
+  try {
+    const res = await fetch('/api/notion-export', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ result: currentResult, unlockCode })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      if (res.status === 503) {
+        showToast('Notion not configured — add NOTION_API_KEY to Vercel settings');
+      } else {
+        showToast(data.error || 'Notion export failed');
+      }
+      return;
+    }
+    if (data.url) {
+      window.open(data.url, '_blank');
+      showToast('Coverage report exported to Notion');
+    }
+  } catch(e) {
+    showToast('Notion export failed — check connection');
+    console.error('[Notion export]', e);
   }
 }
 
@@ -1331,18 +1634,13 @@ writheon.com/coverage`;
 function showUpgradeModal() { document.getElementById('upgradeModal').className = 'modal-overlay active'; }
 function closeModal()       { document.getElementById('upgradeModal').className = 'modal-overlay'; }
 
-const VALID_CODES = {
-  pro:      'WRITHEON-PRO-2026',
-  beta:     'WRITHEON-BETA-2026',
-  founding: 'WRITHEON-FOUNDING-2026',
-  admin:    'WRITHEON-GMOE-ADMIN'
-};
-
 function verifyCode() {
   const code = document.getElementById('unlockCode').value.trim().toUpperCase();
   const tier = Object.keys(VALID_CODES).find(k => VALID_CODES[k] === code);
   if (tier) {
-    isPro = true; saveState();
+    isPro = true;
+    localStorage.setItem('writheon_unlock_code', code);
+    saveState();
     closeModal(); unlockPro();
     const messages = {
       pro:      'Pro access unlocked — welcome to Writheon.',

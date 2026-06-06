@@ -3,6 +3,7 @@
   "outputDirectory": "public",
   "routes": [
     { "src": "/api/stripe-webhook", "dest": "/api/stripe-webhook" },
+    { "src": "/api/notion-export", "dest": "/api/notion-export" },
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/coverage", "dest": "/coverage/index.html" },
     { "src": "/coverage/(.*)", "dest": "/coverage/$1" },
