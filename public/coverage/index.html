@@ -1012,9 +1012,15 @@ async function callAnalyzeAPI(prompt, mode) {
   return raw;
 }
 
+// ─── JSON SCHEMA (shared by all modes) ───────────────────
+// Priorities as plain strings keeps JSON small and parseable.
+const JSON_SCHEMA = `Return ONLY valid JSON — no preamble, no markdown fences. Schema:
+{"verdict":"PASS|CONSIDER|FAIL","score":"A|B+|B|B-|C+|C|C-|D|F","scores":{"structure":0-100,"character":0-100,"dialogue":0-100,"pacing":0-100,"premise":0-100,"marketability":0-100,"emotionalImpact":0-100,"seriesPotential":0-100},"coverageNotes":"diagnostic prose citing named Writheon frameworks","structuralAssessment":"architectural assessment","characterDiagnosis":"character failure mode diagnosis","dialogueDiagnosis":"dialogue assessment","priorities":["1. SEVERITY [Framework]: Problem. Fix: prescribed rewrite action.","2. ...","3. ...","4. ...","5. ..."],"weakAreas":["structure","character"],"suggestions":{"structure":["specific fix"]}}
+
+SCORING: PASS=70+ avg. CONSIDER=50-69. FAIL<50. Letter: A=90+,B+=80-89,B=70-79,B-=65-69,C+=60-64,C=55-59,C-=50-54,D=40-49,F<40. weakAreas = dims below 65 only.`;
+
 // ─── 3-ACT FULL COVERAGE ─────────────────────────────────
 async function executeFullCoverageAnalysis(text, title, genre) {
-  // Split text into act portions by word count (25% / 50% / 25%)
   const words = text.split(/\s+/);
   const act1End = Math.floor(words.length * 0.27);
   const act2End = Math.floor(words.length * 0.77);
@@ -1022,141 +1028,82 @@ async function executeFullCoverageAnalysis(text, title, genre) {
   const act2Text = words.slice(act1End, act2End).join(' ');
   const act3Text = words.slice(act2End).join(' ');
 
-  // Act 1 analysis
-  setLoadingStep('Act One: Opening Architecture', 'Analyzing pages 1–30 — wound, catalyst, break into two...');
-  const act1Prompt = `ACT ONE ANALYSIS — "${title}" (${genre})
+  // Act 1
+  setLoadingStep('Analyzing Act One', 'Opening architecture — wound, catalyst, break into two...');
+  const act1Prompt = `ACT ONE DIAGNOSTIC — "${title}" (${genre})
+Using the Writheon Act One framework, diagnose this material in 200-300 words:
+1. WOUND ESTABLISHMENT — protagonist wound visible through behavior before page 10?
+2. WORLD INSTALLATION — three elements planted that will detonate later?
+3. CATALYST QUALITY — irreversible? Arrives from outside? Contacts the wound specifically?
+4. DEBATE REVELATION — reveals wound through behavior, not explanation?
+5. BREAK INTO TWO — protagonist's active decision, not a circumstance forcing them?
+Apply Moral Engine™ and Character Activation System™. Name every framework used.
 
-You are performing Act One diagnostic coverage using the complete Writheon knowledge base.
-Analyze ONLY the Act One material below. Assess all five Act One jobs:
-1. WOUND ESTABLISHMENT — is the protagonist's wound visible through behavior before page 10? Name the specific belief and how it manifests.
-2. WORLD INSTALLATION — identify three world elements planted. What does each detonate later?
-3. CATALYST QUALITY — does the Catalyst arrive from outside? Is it irreversible? Does it specifically contact the wound?
-4. DEBATE REVELATION — does the Debate reveal the wound through behavior rather than explanation?
-5. BREAK INTO TWO — is it a decision the protagonist makes, or a circumstance forcing them?
-
-Apply the Moral Engine™, Character Activation System™, and Escalation Principle™. Name every framework applied. Minimum 300 words of diagnostic prose.
-
-ACT ONE MATERIAL:
-${act1Text.substring(0, 12000)}`;
+MATERIAL:
+${act1Text.substring(0, 8000)}`;
 
   const act1Analysis = await callAnalyzeAPI(act1Prompt, 'act1');
 
-  // Act 2 analysis
-  setLoadingStep('Act Two: Pressure System', 'Analyzing pages 31–90 — escalation, midpoint, all is lost...');
-  const act2Prompt = `ACT TWO ANALYSIS — "${title}" (${genre})
+  // Act 2
+  setLoadingStep('Analyzing Act Two', 'Pressure system — escalation, midpoint, all is lost...');
+  const act2Prompt = `ACT TWO DIAGNOSTIC — "${title}" (${genre})
+Using the Writheon Act Two framework, diagnose this material in 200-300 words:
+1. ESCALATION PRINCIPLE — exits closing sequentially (not just intensity increasing)?
+2. MIDPOINT — False Victory or Defeat that closes the protagonist's original approach?
+3. VILLAIN ARGUMENT — Grievance, Seductive Truth, Mirror Moment identifiable?
+4. ALL IS LOST — mirrors the Catalyst at maximum severity?
+5. AGENCY AUDIT — protagonist causes ≥40% of Act Two scenes through their decisions?
+Apply Scene Function System™ and Beat Engine™. Name every framework used.
 
-You are performing Act Two diagnostic coverage using the complete Writheon knowledge base.
-Analyze ONLY the Act Two material below. Assess:
-1. AGENCY AUDIT — does the protagonist cause ≥40% of Act Two scenes through their own decisions?
-2. ESCALATION PRINCIPLE — are exits closing sequentially, or is intensity merely increasing without structural escalation?
-3. MIDPOINT — is it a False Victory or False Defeat that permanently closes the protagonist's original approach? Does Act 2B feel structurally different from Act 2A?
-4. VILLAIN ARGUMENT — name the Grievance, Logic Chain, Seductive Truth, Wrong Conclusion, and Mirror Moment.
-5. MIRROR FUNCTION — do protagonist and antagonist share the same wound? What different choice separates them?
-6. ALL IS LOST — is it the mirror of the Catalyst at maximum severity? Does it close the last viable exit?
-7. DARK NIGHT — does the protagonist genuinely confront their distortion, or stall?
-
-Apply the Scene Function System™ and Beat Engine™. Name every framework applied. Minimum 300 words.
-
-ACT TWO MATERIAL:
-${act2Text.substring(0, 18000)}`;
+MATERIAL:
+${act2Text.substring(0, 10000)}`;
 
   const act2Analysis = await callAnalyzeAPI(act2Prompt, 'act2');
 
-  // Act 3 analysis
-  setLoadingStep('Act Three: Resolution Architecture', 'Analyzing pages 91–120 — climax, transformation, final image...');
-  const act3Prompt = `ACT THREE ANALYSIS — "${title}" (${genre})
+  // Act 3
+  setLoadingStep('Analyzing Act Three', 'Resolution — climax, transformation, final image...');
+  const act3Prompt = `ACT THREE DIAGNOSTIC — "${title}" (${genre})
+Using the Writheon Act Three framework, diagnose this material in 200-300 words:
+1. BREAK INTO THREE — emerges from Dark Night answer? New belief present?
+2. CLIMAX — resolves the Villain Argument, not just physical defeat?
+3. BELIEF DEMOLITION — starting belief demonstrably false by end?
+4. FINAL IMAGE — direct transformation of Opening Image?
+5. EARNED CHANGE — transformation consistent with wound's demolition?
+Apply Character Activation System™. Name every framework used.
 
-You are performing Act Three diagnostic coverage using the complete Writheon knowledge base.
-Analyze ONLY the Act Three material below. Assess:
-1. BREAK INTO THREE — does it emerge from the Dark Night answer? Does the protagonist have a new belief?
-2. CLIMAX CONSTRUCTION — does the climax resolve the Villain Argument, not just defeat the antagonist physically?
-3. BELIEF DEMOLITION — is the specific belief the protagonist held at the start demonstrably false by the end? Map the change.
-4. FINAL IMAGE — is it the direct transformation of the Opening Image? Could they be swapped without anyone noticing?
-5. EARNED CHANGE — is the transformation consistent with the wound's specific demolition? Or does it feel imposed by plot?
-6. CATHARSIS — does the resolution close the Moral Engine™ question opened in Act One?
-
-Apply the Narrative Engine™ and Character Activation System™. Name every framework applied. Minimum 300 words.
-
-ACT THREE MATERIAL:
-${act3Text.substring(0, 12000)}`;
+MATERIAL:
+${act3Text.substring(0, 8000)}`;
 
   const act3Analysis = await callAnalyzeAPI(act3Prompt, 'act3');
 
-  // Synthesis call — combine all three analyses into final JSON report
-  setLoadingStep('Synthesis', 'Building comprehensive coverage report — all 22 Writheon frameworks applied...');
+  // Synthesis — compact act summaries only (not full text) to keep input small
+  setLoadingStep('Synthesizing Report', 'Building complete Writheon coverage — scoring all 8 dimensions...');
+  const a1sum = act1Analysis.substring(0, 600);
+  const a2sum = act2Analysis.substring(0, 600);
+  const a3sum = act3Analysis.substring(0, 600);
+
   const synthesisPrompt = `FULL COVERAGE SYNTHESIS — "${title}" (${genre})
 
-You have received three separate act analyses of a complete screenplay. Synthesize them into one comprehensive Writheon coverage report.
+ACT ONE FINDINGS: ${a1sum}
 
-ACT ONE ANALYSIS:
-${act1Analysis}
+ACT TWO FINDINGS: ${a2sum}
 
-ACT TWO ANALYSIS:
-${act2Analysis}
+ACT THREE FINDINGS: ${a3sum}
 
-ACT THREE ANALYSIS:
-${act3Analysis}
+Using the Writheon Script Coverage System, synthesize these findings into a complete coverage report. Apply the Moral Engine™, Narrative Engine™, Scene Function System™, Character Activation System™, and Dialogue systems.
 
-Based on all three analyses, produce a complete JSON coverage report. The JSON must include ALL of these fields exactly:
-
-{
-  "verdict": "PASS" | "CONSIDER" | "FAIL",
-  "score": "A" | "B+" | "B" | "B-" | "C+" | "C" | "C-" | "D" | "F",
-  "scores": {
-    "structure": 0-100,
-    "character": 0-100,
-    "dialogue": 0-100,
-    "pacing": 0-100,
-    "premise": 0-100,
-    "marketability": 0-100,
-    "emotionalImpact": 0-100,
-    "seriesPotential": 0-100
-  },
-  "executiveSummary": "One paragraph, Development Executive voice, 80-120 words. Must cite at least two specific Writheon frameworks.",
-  "act1Analysis": "Full Act One diagnostic prose from the analysis above — paste verbatim or summarize the key diagnostic findings in 200+ words.",
-  "act2Analysis": "Full Act Two diagnostic prose — 200+ words with specific Writheon framework citations.",
-  "act3Analysis": "Full Act Three diagnostic prose — 200+ words with specific framework citations.",
-  "coverageNotes": "Comprehensive overall coverage — 300+ words citing Moral Engine™, Narrative Engine™, Scene Function System™, and at least 3 other named Writheon frameworks.",
-  "structuralAssessment": "100+ word architectural assessment naming the specific structural failure mode (from Act One or Two failure modes) if present.",
-  "characterDiagnosis": "100+ word Character Activation System™ diagnosis — name which of the five failure modes is present: Passive Protagonist / Generic Character Syndrome / Costless Choice / Voice Collapse / Unearned Change.",
-  "dialogueDiagnosis": "80+ word dialogue assessment using Hidden Conversation Principle™, Verbal Mask™, and Dialogue Compression Rule.",
-  "priorities": [
-    {
-      "rank": 1,
-      "problem": "Specific problem in Writheon framework language",
-      "framework": "Name of the specific Writheon tool that identifies this",
-      "severity": "CRITICAL" | "HIGH" | "MEDIUM",
-      "estimatedGain": "+8 points" (realistic score improvement),
-      "fix": "Exact prescribed fix using the named Writheon tool"
-    }
-  ],
-  "weakAreas": ["structure", "character", "dialogue", "pacing", "premise", "marketability"],
-  "suggestions": {
-    "structure": ["specific actionable suggestion citing a Writheon tool"],
-    "character": ["specific actionable suggestion"],
-    "dialogue": ["specific actionable suggestion"]
-  }
-}
-
-SCORING RULES:
-- Scores must be justified by specific framework observations — never assigned arbitrarily
-- PASS = overall Writheon Score 70+. CONSIDER = 50-69. FAIL = below 50
-- Letter grade: A=90+, B+=80-89, B=70-79, B-=65-69, C+=60-64, C=55-59, C-=50-54, D=40-49, F=below 40
-- priorities: exactly 5-7 items, ordered by structural priority (fix architecture before dialogue)
-- weakAreas: only include dimensions scoring below 65
-
-Return ONLY the JSON object. No preamble, no explanation, no markdown fences.`;
+${JSON_SCHEMA}`;
 
   const synthesisRaw = await callAnalyzeAPI(synthesisPrompt, 'synthesis');
-  const stripped = synthesisRaw.replace(/```json|```/gi, '').trim();
+  const stripped = synthesisRaw.replace(/```json[\s\S]*?```|```/gi, '').trim();
   const jsonMatch = stripped.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error('No JSON in synthesis response: ' + stripped.substring(0, 200));
+  if (!jsonMatch) throw new Error('Synthesis returned no JSON. Raw: ' + stripped.substring(0, 300));
   const result = JSON.parse(jsonMatch[0]);
 
-  // Attach act analyses for Notion export and result rendering
-  result.act1Analysis = result.act1Analysis || act1Analysis;
-  result.act2Analysis = result.act2Analysis || act2Analysis;
-  result.act3Analysis = result.act3Analysis || act3Analysis;
+  // Store full act analyses for rendering and Notion export
+  result.act1Analysis = act1Analysis;
+  result.act2Analysis = act2Analysis;
+  result.act3Analysis = act3Analysis;
   result._isFullCoverage = true;
 
   return result;
@@ -1176,8 +1123,11 @@ async function executeAnalysis(text) {
     let result;
 
     if (currentMode === 'full') {
-      // 3-Act analysis + synthesis
-      result = await executeFullCoverageAnalysis(text, title, genre);
+      // 3-Act analysis + synthesis — 150s hard timeout so spinner never sticks
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Full coverage timed out — please try again')), 150000)
+      );
+      result = await Promise.race([executeFullCoverageAnalysis(text, title, genre), timeoutPromise]);
       if (isFirstFreeFull) fullScriptUsed = true;
     } else {
       // Single-call analysis for quick modes
@@ -1254,7 +1204,7 @@ Assess using these Writheon frameworks:
 
 Name every Writheon framework applied. Every observation must be specific, not generic.
 
-Return JSON exactly: {"verdict":"PASS"|"CONSIDER"|"FAIL","score":"A"|"B+"|"B"|"B-"|"C+"|"C"|"C-"|"D"|"F","scores":{"structure":0-100,"character":0-100,"dialogue":0-100,"pacing":0-100,"premise":0-100,"marketability":0-100,"emotionalImpact":0-100,"seriesPotential":0-100},"coverageNotes":"200+ words citing specific Writheon frameworks","structuralAssessment":"100+ words","priorities":[{"rank":1,"problem":"...","framework":"...","severity":"CRITICAL|HIGH|MEDIUM","estimatedGain":"...","fix":"..."}],"weakAreas":["structure","character"],"suggestions":{"structure":["..."]}}
+${JSON_SCHEMA}
 
 SCRIPT MATERIAL:
 ${text.substring(0, 6000)}`,
@@ -1272,7 +1222,7 @@ Assess all five Concept Recognition Test™ elements:
 
 Also apply Narrative Engine™ — name which of the 8 engines (Pursuit/Mystery/Ticking Clock/Relationship/Survival/Corruption/Revenge/Collapse) this concept runs on. If unclear, that is itself a diagnosis.
 
-Return JSON exactly: {"verdict":"PASS"|"CONSIDER"|"FAIL","score":"A"|"B+"|"B"|"B-"|"C+"|"C"|"C-"|"D"|"F","scores":{"structure":0-100,"character":0-100,"dialogue":0-100,"pacing":0-100,"premise":0-100,"marketability":0-100,"emotionalImpact":0-100,"seriesPotential":0-100},"coverageNotes":"200+ words citing Concept Recognition Test™ and Narrative Engine™","structuralAssessment":"80+ words","priorities":[{"rank":1,"problem":"...","framework":"...","severity":"CRITICAL|HIGH|MEDIUM","estimatedGain":"...","fix":"..."}],"weakAreas":["premise"],"suggestions":{"premise":["..."]}}
+${JSON_SCHEMA}
 
 CONCEPT MATERIAL:
 ${text.substring(0, 4000)}`,
@@ -1294,7 +1244,7 @@ Then run all five Beat Engine™ tests:
 Apply Hidden Conversation Principle™ — identify the surface conversation and the hidden one.
 Apply Verbal Mask™ — does any character say exactly what they mean? If so, is that the right moment?
 
-Return JSON exactly: {"verdict":"PASS"|"CONSIDER"|"FAIL","score":"A"|"B+"|"B"|"B-"|"C+"|"C"|"C-"|"D"|"F","scores":{"structure":0-100,"character":0-100,"dialogue":0-100,"pacing":0-100,"premise":0-100,"marketability":0-100,"emotionalImpact":0-100,"seriesPotential":0-100},"coverageNotes":"200+ words with specific Scene Function, Beat Engine, Hidden Conversation citations","structuralAssessment":"80+ words","priorities":[{"rank":1,"problem":"...","framework":"...","severity":"CRITICAL|HIGH|MEDIUM","estimatedGain":"...","fix":"..."}],"weakAreas":["structure"],"suggestions":{"structure":["..."]}}
+${JSON_SCHEMA}
 
 SCENE MATERIAL:
 ${text.substring(0, 5000)}`

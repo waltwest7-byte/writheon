@@ -39,14 +39,14 @@ module.exports = async function handler(req, res) {
 
     // Token limits by mode
     const tokenMap = {
-      synthesis: 8000,
+      synthesis: 4000,
       full:      6000,
       act1:      3000,
       act2:      3000,
       act3:      3000,
-      first10:   2000,
-      concept:   1800,
-      scene:     1800,
+      first10:   3000,
+      concept:   2500,
+      scene:     2500,
     };
     const selectedTokens = tokenMap[mode] || 2000;
 
