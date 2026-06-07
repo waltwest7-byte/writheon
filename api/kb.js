@@ -9937,88 +9937,95 @@ Apply the Writheon standard for every passage:
 Operate as a professional development executive using the full Writheon framework. Provide notes in the style of a senior story analyst: specific, actionable, prioritized by impact. Apply Script Coverage System categories: Concept, Structure, Character, Dialogue, Scene Function, Pacing, Transitions, Protagonist Arc, Antagonist, Commercial Viability. Prioritize by structural impact.`,
 };
 
+// ─── HELPER: cap a string at N characters ─────────────────
+function cap(str, n) { return str ? str.substring(0, n) : ''; }
+
+// ─── BUILD SYSTEM PROMPT (mode-aware, size-constrained) ───
+// Target: ≤ 40,000 characters (~10,000 tokens) per call.
+// The full KB lives in the constants above. We inject only
+// what is needed for the specific mode so we never overflow
+// the Anthropic context window on any plan tier.
 function buildSystemPrompt({ mode = 'full', genre, voice, title }) {
   const parts = [];
+  const titleStr = title ? ` — "${title}"` : '';
+  parts.push(`You are the Writheon Screenplay Intelligence Engine${titleStr}. Every analysis must name specific Writheon frameworks. Generic observations are not permitted.`);
 
-  // Identity framing
-  const titleStr = title ? ` analyzing: ${title}` : '';
-  parts.push(`You are the Writheon Screenplay Intelligence Engine${titleStr}.`);
-
-  // Core doctrine always included
+  // Core doctrine — always small, always included
   parts.push(CORE_DOCTRINE);
 
-  // Mode instructions
   const modeKey = (mode || 'full').toLowerCase();
-  if (MODE_INSTRUCTIONS[modeKey]) {
-    parts.push(MODE_INSTRUCTIONS[modeKey]);
+  if (MODE_INSTRUCTIONS[modeKey]) parts.push(MODE_INSTRUCTIONS[modeKey]);
+  if (voice && voice.trim()) parts.push(`VOICE/PERSONA:\n${voice.trim()}`);
+
+  // ── ACT ONE analysis ──────────────────────────────────────
+  if (modeKey === 'act1') {
+    parts.push('## ACT ONE: THE ARCHITECTURE OF BEGINNING\n' + cap(ACT_ONE, 22000));
+    parts.push('## CHARACTER PRESSURE SYSTEM\n' + cap(ADDON_13_CHARACTER_PRESSURE, 8000));
+    parts.push('## CHARACTER ACTIVATION SYSTEM\n' + cap(ADDON_21_CHARACTER_ACTIVATION, 7000));
+
+  // ── ACT TWO analysis ─────────────────────────────────────
+  } else if (modeKey === 'act2') {
+    parts.push('## ACT TWO: THE ARCHITECTURE OF PRESSURE\n' + cap(ACT_TWO, 22000));
+    parts.push('## NARRATIVE ENGINE\n' + cap(ADDON_16_NARRATIVE, 6000));
+    parts.push('## PACING SYSTEM\n' + cap(ADDON_20_PACING, 5000));
+    parts.push('## CHARACTER PRESSURE SYSTEM\n' + cap(ADDON_13_CHARACTER_PRESSURE, 5000));
+
+  // ── ACT THREE analysis ───────────────────────────────────
+  } else if (modeKey === 'act3') {
+    parts.push('## ACT THREE: THE ARCHITECTURE OF RESOLUTION\n' + cap(ACT_THREE, 22000));
+    parts.push('## CHARACTER ACTIVATION SYSTEM\n' + cap(ADDON_21_CHARACTER_ACTIVATION, 7000));
+    parts.push('## CHARACTER PSYCHOLOGY\n' + cap(ADDON_22_CHARACTER_PSYCHOLOGY, 6000));
+
+  // ── SYNTHESIS / FULL ─────────────────────────────────────
+  } else if (modeKey === 'synthesis' || modeKey === 'full') {
+    // Condensed act summaries + scoring system
+    parts.push('## ACT ONE ARCHITECTURE (Key Frameworks)\n' + cap(ACT_ONE, 8000));
+    parts.push('## ACT TWO ARCHITECTURE (Key Frameworks)\n' + cap(ACT_TWO, 8000));
+    parts.push('## ACT THREE ARCHITECTURE (Key Frameworks)\n' + cap(ACT_THREE, 6000));
+    parts.push('## SCRIPT COVERAGE SYSTEM\n' + cap(ADDON_17_COVERAGE, 8000));
+    parts.push('## CHARACTER ACTIVATION SYSTEM\n' + cap(ADDON_21_CHARACTER_ACTIVATION, 5000));
+    parts.push('## DIALOGUE SYSTEM\n' + cap(ADDON_04_DIALOGUE, 5000));
+
+  // ── FIRST 10 PAGES ───────────────────────────────────────
+  } else if (modeKey === 'first10') {
+    parts.push('## ACT ONE: OPENING ARCHITECTURE\n' + cap(ACT_ONE, 18000));
+    parts.push('## SCENE PRESSURE DIAGNOSTIC\n' + cap(FREE_SCENE_DIAGNOSTIC, 5000));
+    parts.push('## CONCEPT ENGINE\n' + cap(ADDON_15_CONCEPT, 6000));
+
+  // ── CONCEPT TEST ─────────────────────────────────────────
+  } else if (modeKey === 'concept') {
+    parts.push('## CONCEPT ENGINE\n' + cap(ADDON_15_CONCEPT, 12000));
+    parts.push('## NARRATIVE ENGINE\n' + cap(ADDON_16_NARRATIVE, 10000));
+    parts.push('## DEVELOPMENT EXECUTIVE\n' + cap(ADDON_11_DEVEXEC, 6000));
+
+  // ── SCENE DIAGNOSTIC ─────────────────────────────────────
+  } else if (modeKey === 'scene') {
+    parts.push('## SCENE PRESSURE DIAGNOSTIC\n' + cap(FREE_SCENE_DIAGNOSTIC, 7000));
+    parts.push('## SCENE PRESSURE DIAGNOSTIC V2\n' + cap(SCENE_PRESSURE_DIAGNOSTIC, 7000));
+    parts.push('## DIALOGUE SYSTEM\n' + cap(ADDON_04_DIALOGUE, 8000));
+    parts.push('## TRANSITION ENGINE\n' + cap(ADDON_14_TRANSITION, 6000));
+    parts.push('## BEAT ENGINE\n' + cap(ADDON_18_BEAT_ENGINE, 5000));
+
+  // ── ADVISOR / REWRITE ────────────────────────────────────
+  } else {
+    parts.push('## ACT ONE ARCHITECTURE\n' + cap(ACT_ONE, 10000));
+    parts.push('## ACT TWO ARCHITECTURE\n' + cap(ACT_TWO, 10000));
+    parts.push('## CHARACTER PRESSURE SYSTEM\n' + cap(ADDON_13_CHARACTER_PRESSURE, 7000));
+    parts.push('## DIALOGUE SYSTEM\n' + cap(ADDON_04_DIALOGUE, 6000));
+    parts.push('## SCRIPT COVERAGE SYSTEM\n' + cap(ADDON_17_COVERAGE, 5000));
   }
 
-  // Voice persona
-  if (voice && voice.trim()) {
-    parts.push(`VOICE/PERSONA CONTEXT:\n${voice.trim()}`);
-  }
-
-  // Full Writheon framework library (always included)
-  parts.push('--- WRITHEON FRAMEWORK LIBRARY (Complete Verbatim Text) ---');
-  parts.push('## ACT ONE: THE ARCHITECTURE OF BEGINNING\n' + ACT_ONE);
-  parts.push('## ACT TWO: THE ARCHITECTURE OF PRESSURE\n' + ACT_TWO);
-  parts.push('## ACT THREE: THE ARCHITECTURE OF RESOLUTION\n' + ACT_THREE);
-  parts.push('## DEVELOPMENT BIBLE\n' + DEVELOPMENT_BIBLE);
-  parts.push('## ADD-ON 04 DIALOGUE\n' + ADDON_04_DIALOGUE);
-  parts.push('## ADD-ON 04 DIALOGUE PUNCH-UP\n' + ADDON_04_DIALOGUE_PUNCHUP);
-  parts.push('## ADD-ON 11 DEVELOPMENTAL EXECUTIVE\n' + ADDON_11_DEVEXEC);
-  parts.push('## ADD-ON 13 CHARACTER PRESSURE SYSTEM\n' + ADDON_13_CHARACTER_PRESSURE);
-  parts.push('## ADD-ON 14 TRANSITION ENGINE\n' + ADDON_14_TRANSITION);
-  parts.push('## ADD-ON 15 CONCEPT ENGINE\n' + ADDON_15_CONCEPT);
-  parts.push('## ADD-ON 16 NARRATIVE ENGINE\n' + ADDON_16_NARRATIVE);
-  parts.push('## ADD-ON 17 SCRIPT COVERAGE\n' + ADDON_17_COVERAGE);
-  parts.push('## ADD-ON 18 BEAT ENGINE\n' + ADDON_18_BEAT_ENGINE);
-  parts.push('## ADD-ON 18 BEAT SHEET\n' + ADDON_18_BEAT_SHEET);
-  parts.push('## ADD-ON 19 SHOW VS TELL\n' + ADDON_19_SHOW_VS_TELL);
-  parts.push('## ADD-ON 20 PACING SYSTEM\n' + ADDON_20_PACING);
-  parts.push('## ADD-ON 21 CHARACTER ACTIVATION\n' + ADDON_21_CHARACTER_ACTIVATION);
-  parts.push('## ADD-ON 22 CHARACTER PSYCHOLOGY\n' + ADDON_22_CHARACTER_PSYCHOLOGY);
-  parts.push('## ADD-ON 23 WORLD BUILDING\n' + ADDON_23_WORLDBUILDING);
-  parts.push('## FREE SCENE DIAGNOSTIC\n' + FREE_SCENE_DIAGNOSTIC);
-  parts.push('## SCENE PRESSURE DIAGNOSTIC\n' + SCENE_PRESSURE_DIAGNOSTIC);
-  parts.push('## SCENE PRESSURE DIAGNOSTIC V2\n' + SCENE_PRESSURE_DIAGNOSTIC_V2);
-
-  // Genre framework
+  // Genre-specific framework injection (primary genre only)
   if (genre) {
     const genreKey = genre.toLowerCase().replace(/[^a-z]/g, '');
     const genreContent = GENRE_MAP[genreKey];
     if (genreContent) {
-      parts.push(`--- GENRE FRAMEWORK: ${genre.toUpperCase()} ---\n` + genreContent);
+      parts.push(`## GENRE FRAMEWORK — ${genre.toUpperCase()}\n` + cap(genreContent, 10000));
     }
-    // Always also include the remaining genre add-ons
-    const allGenreAddons = [
-      ['ADD-ON 02 HORROR', ADDON_02_HORROR],
-      ['ADD-ON 03 THRILLER', ADDON_03_THRILLER],
-      ['ADD-ON 05 SHORT FORM', ADDON_05_SHORTFORM],
-      ['ADD-ON 08 COMEDY', ADDON_08_COMEDY],
-      ['ADD-ON 09 MYSTERY', ADDON_09_MYSTERY],
-      ['ADD-ON 10 CROSS-GENRE', ADDON_10_CROSSGENRE],
-      ['ADD-ON 12 ACTION', ADDON_12_ACTION],
-    ];
-    parts.push('--- ALL GENRE FRAMEWORKS ---');
-    for (const [label, content] of allGenreAddons) {
-      parts.push(`## ${label}\n` + content);
-    }
-  } else {
-    // No genre -- include all
-    parts.push('--- ALL GENRE FRAMEWORKS ---');
-    parts.push('## ADD-ON 02 HORROR\n' + ADDON_02_HORROR);
-    parts.push('## ADD-ON 03 THRILLER\n' + ADDON_03_THRILLER);
-    parts.push('## ADD-ON 05 SHORT FORM\n' + ADDON_05_SHORTFORM);
-    parts.push('## ADD-ON 08 COMEDY\n' + ADDON_08_COMEDY);
-    parts.push('## ADD-ON 09 MYSTERY\n' + ADDON_09_MYSTERY);
-    parts.push('## ADD-ON 10 CROSS-GENRE\n' + ADDON_10_CROSSGENRE);
-    parts.push('## ADD-ON 12 ACTION\n' + ADDON_12_ACTION);
   }
 
-  // Classical Foundation always last
-  parts.push('--- CLASSICAL FOUNDATION ---');
-  parts.push(CLASSICAL_FOUNDATION);
+  // Classical Foundation — condensed, always last
+  parts.push('## CLASSICAL FOUNDATION (for historical validation only — Writheon frameworks take priority)\n' + cap(CLASSICAL_FOUNDATION, 3000));
 
   return parts.join('\n\n');
 }
