@@ -451,8 +451,15 @@ REWRITE PRINCIPLES:
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        system: systemPrompt,
-        messages: [{ role: 'user', content: `REWRITE THIS SCENE:\n\n${text.substring(0, 3500)}` }]
+        max_tokens: 3000,
+        genre: '',
+        messages: [{ role: 'user', content: 'REWRITE MODE: ' + REWRITE_MODES[rewriteMode].name + '
+FOCUS: ' + getFocusAreas().join(', ') + '
+
+Rewrite this scene. Return ONLY valid JSON with fields: rewrite, changes (array), diagnostics (array), scoreBefore, scoreAfter, verdict, improvement.
+
+SCENE:
+' + text.substring(0, 3500) }]
       })
     });
 

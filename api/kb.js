@@ -10007,6 +10007,34 @@ function buildSystemPrompt({ mode = 'full', genre, voice, title }) {
     parts.push('## BEAT ENGINE\n' + cap(ADDON_18_BEAT_ENGINE, 5000));
 
   // ── ADVISOR / REWRITE ────────────────────────────────────
+  // -- ADVISOR
+  } else if (modeKey === 'advisor') {
+    parts.push('## ACT ONE ARCHITECTURE\n' + cap(ACT_ONE, 12000));
+    parts.push('## ACT TWO ARCHITECTURE\n' + cap(ACT_TWO, 12000));
+    parts.push('## ACT THREE ARCHITECTURE\n' + cap(ACT_THREE, 8000));
+    parts.push('## CONCEPT ENGINE\n' + cap(ADDON_15_CONCEPT, 8000));
+    parts.push('## NARRATIVE ENGINE\n' + cap(ADDON_16_NARRATIVE, 8000));
+    parts.push('## CHARACTER ACTIVATION SYSTEM\n' + cap(ADDON_21_CHARACTER_ACTIVATION, 8000));
+    parts.push('## CHARACTER PSYCHOLOGY\n' + cap(ADDON_22_CHARACTER_PSYCHOLOGY, 7000));
+    parts.push('## DIALOGUE SYSTEM\n' + cap(ADDON_04_DIALOGUE, 7000));
+    parts.push('## DEVELOPMENT EXECUTIVE\n' + cap(ADDON_11_DEVEXEC, 6000));
+    parts.push('## SCENE PRESSURE DIAGNOSTIC\n' + cap(FREE_SCENE_DIAGNOSTIC, 5000));
+    parts.push('## BEAT ENGINE\n' + cap(ADDON_18_BEAT_ENGINE, 5000));
+    parts.push('## SHOW VS TELL\n' + cap(ADDON_19_SHOW_VS_TELL, 5000));
+
+  // -- REWRITE
+  } else if (modeKey === 'rewrite') {
+    parts.push('## SCENE PRESSURE DIAGNOSTIC\n' + cap(FREE_SCENE_DIAGNOSTIC, 8000));
+    parts.push('## SCENE PRESSURE DIAGNOSTIC V2\n' + cap(SCENE_PRESSURE_DIAGNOSTIC, 7000));
+    parts.push('## BEAT ENGINE\n' + cap(ADDON_18_BEAT_ENGINE, 8000));
+    parts.push('## DIALOGUE SYSTEM\n' + cap(ADDON_04_DIALOGUE, 10000));
+    parts.push('## DIALOGUE PUNCH-UP\n' + cap(ADDON_04_DIALOGUE_PUNCHUP, 8000));
+    parts.push('## CHARACTER PRESSURE SYSTEM\n' + cap(ADDON_13_CHARACTER_PRESSURE, 7000));
+    parts.push('## TRANSITION ENGINE\n' + cap(ADDON_14_TRANSITION, 6000));
+    parts.push('## SHOW VS TELL\n' + cap(ADDON_19_SHOW_VS_TELL, 6000));
+    parts.push('## ACT ONE ARCHITECTURE\n' + cap(ACT_ONE, 7000));
+
+  // -- FALLBACK
   } else {
     parts.push('## ACT ONE ARCHITECTURE\n' + cap(ACT_ONE, 10000));
     parts.push('## ACT TWO ARCHITECTURE\n' + cap(ACT_TWO, 10000));

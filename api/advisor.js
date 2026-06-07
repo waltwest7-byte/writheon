@@ -1,3 +1,4 @@
+const { buildSystemPrompt } = require('./kb');
 const { checkRateLimit } = require('./lib/rateLimit');
 
 module.exports = async function handler(req, res) {
@@ -26,8 +27,21 @@ module.exports = async function handler(req, res) {
 
     if (!body.messages) return res.status(400).json({ error: 'Missing: messages' });
 
-    // Use Sonnet for advisor — quality matters for open-ended development conversation
-    const payload = { ...body, model: 'claude-sonnet-4-6' };
+    // Build system prompt from full kb.js — advisor mode includes all three acts,
+    // concept, narrative, character activation/psychology, dialogue, dev exec frameworks
+    const system = buildSystemPrompt({
+      mode: 'advisor',
+      genre: body.genre || '',
+      voice: body.voice || '',
+      title: body.title || ''
+    });
+
+    const payload = {
+      model: 'claude-sonnet-4-6',
+      max_tokens: body.max_tokens || 4000,
+      system,
+      messages: body.messages
+    };
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',

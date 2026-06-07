@@ -952,9 +952,9 @@ CITE: mention the film/source when using web results.
   // Use claude-haiku-4-5-20251001 for all queries — web search disabled until
   // a supported model is confirmed. The 26-Add-On KB covers framework questions.
   const requestBody = {
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 1000,
-    system: KNOWLEDGE_BASE + '\n\n' + contextBlock,
+    max_tokens: 4000,
+    genre: '',
+    voice: '',
     messages: apiMessages
   };
 

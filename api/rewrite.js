@@ -1,3 +1,4 @@
+const { buildSystemPrompt } = require('./kb');
 const { checkRateLimit } = require('./lib/rateLimit');
 
 module.exports = async function handler(req, res) {
@@ -26,8 +27,21 @@ module.exports = async function handler(req, res) {
 
     if (!body.messages) return res.status(400).json({ error: 'Missing: messages' });
 
-    // Use haiku for rewrite — structured JSON output, speed matters
-    const payload = { ...body, model: 'claude-haiku-4-5-20251001', max_tokens: body.max_tokens || 2000 };
+    // Build system prompt from full kb.js — rewrite mode includes scene diagnostic,
+    // beat engine, dialogue punch-up, character pressure, transition, show-vs-tell
+    const system = buildSystemPrompt({
+      mode: 'rewrite',
+      genre: body.genre || '',
+      voice: body.voice || '',
+      title: body.title || ''
+    });
+
+    const payload = {
+      model: 'claude-sonnet-4-6',
+      max_tokens: body.max_tokens || 3000,
+      system,
+      messages: body.messages
+    };
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -41,7 +55,7 @@ module.exports = async function handler(req, res) {
 
     const data = await response.json();
     if (!response.ok) {
-      console.error('[rewrite] Anthropic error', response.status, JSON.stringify(data).substring(0,200));
+      console.error('[rewrite] Anthropic error', response.status, JSON.stringify(data).substring(0, 200));
     }
 
     return res.status(response.status).json(data);
