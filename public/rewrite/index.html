@@ -352,6 +352,7 @@ let rewriteMode = 'precision';
 let currentResult = null;
 let isPro = false;
 let rewriteCount = 0;
+let rewritePass = 0;
 const FREE_LIMIT = 2;
 
 const REWRITE_MODES = {
@@ -453,13 +454,14 @@ REWRITE PRINCIPLES:
       body: JSON.stringify({
         max_tokens: 3000,
         genre: '',
-        messages: [{ role: 'user', content: 'REWRITE MODE: ' + REWRITE_MODES[rewriteMode].name + '
-FOCUS: ' + getFocusAreas().join(', ') + '
-
-Rewrite this scene. Return ONLY valid JSON with fields: rewrite, changes (array), diagnostics (array), scoreBefore, scoreAfter, verdict, improvement.
-
-SCENE:
-' + text.substring(0, 3500) }]
+        messages: [{ role: 'user', content:
+          'REWRITE MODE: ' + REWRITE_MODES[rewriteMode].name +
+          (rewritePass > 0 ? ' [Pass ' + (rewritePass + 1) + ']' : '') + '\n' +
+          'FOCUS AREAS: ' + (getFocusAreas().length ? getFocusAreas().join(', ') : 'All') + '\n\n' +
+          'Return ONLY valid JSON: {"rewrite":"full rewritten scene","changes":[{"type":"structure|pressure|dialogue|character","original":"line","rewritten":"new version","reason":"why"}],"diagnostics":[{"category":"Structure|Pressure|Dialogue|Character","finding":"observation","recommendation":"note"}],"scoreBefore":40-85,"scoreAfter":"scoreBefore+8to18","verdict":"one sentence","improvement":"one sentence"}\n\n' +
+          'PRINCIPLES: Never invent plot points. Preserve writer voice.\n\n' +
+          'SCENE:\n' + text.substring(0, 3500)
+        }]
       })
     });
 
@@ -476,6 +478,7 @@ SCENE:
     const result = JSON.parse(jsonMatch[0]);
 
     rewriteCount++;
+    rewritePass++;
     currentResult = { ...result, original: text };
     saveState();
     renderResult(result, text);
@@ -536,9 +539,22 @@ function renderResult(r, original) {
       <div class="sd-after"><div class="sd-num" style="color:${aColor}">${after}</div><div class="sd-label">After Rewrite</div></div>
     </div>
     <div class="sd-delta" style="text-align:center;font-family:'DM Mono',monospace;font-size:14px;font-weight:400;letter-spacing:.1em;color:var(--green)">+${delta} points estimated</div>
-    <div style="margin-top:24px;font-family:'DM Mono',monospace;font-size:10px;font-weight:300;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;text-align:center">Score estimates based on structural improvement analysis — not a guarantee of coverage outcome</div>`;
+    <div style="margin-top:24px;font-family:'DM Mono',monospace;font-size:10px;font-weight:300;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;text-align:center">Score estimates based on structural improvement analysis — not a guarantee of coverage outcome</div>
+    <div style="margin-top:32px;text-align:center">
+      <button onclick="refineRewrite()" style="font-family:'DM Mono',monospace;font-size:10px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);background:none;border:1px solid var(--gold);padding:12px 28px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='var(--gold)';this.style.color='var(--black)'" onmouseout="this.style.background='none';this.style.color='var(--gold)'">Refine This Rewrite →</button>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;font-weight:300;letter-spacing:.08em;color:var(--dim);margin-top:10px">Loads rewrite into input for another pass</div>
+    </div>`;
 
   updateTierBadge();
+}
+
+// ── ITERATE / REFINE ─────────────────────────────────────
+function refineRewrite() {
+  if (!currentResult || !currentResult.rewrite) { showToast('No rewrite to refine'); return; }
+  document.getElementById('sceneInput').value = currentResult.rewrite;
+  updateChar();
+  document.getElementById('sceneInput').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  showToast('Rewrite loaded into input — adjust mode or focus and run again');
 }
 
 // ── TABS ──────────────────────────────────────────────────
