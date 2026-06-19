@@ -9914,14 +9914,21 @@ Provide a complete Writheon diagnostic across all layers:
 Return a complete prioritized rewrite roadmap.`,
 
   first10: `MODE: FIRST 10 PAGES DIAGNOSTIC
-Assess exclusively the first 10 pages. Diagnose:
-- Is the protagonist's WOUND visible in behavior within the first 3 pages (shown, not stated)?
-- Is the OPENING IMAGE a thesis statement?
-- Is the NARRATIVE ENGINE type identifiable from these pages alone?
-- Is the THEME STATED present by page 5?
-- Is the world established through pressure, not description?
-- Is the protagonist active or reactive?
-FAILURE MODE CHECK: Does the script open with weather, alarm clocks, or protagonist waking up? State announcements? Protagonist described rather than revealed?`,
+Assess exclusively the first 10 pages. Run each diagnostic in order:
+
+1. OPENING IMAGE — Is it a visual thesis statement containing the protagonist's wound? Could it be swapped with the Final Image without anyone noticing? If yes — the Opening Image has failed.
+
+2. WOUND ESTABLISHMENT — Is the protagonist's wound visible in behavior within the first 3 pages? Shown through action, not announced through dialogue? Name the specific belief the wound creates.
+
+3. THEME STATED — By page 5, does a character (not the protagonist) state the film's thesis as a dramatic question? Quote the exact line if present. If absent, flag it as a structural failure. Diagnose: (a) Does the protagonist disagree with or dismiss it? (b) Is it planted as information or as a question? (c) Does it name the belief the story will spend 110 pages dismantling? The Theme Stated is the Moral Engine question in spoken form — it must be a dramatic question, not a compliment.
+
+4. NARRATIVE ENGINE — Which of the 8 engines is running: Pursuit / Mystery / Ticking Clock / Relationship / Survival / Corruption / Revenge / Collapse? If it cannot be identified by page 10, that is a diagnostic finding.
+
+5. CATALYST QUALITY — Does the inciting incident arrive from outside the protagonist? Is it irreversible? Does it specifically contact the wound named in step 2?
+
+6. PROTAGONIST ACTIVATION — Is the protagonist active or reactive? Is the wound driving behavior or is the protagonist waiting for plot to happen to them?
+
+FAILURE MODE CHECK: Weather / alarm clock / protagonist waking up / state announcements / protagonist described rather than revealed / no Theme Stated by page 5 / Theme Stated is a compliment not a dramatic question.`,
 
   rewrite: `MODE: REWRITE
 Apply the Writheon standard for every passage:
